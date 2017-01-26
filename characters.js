@@ -115,6 +115,8 @@ function CharacterPC(game, spritesheet) {
     this.x = 0;
     this.y = 0;
     this.speed = 110;
+    this.deltaCenterX = 60;
+    this.deltaCenterY = 60;
     this.game = game;
     this.ctx = game.ctx;
 	

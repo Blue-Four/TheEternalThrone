@@ -51,46 +51,18 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("click", function (e) {
         that.click = getXandY(e);
 		that.mouse_clicked_left = true;
-        console.log(e);
-        console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
     }, false);
 
     this.ctx.canvas.addEventListener("contextmenu", function (e) {
         that.click = getXandY(e);
 		that.mouse_clicked_right = true;
-        console.log(e);
-        console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
         e.preventDefault();
     }, false);
 
-    this.ctx.canvas.addEventListener("mousemove", function (e) {
-        //console.log(e);
-        that.mouse = getXandY(e);
-    }, false);
-
-    this.ctx.canvas.addEventListener("mousewheel", function (e) {
-        console.log(e);
-        that.wheel = e;
-        console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
-    }, false);
-
-    this.ctx.canvas.addEventListener("keydown", function (e) {
-        console.log(e);
-        console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
-    }, false);
-
     this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (e.code === "KeyD") that.d = true;
-        that.chars[e.code] = true;
-        console.log(e);
-        console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
+        if (e.code === "KeyZ") SpawnZombie(800, 600);
     }, false);
-
-    this.ctx.canvas.addEventListener("keyup", function (e) {
-        console.log(e);
-        console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
-    }, false);
-
+    
     console.log('Input started');
 }
 
@@ -161,7 +133,7 @@ Entity.prototype.draw = function (ctx) {
     }
 }
 
-Entity.prototype.rotateAndCache = function (image, angle) {
+/*Entity.prototype.rotateAndCache = function (image, angle) {
     var offscreenCanvas = document.createElement('canvas');
     var size = Math.max(image.width, image.height);
     offscreenCanvas.width = size;
@@ -176,4 +148,4 @@ Entity.prototype.rotateAndCache = function (image, angle) {
     //offscreenCtx.strokeStyle = "red";
     //offscreenCtx.strokeRect(0,0,size,size);
     return offscreenCanvas;
-}
+}*/

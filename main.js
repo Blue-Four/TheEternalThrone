@@ -3,6 +3,7 @@ var AM = new AssetManager();
 // Begin download queue.
 AM.queueDownload("./img/background.jpg");
 AM.queueDownload("./img/barbarian_spritesheet.png");
+AM.queueDownload("./img/zombie.png");
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
@@ -19,7 +20,10 @@ AM.downloadAll(function () {
 	barbarianPC.x = 200;
 	barbarianPC.y = 200;
     gameEngine.addEntity(barbarianPC);
-	
+
+    var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"));
+    gameEngine.addEntity(zombie);
+
     console.log("All Done!");
 	
 });
