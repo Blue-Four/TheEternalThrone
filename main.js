@@ -21,9 +21,10 @@ AM.downloadAll(function () {
 	barbarianPC.y = 200;
     gameEngine.addEntity(barbarianPC);
 
-    var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"));
-    gameEngine.addEntity(zombie);
-
+    for(var i = 0; i <= 10; i++) {
+        var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"));
+         gameEngine.addEntity(zombie);
+    }
     console.log("All Done!");
 	
 });
