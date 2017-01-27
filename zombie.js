@@ -1,3 +1,11 @@
+"use strict";
+//var AM = new AssetManager();
+//var gameEngine;
+//var ctx;
+var zombies = [];
+var debugDraw = false;
+//var animations = [];
+
 //set which frame to start from and number of frames to select set to animate 
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, 
                     loop, scale, startFrame) {
@@ -12,9 +20,7 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.loop = loop;
     this.scale = scale;
     this.startFrame = startFrame;
-    this.facing = 0;
-    this.state = 0;
-    this.state_switched = false;
+    this.animations = [];
 }
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y) {
@@ -38,112 +44,134 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y) {
 };
 
 Animation.prototype.currentFrame = function () {
-	if	(this.state_switched === true) {
-		this.state_switched = false;
-		return 0;
-	} else {
-		return Math.floor(this.elapsedTime / this.frameDuration);	
-	}	
+    return Math.floor(this.elapsedTime / this.frameDuration);
 }
 
 Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+//get distance between two collision radiis
+function distance(a, b) {
+    var dx = (a.collX) - (b.collX);
+    var dy = (a.collY) - (b.collY);
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
-function Zombie(game, spritesheet, x, y) {
-	/*
-	    4
-	  3   5
-	2       6
-	  1   7
-	    0
-	*/
+function SpawnZombie(canvasW, canvasH, gameEngine) {
+    var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"));
+/*    ZombieDirection(zombie);
+    zombie.x = Math.floor(Math.random() * canvasW);
+    zombie.y = Math.floor(Math.random() * canvasH);
+    zombie.speed = Math.floor(Math.random() * (100) + 60);*/
+    //console.log("X  and Y Coord:" + zombie.x + ", " zombie.y);
+    //console.log("Zombie direction/speed: " + zombie.direction + "/" + zombie.speed);
+    gameEngine.addEntity(zombie);
+}
+
+function ZombieDirection(zombie) {
+    var dir = Math.floor(Math.random() * (4));
+    switch(dir) {
+        case 0:
+            zombie.direction = 'u';
+            zombie.animation = zombie.animations['upW'];
+            break;
+        case 1:
+            zombie.direction = 'r';
+            zombie.animation = zombie.animations['rightW'];
+            break;
+        case 2:
+            zombie.direction = 'd';
+            zombie.animation = zombie.animations['downW'];
+            break;
+        case 3:
+            zombie.direction = 'l';
+            zombie.animation = zombie.animations['leftW'];
+            break;
+        default:
+            console.log("ZombieDirection Error");
+
+    }
+}
+
+function SwitchDirections() {
+    for(var i = 0; i < zombies.length; i++) {
+        ZombieDirection(zombies[i]);
+    }
+}
+
+function Zombie(game, spritesheet) {
     this.animations = [];
-    //walking animations
-    this.animations['dir4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 76);
-    this.animations['dir0'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 220);
-    this.animations['dir2'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 4);
-    this.animations['dir6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 148);
-    this.animations['dir3'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 40);
-    this.animations['dir5'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 112);
-    this.animations['dir7'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 184);
-    this.animations['dir1'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 256);
+    this.animations['upW'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 1, 76);
+    this.animations['downW'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 1, 220);
+    this.animations['leftW'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 1, 4);
+    this.animations['rightW'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 1, 148);
 
-    //idle animations
-    this.animations['idle0'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 216);
-    this.animations['idle1'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 252);
-    this.animations['idle2'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 0);
-    this.animations['idle3'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 36);
-    this.animations['idle4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 72);
-    this.animations['idle5'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 108);
-    this.animations['idle6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 144);
-    this.animations['idle7'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 180);
+    this.animations['upDeath'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 99);
+    this.animations['downDeath'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 243);
+    this.animations['leftDeath'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 27);
+    this.animations['rightDeath'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 171);
 
-/*    //death animations
-    this.animations['death4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 99);
-    this.animations['death0'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 243);
-    this.animations['death2'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 27);
-    this.animations['death6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 171);*/
+    ZombieDirection(this);
+    this.x = Math.floor(Math.random() * 800);
+    this.y = Math.floor(Math.random() * 600);
+    this.speed = Math.floor(Math.random() * (100) + 60);
 
-    this.x = x;
-    this.y = y;
-    this.animation = this.animations['idle0'];
-    this.speed = 110;
+    this.radius = 16;
+    this.deltaCenterX = 64;
+    this.deltaCenterY = 80;
+    this.health = 20;
     this.game = game;
     this.ctx = game.ctx;
-	
-	// Movement
-	this.is_moving = false;
-	this.desired_x = x + 64;
-	this.desired_y = y + 64;
-	
+}
+
+Zombie.prototype = new Entity();
+Zombie.prototype.constructor = Zombie;
+Zombie.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
+};
+
+Zombie.prototype.playDeathAnimation = function (direction) {
+    if(direction === 'r') this.animation = this.animations['rightDeath'];
+    if(direction === 'l') this.animation = this.animations['leftDeath'];
+    if(direction === 'u') this.animation = this.animations['upDeath'];
+    if(direction === 'd') this.animation = this.animations['downDeath'];
+};
+
+Zombie.prototype.update = function () {
+    this.collX = this.x + this.deltaCenterX;
+    this.collY = this.y + this.deltaCenterY;
+
+    for(var i = 0; i < zombies.length; i++) {
+        var ent = zombies[i];
+        if(ent != this && this.collide(ent) && ent.health > 0) {
+            ZombieDirection(ent);
+            ent.health--;
+            this.health--;
+            console.log("Health: " + this.health);
+        }
+    }
+    if(this.health <= 0) {
+        this.playDeathAnimation(this.direction);
+    } else {
+        if(this.direction === 'r') this.x += this.game.clockTick * this.speed;
+        if(this.direction === 'l') this.x -= this.game.clockTick * this.speed;
+        if(this.direction === 'u') this.y -= this.game.clockTick * this.speed;
+        if(this.direction === 'd') this.y += this.game.clockTick * this.speed;
+    }
+/*    if(this.direction === 'r') this.x += this.game.clockTick * this.speed;
+    if(this.direction === 'l') this.x -= this.game.clockTick * this.speed;
+    if(this.direction === 'u') this.y -= this.game.clockTick * this.speed;
+    if(this.direction === 'd') this.y += this.game.clockTick * this.speed;*/
+    //have zombie wrap around to other side of canvas when it walks off the screen 
+    if (this.x > 804) this.x = -128;
+     else if (this.x < -128) this.x = 804;
+    if (this.y > 664) this.y = -128;
+     else if (this.y < -128) this.y = 600;
+    Entity.prototype.update.call(this);
 }
 
 Zombie.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-}
-
-Zombie.prototype.update = function () {
-	zombieMovement(this);
-	
-}
-
-
-//handle zombie movement, adapted from handleMovement
-function zombieMovement(character) {
-	if	(character.is_moving === true) {
-		var frameHalfSize = (character.animation.frameWidth / 2);
-		var desired_movement_arc = calculateMovementArc(character.x + frameHalfSize, character.y + frameHalfSize,
-											character.desired_x, character.desired_y);
-		if	(Math.abs(character.x + frameHalfSize - character.desired_x) < 1 &&
-			 Math.abs(character.y + frameHalfSize - character.desired_y) < 1) {
-			character.x = character.desired_x - frameHalfSize;
-			character.y = character.desired_y - frameHalfSize;
-			var idle = "idle" + desired_movement_arc;
-			character.animation = character.animations[idle];
-			character.is_moving = false;
-			character.animation.state_switched = true;
-			
-		} else {
-			character.animation.state = 1;
-		
-			if	(desired_movement_arc !== character.animation.facing) {
-				character.animation.state_switched = true;
-				var dir = "dir" + desired_movement_arc;
-				character.animation = character.animations[dir];
-				character.animation.facing = desired_movement_arc;
-				
-			}
-			
-			var direction = Math.atan2(character.desired_y - (character.y + frameHalfSize),
-										character.desired_x - (character.x + frameHalfSize));
-			
-			character.x += character.game.clockTick * character.speed * Math.cos(direction);
-			character.y += character.game.clockTick * character.speed * Math.sin(direction) / 2;
-			
-		}
-	
-	}
-	
+    Entity.prototype.draw.call(this);
 }
