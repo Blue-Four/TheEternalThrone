@@ -13,6 +13,6 @@ function apply_AI_Wander(character) {
 		}
 	
 			
-	}, 5000);
+	}, 5000 + (Math.floor(Math.random() * 2000) - 1000));
 	
 }
