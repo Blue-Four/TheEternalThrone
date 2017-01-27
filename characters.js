@@ -1,26 +1,26 @@
 function AnimationCharacter(spriteSheet, frameSize, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
 	
-	// Caches a reversed version of the sprite-sheet, for animations facing from north-east to south-east.
-    var offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = frameSize * 15;
-    offscreenCanvas.height = frameSize * 25;
-    var offscreenCtx = offscreenCanvas.getContext('2d');
-    offscreenCtx.save();
-	offscreenCtx.scale(-1, 1);
-    offscreenCtx.drawImage(spriteSheet, frameSize * -15, 0);
-    offscreenCtx.restore();
-    this.spriteSheetReversed = offscreenCanvas;
-	
-    this.frameSize = frameSize;
+	this.sheetWidth = frameSize * frames * 5;
+	this.sheetHeight = frameSize * 5;
+	this.frameSize = frameSize;
     this.frameDuration = frameDuration;
-	this.sheetWidth = frameSize * 15;
-	this.sheetHeight = frameSize * 25;
-    this.frames = frames;
     this.totalTime = frameDuration * frames;
     this.elapsedTime = 0;
     this.loop = loop;
     this.scale = scale;
+	this.frames_state = [frames, frames, frames, frames, 1];
+	
+	// Caches a reversed version of the sprite-sheet, for animations facing from north-east to south-east.
+    var offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = this.sheetWidth;
+    offscreenCanvas.height = this.sheetHeight;
+    var offscreenCtx = offscreenCanvas.getContext('2d');
+    offscreenCtx.save();
+	offscreenCtx.scale(-1, 1);
+    offscreenCtx.drawImage(spriteSheet, 0 - this.sheetWidth, 0);
+    offscreenCtx.restore();
+    this.spriteSheetReversed = offscreenCanvas;
 	
 	/*
 	    4
@@ -48,13 +48,9 @@ function AnimationCharacter(spriteSheet, frameSize, frameDuration, frames, loop,
 AnimationCharacter.prototype.drawFrame = function (tick, ctx, x, y) {
     this.elapsedTime += tick;
     if (this.isDone()) {
-        if (this.loop) this.elapsedTime = 0;
-    }
-	
-    var frame = this.currentFrame();
-    var source_x = 0;
-    var source_y = 0;
-	source_x = frame * this.frameSize;
+		if 	(this.loop) this.elapsedTime = 0;
+		if	(this.state === 3) { this.state = 4; }
+	}
 	
 	/*
 	    4
@@ -68,25 +64,28 @@ AnimationCharacter.prototype.drawFrame = function (tick, ctx, x, y) {
 	var direction = this.facing;
 	if	(direction > 4) { direction = direction - (2 * (direction - 4)); }
 
-	source_y = (direction * this.frameSize) + (this.state * this.frameSize * 5);
-
+	var frame = this.currentFrame();
+    var source_x = 0;
+    var source_y = 0;
+	
+	source_x = (frame + (this.frames_state[this.state] * direction)) * this.frameSize;
+	source_y = this.frameSize * this.state;	
+	
+	// Set up to pull from the reversed sprite-sheet if the character is facing
+	// directions North-east to South-east.
 	if	(this.facing < 5) {
-		ctx.drawImage(this.spriteSheet,
-			 source_x, source_y,  // Source from the sprite sheet.
-			 this.frameSize, this.frameSize,
-			 x, y,
-			 this.frameSize * this.scale,
-			 this.frameSize * this.scale);
-		
-	} else {		
-		ctx.drawImage(this.spriteSheetReversed,
-			 (14 * this.frameSize) - source_x, source_y,  // Source from the sprite sheet.
-			 this.frameSize, this.frameSize,
-			 x, y,
-			 this.frameSize * this.scale,
-			 this.frameSize * this.scale);
-		
+		sourceImage = this.spriteSheet;
+	} else {
+		sourceImage = this.spriteSheetReversed;
+		source_x = this.sheetWidth - source_x - this.frameSize;
 	}
+	
+	ctx.drawImage(sourceImage,
+		 source_x, source_y,  // Source from the sprite sheet.
+		 this.frameSize, this.frameSize,
+		 x, y,
+		 this.frameSize * this.scale,
+		 this.frameSize * this.scale);
 
 				 
 }
@@ -105,25 +104,25 @@ AnimationCharacter.prototype.currentFrame = function () {
 }
 
 AnimationCharacter.prototype.isDone = function () {
-    return (this.elapsedTime >= this.totalTime);
+    return (this.elapsedTime >= this.frameDuration * this.frames_state[this.state]);
 }
 
 
 // Basic PC
-function CharacterPC(game, spritesheet) {
+function CharacterPC(game, spritesheet, x, y) {
     this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, 1);
-    this.x = 0;
-    this.y = 0;
+    this.x = x;
+    this.y = y;
     this.speed = 110;
-    this.deltaCenterX = 60;
-    this.deltaCenterY = 60;
     this.game = game;
     this.ctx = game.ctx;
+    this.deltaCenterX = x + 60;
+    this.deltaCenterY = y + 60;
 	
 	// Movement
 	this.is_moving = false;
-	this.desired_x = 60;
-	this.desired_y = 60;
+	this.desired_x = x + 60;
+	this.desired_y = y + 60;
 	
 }
 
@@ -141,6 +140,51 @@ CharacterPC.prototype.update = function () {
 		this.game.mouse_clicked_right = false;
 		
 	}
+	
+	if	(this.game.mouse_clicked_left) {
+		
+		this.animation.state = 3;
+		this.state_switched = true;
+		
+		this.game.mouse_clicked_left = false;
+		
+	}
+	
+	handleMovement(this);
+	
+}
+
+
+
+// ====================================
+//            E N E M I E S
+// ====================================
+
+// Enemy Melee Skeleton
+function Enemy_Skeleton_Melee(game, spritesheet, x, y) {
+    this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, 1);
+	this.animation.frames_state[0] = 7;
+	this.animation.frames_state[2] = 10;
+	this.animation.frames_state[3] = 10;
+	this.animation.frames_state[4] = 1;
+    this.x = x;
+    this.y = y;
+    this.speed = 110;
+    this.game = game;
+    this.ctx = game.ctx;
+	
+	// Movement
+	this.is_moving = false;
+	this.desired_x = x + 60;
+	this.desired_y = y + 60;
+	
+}
+
+Enemy_Skeleton_Melee.prototype.draw = function () {
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+}
+
+Enemy_Skeleton_Melee.prototype.update = function () {
 	handleMovement(this);
 	
 }
@@ -225,3 +269,8 @@ Character.prototype.update = function () {
 	
 }
 */
+
+function killCharacter(character) {
+	
+	
+} 
