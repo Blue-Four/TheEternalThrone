@@ -23,6 +23,11 @@ AM.downloadAll(function () {
     gameEngine.addEntity(swordyMcSwordface);
 	apply_AI_Wander(swordyMcSwordface);
 	
+	for(var i = 0; i <= 10; i++) {
+		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"));
+		gameEngine.addEntity(zombie);
+	}
+	
     console.log("All Done!");
 	
 });
