@@ -4,6 +4,7 @@ var AM = new AssetManager();
 AM.queueDownload("./img/background.jpg");
 AM.queueDownload("./img/barbarian_spritesheet.png");
 AM.queueDownload("./img/skeleton_spritesheet.png");
+AM.queueDownload("./img/zombie.png");
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
