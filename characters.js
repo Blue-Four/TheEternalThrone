@@ -166,12 +166,13 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y) {
 	this.animation.frames_state[0] = 7;
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
-	this.animation.frames_state[4] = 1;
     this.x = x;
     this.y = y;
     this.speed = 110;
     this.game = game;
-    this.ctx = game.ctx;
+    this.ctx = game.ctx;	
+    this.deltaCenterX = x + 60;
+    this.deltaCenterY = y + 60;
 	
 	// Movement
 	this.is_moving = false;
@@ -190,7 +191,43 @@ Enemy_Skeleton_Melee.prototype.update = function () {
 }
 
 
-// Shared functionality
+// ====================================
+//             A L L I E S
+// ====================================
+
+
+// Basic Villager
+function Ally_Villager(game, spritesheet, x, y) {
+    this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, 1);
+    this.x = x;
+    this.y = y;
+    this.speed = 110;
+    this.game = game;
+    this.ctx = game.ctx;
+	this.deltaCenterX = x + 60;
+    this.deltaCenterY = y + 60;
+	
+	// Movement
+	this.is_moving = false;
+	this.desired_x = x + 60;
+	this.desired_y = y + 60;
+	
+}
+
+Ally_Villager.prototype.draw = function () {
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+}
+
+Ally_Villager.prototype.update = function () {
+	handleMovement(this);
+	
+}
+
+
+// ====================================
+//   S H A R E D   F U N C T I O N S
+// ====================================
+
 
 // Handles movement for all Characters. Should be called from the Character.update() function.
 function handleMovement(character) {
