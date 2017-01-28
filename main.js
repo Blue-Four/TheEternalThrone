@@ -18,10 +18,10 @@ AM.downloadAll(function () {
 	var background = new Background(gameEngine, AM.getAsset("./img/background.jpg"));
     gameEngine.addEntity(background);
 
-	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 200, 200);
+	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 200, 200, 60, 110, 1);
     gameEngine.addEntity(barbarianPC);
 	
-	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200);
+	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 60, 110, 1);
     gameEngine.addEntity(missDemeanor);
 	apply_AI_Wander(missDemeanor);
 	
@@ -37,9 +37,17 @@ AM.downloadAll(function () {
 	for(var i = 0; i < 4; i++) {
 		rX = Math.floor(Math.random() * 800);
    		rY = Math.floor(Math.random() * 600);
-		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), rX, rY);
+		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), rX, rY, 60, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
 		apply_AI_Wander(swordyMcSwordface);
+	}
+
+	for(var i = 0; i < 2; i++) {
+		rX = Math.floor(Math.random() * 800);
+   		rY = Math.floor(Math.random() * 600);
+		var largeMcSwordface = new Large_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), rX, rY, 60, 25, 2);
+	    gameEngine.addEntity(largeMcSwordface);
+	    apply_AI_Wander(largeMcSwordface);
 	}
 
     console.log("All Done!");
