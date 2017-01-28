@@ -110,7 +110,7 @@ AnimationCharacter.prototype.isDone = function () {
 
 // Basic Sprite
 function BasicSprite(game, spritesheet, x, y, offset, speed, scale) {
-	this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, scale);
+	this.animation = new AnimationCharacter(spritesheet, 120, 0.1, 15, true, scale);
     this.x = x;
     this.y = y;
     this.speed = speed;
