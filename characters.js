@@ -108,27 +108,38 @@ AnimationCharacter.prototype.isDone = function () {
 }
 
 
-// Basic PC
-function CharacterPC(game, spritesheet, x, y) {
-    this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, 1);
+// Basic Sprite
+function BasicSprite(game, spritesheet, x, y, offset, speed, scale) {
+	this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, scale);
     this.x = x;
     this.y = y;
-    this.speed = 110;
+    this.speed = speed;
     this.game = game;
     this.ctx = game.ctx;
-    this.deltaCenterX = x + 60;
-    this.deltaCenterY = y + 60;
+    this.deltaCenterX = x + offset;
+    this.deltaCenterY = y + offset;
 	
 	// Movement
 	this.is_moving = false;
-	this.desired_x = x + 60;
-	this.desired_y = y + 60;
-	
+	this.desired_x = x + offset;
+	this.desired_y = y + offset;
 }
 
-CharacterPC.prototype.draw = function () {
+BasicSprite.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
 }
+
+BasicSprite.prototype.update = function () {
+	handleMovement(this);
+}
+
+// PC
+function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+}
+
+CharacterPC.prototype = Object.create(BasicSprite.prototype);
+CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
 	if	(this.game.mouse_clicked_right) {
@@ -161,34 +172,27 @@ CharacterPC.prototype.update = function () {
 // ====================================
 
 // Enemy Melee Skeleton
-function Enemy_Skeleton_Melee(game, spritesheet, x, y) {
-    this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, 1);
+function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
 	this.animation.frames_state[0] = 7;
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
-    this.x = x;
-    this.y = y;
-    this.speed = 110;
-    this.game = game;
-    this.ctx = game.ctx;	
-    this.deltaCenterX = x + 60;
-    this.deltaCenterY = y + 60;
-	
-	// Movement
-	this.is_moving = false;
-	this.desired_x = x + 60;
-	this.desired_y = y + 60;
-	
 }
 
-Enemy_Skeleton_Melee.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
+Enemy_Skeleton_Melee.prototype.constructor = BasicSprite;
+
+// Enemy Large Melee Skeleton
+function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+	this.animation.frames_state[0] = 7;
+	this.animation.frames_state[2] = 10;
+	this.animation.frames_state[3] = 10;
 }
 
-Enemy_Skeleton_Melee.prototype.update = function () {
-	handleMovement(this);
-	
-}
+Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
+Large_Skeleton_Melee.prototype.constructor = BasicSprite;
+
 
 
 // ====================================
@@ -197,31 +201,12 @@ Enemy_Skeleton_Melee.prototype.update = function () {
 
 
 // Basic Villager
-function Ally_Villager(game, spritesheet, x, y) {
-    this.animation = new AnimationCharacter(spritesheet, 120, 0.05, 15, true, 1);
-    this.x = x;
-    this.y = y;
-    this.speed = 110;
-    this.game = game;
-    this.ctx = game.ctx;
-	this.deltaCenterX = x + 60;
-    this.deltaCenterY = y + 60;
-	
-	// Movement
-	this.is_moving = false;
-	this.desired_x = x + 60;
-	this.desired_y = y + 60;
-	
+function Ally_Villager(game, spritesheet, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
 }
 
-Ally_Villager.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-}
-
-Ally_Villager.prototype.update = function () {
-	handleMovement(this);
-	
-}
+Ally_Villager.prototype = Object.create(BasicSprite.prototype);
+Ally_Villager.prototype.constructor = BasicSprite;
 
 
 // ====================================
