@@ -105,6 +105,10 @@ GameEngine.prototype.draw = function () {
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.ctx);
     }
+    this.ctx.font = "bold 16px Arial";
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("L-Click: Death Animation", 600, 20);
+    this.ctx.fillText("R-Click: Move Player", 600, 36);
     this.ctx.restore();
 }
 
