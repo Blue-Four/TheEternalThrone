@@ -1,1 +1,1 @@
-# TheEternalThrone
+[Play Game!](./game.html)

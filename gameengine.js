@@ -9,7 +9,10 @@ window.requestAnimFrame = (function () {
             };
 })();
 
+<<<<<<< HEAD
 //user char array to keep track of keycodes, keycode will map into array of booleans
+=======
+>>>>>>> refs/remotes/origin/master
 function GameEngine() {
     this.entities = [];
     this.ctx = null;
@@ -18,8 +21,11 @@ function GameEngine() {
 }
 
 GameEngine.prototype.init = function (ctx) {
+<<<<<<< HEAD
     var space;
     this.chars = [];
+=======
+>>>>>>> refs/remotes/origin/master
     this.ctx = ctx;
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
@@ -44,12 +50,15 @@ GameEngine.prototype.startInput = function () {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
 
+<<<<<<< HEAD
         //use for gridlike layout (32 x 32 grid spaces  )
         if (x < 1024) {
             x = Math.floor(x / 32);
             y = Math.floor(y / 32);
         }
 
+=======
+>>>>>>> refs/remotes/origin/master
         return { x: x, y: y };
     }
 
@@ -58,6 +67,7 @@ GameEngine.prototype.startInput = function () {
     // event listeners are added here
 
     this.ctx.canvas.addEventListener("click", function (e) {
+<<<<<<< HEAD
         SpawnZombie(800, 700);
     }, false);
 
@@ -71,6 +81,22 @@ GameEngine.prototype.startInput = function () {
     }, false);
     
     /*
+=======
+        that.click = getXandY(e);
+		that.mouse_clicked_left = true;
+        console.log(e);
+        console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
+    }, false);
+
+    this.ctx.canvas.addEventListener("contextmenu", function (e) {
+        that.click = getXandY(e);
+		that.mouse_clicked_right = true;
+        console.log(e);
+        console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
+        e.preventDefault();
+    }, false);
+
+>>>>>>> refs/remotes/origin/master
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         //console.log(e);
         that.mouse = getXandY(e);
@@ -89,7 +115,10 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
         if (e.code === "KeyD") that.d = true;
+<<<<<<< HEAD
         if (e.code === "Space") that.space = true;
+=======
+>>>>>>> refs/remotes/origin/master
         that.chars[e.code] = true;
         console.log(e);
         console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
@@ -99,7 +128,11 @@ GameEngine.prototype.startInput = function () {
         console.log(e);
         console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
+<<<<<<< HEAD
 */
+=======
+
+>>>>>>> refs/remotes/origin/master
     console.log('Input started');
 }
 
@@ -115,9 +148,15 @@ GameEngine.prototype.draw = function () {
         this.entities[i].draw(this.ctx);
     }
     this.ctx.font = "bold 16px Arial";
+<<<<<<< HEAD
     this.ctx.fillText("L-Click: Spawn Zombie", 600, 20);
     this.ctx.fillText("R-Click: Change Direction", 600, 36);
     this.ctx.fillText("Num. of Zombies: " + this.entities.length, 600, 52);
+=======
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("L-Click: Death Animation", 600, 20);
+    this.ctx.fillText("R-Click: Move Player", 600, 36);
+>>>>>>> refs/remotes/origin/master
     this.ctx.restore();
 }
 
@@ -129,15 +168,27 @@ GameEngine.prototype.update = function () {
 
         entity.update();
     }
+<<<<<<< HEAD
+=======
+	
+	this.entities.sort(function (a, b) {
+		return a.y - b.y;
+		
+	});
+	
+>>>>>>> refs/remotes/origin/master
 }
 
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
     this.draw();
+<<<<<<< HEAD
     //update event variables to false after update() is called and entities have had a chance to
     //detect key events 
     //this.space = false;
+=======
+>>>>>>> refs/remotes/origin/master
 }
 
 function Timer() {
@@ -156,12 +207,19 @@ Timer.prototype.tick = function () {
     return gameDelta;
 }
 
+<<<<<<< HEAD
 function Entity(game, x, y, collX, collY) {
     this.game = game;
     this.x = x;
     this.collX;
     this.y = y;
     this.collY;
+=======
+function Entity(game, x, y) {
+    this.game = game;
+    this.x = x;
+    this.y = y;
+>>>>>>> refs/remotes/origin/master
     this.removeFromWorld = false;
 }
 
