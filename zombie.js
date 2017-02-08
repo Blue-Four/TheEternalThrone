@@ -101,7 +101,7 @@ function Zombie(game, spritesheet, x, y) {
 }
 
 Zombie.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x + this.game.x, this.y + this.game.y);
 }
 
 Zombie.prototype.update = function () {
