@@ -83,7 +83,7 @@ AnimationCharacter.prototype.drawFrame = function (tick, ctx, x, y) {
 	ctx.drawImage(sourceImage,
 		 source_x, source_y,  // Source from the sprite sheet.
 		 this.frameSize, this.frameSize,
-		 x, y,
+		 x - (this.frameSize / 2), y - (this.frameSize / 2),
 		 this.frameSize * this.scale,
 		 this.frameSize * this.scale);
 
@@ -109,24 +109,22 @@ AnimationCharacter.prototype.isDone = function () {
 
 
 // Basic Sprite
-function BasicSprite(game, spritesheet, x, y, offset, speed, scale) {
+function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.animation = new AnimationCharacter(spritesheet, 120, 0.1, 15, true, scale);
     this.x = x;
     this.y = y;
     this.speed = speed;
     this.game = game;
     this.ctx = game.ctx;
-    this.deltaCenterX = x + offset;
-    this.deltaCenterY = y + offset;
 	
 	// Movement
 	this.is_moving = false;
-	this.desired_x = x + offset;
-	this.desired_y = y + offset;
+	this.desired_x = x;
+	this.desired_y = y;
 }
 
 BasicSprite.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x + this.game.x, this.y + this.game.y);
 }
 
 BasicSprite.prototype.update = function () {
@@ -143,8 +141,8 @@ CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
 	if	(this.game.mouse_clicked_right) {
-		this.desired_x = this.game.click.x;
-		this.desired_y = this.game.click.y;
+		this.desired_x = this.game.rightclick.x - this.game.x;
+		this.desired_y = this.game.rightclick.y - this.game.y;
 		
 		this.is_moving = true;
 		
@@ -152,14 +150,8 @@ CharacterPC.prototype.update = function () {
 		
 	}
 	
-	if	(this.game.mouse_clicked_left) {
-		
-		this.animation.state = 3;
-		this.state_switched = true;
-		
-		this.game.mouse_clicked_left = false;
-		
-	}
+	this.game.x = SCREEN_WIDTH / 2 - this.x;
+	this.game.y = SCREEN_HEIGHT / 2 - this.y;
 	
 	handleMovement(this);
 	
@@ -217,11 +209,10 @@ Ally_Villager.prototype.constructor = BasicSprite;
 // Handles movement for all Characters. Should be called from the Character.update() function.
 function handleMovement(character) {
 	if	(character.is_moving === true) {
-		var frameHalfSize = (character.animation.frameSize / 2);
-		if	(Math.abs(character.x + frameHalfSize - character.desired_x) < 1 &&
-			 Math.abs(character.y + frameHalfSize - character.desired_y) < 1) {
-			character.x = character.desired_x - frameHalfSize;
-			character.y = character.desired_y - frameHalfSize;
+		if	(Math.abs(character.x - character.desired_x) < 1 &&
+			 Math.abs(character.y - character.desired_y) < 1) {
+			character.x = character.desired_x;
+			character.y = character.desired_y;
 			character.is_moving = false;
 			character.animation.state = 0;
 			character.animation.state_switched = true;
@@ -230,7 +221,7 @@ function handleMovement(character) {
 			character.animation.state = 1;
 			
 			// Tests to make sure the character is facing the appropriate direction.
-			var desired_movement_arc = calculateMovementArc(character.x + frameHalfSize, character.y + frameHalfSize,
+			var desired_movement_arc = calculateMovementArc(character.x, character.y,
 														character.desired_x, character.desired_y);
 			if	(desired_movement_arc !== character.animation.facing) {
 				character.animation.state_switched = true;
@@ -238,8 +229,8 @@ function handleMovement(character) {
 				
 			}
 			
-			var direction = Math.atan2(character.desired_y - (character.y + frameHalfSize),
-										character.desired_x - (character.x + frameHalfSize));
+			var direction = Math.atan2(character.desired_y - (character.y),
+										character.desired_x - (character.x));
 			
 			character.x += character.game.clockTick * character.speed * Math.cos(direction);
 			character.y += character.game.clockTick * character.speed * Math.sin(direction) / 2;
