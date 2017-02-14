@@ -10,10 +10,15 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 	// Convert tile sprite array to an array of Tile objects, and integrate tile logic.
 	for	(var iX = 0; iX < tile_sprite_array[0].length; iX++) {
 		for	(var iY = 0; iY < tile_sprite_array.length; iY++) {
+			// var tile_x = (tile_sprite_array.length - iY + iX - 2) * 30;
+			// var tile_y = (15 * (iX + iY));
+			
+			var tile_x = (iX - iY) * 30;
+			var tile_y = 15 * (iX + iY);
+			
 			var tile = new Tile(tile_sprite_array[iY][iX],
 								tile_logic[tile_sprite_array[iY][iX]],
-								(tile_sprite_array.length - iY + iX - 2) * 30, 
-								(15 * (iX + iY)));
+								tile_x, tile_y);
 				
 			this.array[iY][iX] = tile;
 			if	(tile.type === "TYPE_FLOOR") { this.floor.push(tile); }
@@ -37,9 +42,15 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 }
 
 Level.prototype.getTileFromPoint = function(x, y) {
-	var calculated_x = Math.round((x / 30 + (y / 15)) / 2 - 23);
-	var calculated_y = Math.round((y / 15 - (x / 30)) / 2 + 6);
-	console.log("(" + calculated_x + ", " + calculated_y + ")");	
+	var calculated_x = Math.round((x / 30 + y / 15) / 2);
+	var calculated_y = Math.round((y / 15 - (x / 30)) / 2);
+	
+	if	(calculated_y >= this.array.length || calculated_x >= this.array[0].length ||
+		 calculated_y < 0 || calculated_x < 0) {
+		return new Tile(null, "TYPE_WALL", x, y);
+	} else {
+		return this.array[calculated_y][calculated_x];
+	}
 }
 
 /*
@@ -59,8 +70,8 @@ function Tile(sprite_index, type, x, y) {
 }
 
 Tile.prototype.isCollision = function(x, y) {
-	var center_x = x + 60;
-	var center_y = y + 90;
+	var center_x = this.x + 60;
+	var center_y = this.y + 90;
 	
 	/*
 	 sector2 | sector1 

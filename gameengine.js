@@ -54,7 +54,8 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("click", function (e) {
         that.leftclick = getXandY(e);
 		that.mouse_clicked_left = true;
-		that.level.getTileFromPoint(that.leftclick.x, that.leftclick.y);
+		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
+		console.log("Tile Type = " + tile.type);
     }, false);
 	
 	this.ctx.canvas.addEventListener("mousedown", function (e) {
@@ -132,7 +133,7 @@ GameEngine.prototype.draw = function () {
 				this.ctx.drawImage(this.level.spritesheet,
 					120 * tile.sprite_index, 0,
 					120, 120,
-					tile.x + this.x, tile.y + this.y,
+					tile.x + this.x - 60, tile.y + this.y - 90,
 					120, 120);
 					
 		}
@@ -141,18 +142,19 @@ GameEngine.prototype.draw = function () {
 
 	var iWallCount = 0;
 	var iEntityCount = 0;
-	while	(true) {			
+	while	(true) {
 		if	(iEntityCount < this.entities.length && iWallCount < this.level.walls.length) {
 			var tile = this.level.walls[iWallCount];
 			var entity = this.entities[iEntityCount];
 			
-			if	(tile.y + 90 <= entity.y) {
+			if	(tile.y <= entity.y) {
+				// If this tile is within the bounds of the screen...
 				if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
 						&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
 					this.ctx.drawImage(this.level.spritesheet,
 								120 * tile.sprite_index, 0,
 								120, 120,
-								tile.x + this.x, tile.y + this.y,
+								tile.x + this.x - 60, tile.y + this.y - 90,
 								120, 120);
 								
 				}
@@ -171,14 +173,18 @@ GameEngine.prototype.draw = function () {
 			}
 			
 		} else if (iWallCount < this.level.walls.length && iEntityCount >= this.entities.length) {
+			var tile = this.level.walls[iWallCount];
+			
 			this.ctx.drawImage(this.level.spritesheet,
 								120 * tile.sprite_index, 0,
 								120, 120,
-								tile.x + this.x, tile.y + this.y,
+								tile.x + this.x - 60, tile.y + this.y - 90,
 								120, 120);
 			iWallCount++;	
 			
 		} else if (iWallCount >= this.level.walls.length && iEntityCount < this.entities.length) {
+			var entity = this.entities[iEntityCount];
+			
 			entity.draw(this.ctx);
 			iEntityCount++;	
 			

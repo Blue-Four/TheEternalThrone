@@ -21,7 +21,7 @@ AM.downloadAll(function () {
 	
     gameEngine.start();
 
-	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 200, 200, 175, 1);
+	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 100, 200, 175, 1);
     gameEngine.addEntity(barbarianPC);
 	
 	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 110, 1);

@@ -116,6 +116,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
     this.speed = speed;
     this.game = game;
     this.ctx = game.ctx;
+	this.collision_radius = 24;
 	
 	// Movement
 	this.is_moving = false;
@@ -129,7 +130,18 @@ BasicSprite.prototype.draw = function () {
 
 BasicSprite.prototype.update = function () {
 	handleMovement(this);
+	
 }
+
+// BasicSprite.prototype.getNearestBoundingPoint = function (x, y) {
+	// var point = Math.atan2(y - character.y, x - character.x);
+	
+	// var x_bound = Math.abs(this.x - this.collision_radius * Math.cos(direction));
+	// var y_bound = Math.abs(this.y - this.collision_radius * Math.sin(direction) / 2);
+	
+	// return array = [x_bound, y_bound];
+	
+// }
 
 // PC
 function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
@@ -141,10 +153,14 @@ CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
 	if	(this.game.mouse_clicked_right) {
-		this.desired_x = this.game.rightclick.x - this.game.x;
-		this.desired_y = this.game.rightclick.y - this.game.y;
+		var tile = this.game.level.getTileFromPoint(this.game.rightclick.x - this.game.x, this.game.rightclick.y - this.game.y);
+		if	(tile.type != "TYPE_WALL") {
+			this.desired_x = this.game.rightclick.x - this.game.x;
+			this.desired_y = this.game.rightclick.y - this.game.y;
 		
-		this.is_moving = true;
+			this.is_moving = true;
+			
+		}
 		
 		this.game.mouse_clicked_right = false;
 		
