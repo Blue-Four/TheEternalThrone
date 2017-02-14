@@ -18,6 +18,9 @@ function GameEngine() {
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
+	this.level = null;
+	this.x = 0;
+	this.y = 0;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -68,6 +71,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("click", function (e) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         SpawnZombie(800, 700);
     }, false);
 
@@ -83,23 +87,32 @@ GameEngine.prototype.startInput = function () {
     /*
 =======
         that.click = getXandY(e);
+=======
+        that.leftclick = getXandY(e);
+>>>>>>> refs/remotes/origin/master
 		that.mouse_clicked_left = true;
-        console.log(e);
-        console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
+		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
+		console.log("Tile Type = " + tile.type);
+    }, false);
+	
+	this.ctx.canvas.addEventListener("mousedown", function (e) {
+		that.mouse_down = true;
+		that.mouse_anchor = getXandY(e);
+    }, false);
+	
+	this.ctx.canvas.addEventListener("mouseup", function (e) {
+		that.mouse_down = false;
     }, false);
 
     this.ctx.canvas.addEventListener("contextmenu", function (e) {
-        that.click = getXandY(e);
+        that.rightclick = getXandY(e);
 		that.mouse_clicked_right = true;
-        console.log(e);
-        console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
         e.preventDefault();
     }, false);
 
 >>>>>>> refs/remotes/origin/master
     this.ctx.canvas.addEventListener("mousemove", function (e) {
-        //console.log(e);
-        that.mouse = getXandY(e);
+        that.mouse = getXandY(e);		
     }, false);
 
     this.ctx.canvas.addEventListener("mousewheel", function (e) {
@@ -114,12 +127,20 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
+<<<<<<< HEAD
         if (e.code === "KeyD") that.d = true;
 <<<<<<< HEAD
         if (e.code === "Space") that.space = true;
 =======
 >>>>>>> refs/remotes/origin/master
         that.chars[e.code] = true;
+=======
+		// var scrollSpeed = 5;
+        // if (e.code === "KeyW") that.y += scrollSpeed;
+		// if (e.code === "KeyA") that.x += scrollSpeed;
+		// if (e.code === "KeyS") that.y -= scrollSpeed;
+		// if (e.code === "KeyD") that.x -= scrollSpeed;
+>>>>>>> refs/remotes/origin/master
         console.log(e);
         console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
     }, false);
@@ -141,12 +162,90 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
+GameEngine.prototype.setLevel = function (level) {
+    console.log('set level');
+    this.level = level;
+}
+
 GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
-    this.ctx.save();
-    for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].draw(this.ctx);
-    }
+		
+	// Sort all entities by depth, so they can be drawn in the proper order.
+	this.entities.sort(function (a, b) {
+		return a.y - b.y;
+		
+	});
+
+	for	(var iFloorCount = 0; iFloorCount < this.level.floor.length; iFloorCount++) {
+		var tile = this.level.floor[iFloorCount];
+		
+		if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
+			&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
+				this.ctx.drawImage(this.level.spritesheet,
+					120 * tile.sprite_index, 0,
+					120, 120,
+					tile.x + this.x - 60, tile.y + this.y - 90,
+					120, 120);
+					
+		}
+		
+	}
+
+	var iWallCount = 0;
+	var iEntityCount = 0;
+	while	(true) {
+		if	(iEntityCount < this.entities.length && iWallCount < this.level.walls.length) {
+			var tile = this.level.walls[iWallCount];
+			var entity = this.entities[iEntityCount];
+			
+			if	(tile.y <= entity.y) {
+				// If this tile is within the bounds of the screen...
+				if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
+						&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
+					this.ctx.drawImage(this.level.spritesheet,
+								120 * tile.sprite_index, 0,
+								120, 120,
+								tile.x + this.x - 60, tile.y + this.y - 90,
+								120, 120);
+								
+				}
+							
+				iWallCount++;
+				
+			} else {
+				if	(entity.x + this.x > -120 && entity.x + this.x < SCREEN_WIDTH + 120 
+						&& entity.y + this.y > -120 && entity.y + this.y < SCREEN_HEIGHT + 120) {
+					entity.draw(this.ctx);
+					
+				}
+				
+				iEntityCount++;				
+			
+			}
+			
+		} else if (iWallCount < this.level.walls.length && iEntityCount >= this.entities.length) {
+			var tile = this.level.walls[iWallCount];
+			
+			this.ctx.drawImage(this.level.spritesheet,
+								120 * tile.sprite_index, 0,
+								120, 120,
+								tile.x + this.x - 60, tile.y + this.y - 90,
+								120, 120);
+			iWallCount++;	
+			
+		} else if (iWallCount >= this.level.walls.length && iEntityCount < this.entities.length) {
+			var entity = this.entities[iEntityCount];
+			
+			entity.draw(this.ctx);
+			iEntityCount++;	
+			
+		} else {
+			break;
+			
+		}
+		
+	}
+
     this.ctx.font = "bold 16px Arial";
 <<<<<<< HEAD
     this.ctx.fillText("L-Click: Spawn Zombie", 600, 20);
@@ -169,6 +268,7 @@ GameEngine.prototype.update = function () {
         entity.update();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	
 	this.entities.sort(function (a, b) {
@@ -176,6 +276,9 @@ GameEngine.prototype.update = function () {
 		
 	});
 	
+>>>>>>> refs/remotes/origin/master
+=======
+		
 >>>>>>> refs/remotes/origin/master
 }
 
