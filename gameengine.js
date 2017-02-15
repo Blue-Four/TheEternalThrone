@@ -9,10 +9,6 @@ window.requestAnimFrame = (function () {
             };
 })();
 
-<<<<<<< HEAD
-//user char array to keep track of keycodes, keycode will map into array of booleans
-=======
->>>>>>> refs/remotes/origin/master
 function GameEngine() {
     this.entities = [];
     this.ctx = null;
@@ -24,11 +20,6 @@ function GameEngine() {
 }
 
 GameEngine.prototype.init = function (ctx) {
-<<<<<<< HEAD
-    var space;
-    this.chars = [];
-=======
->>>>>>> refs/remotes/origin/master
     this.ctx = ctx;
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
@@ -53,15 +44,6 @@ GameEngine.prototype.startInput = function () {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
 
-<<<<<<< HEAD
-        //use for gridlike layout (32 x 32 grid spaces  )
-        if (x < 1024) {
-            x = Math.floor(x / 32);
-            y = Math.floor(y / 32);
-        }
-
-=======
->>>>>>> refs/remotes/origin/master
         return { x: x, y: y };
     }
 
@@ -70,26 +52,7 @@ GameEngine.prototype.startInput = function () {
     // event listeners are added here
 
     this.ctx.canvas.addEventListener("click", function (e) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        SpawnZombie(800, 700);
-    }, false);
-
-    this.ctx.canvas.addEventListener("contextmenu", function (e) {
-        SwitchDirections();
-        e.preventDefault();
-    }, false);
-
-    this.ctx.canvas.addEventListener("keydown", function (e) {
-        if (e.code === "KeyT") ThrillerMode();
-    }, false);
-    
-    /*
-=======
-        that.click = getXandY(e);
-=======
         that.leftclick = getXandY(e);
->>>>>>> refs/remotes/origin/master
 		that.mouse_clicked_left = true;
 		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
 		console.log("Tile Type = " + tile.type);
@@ -110,7 +73,6 @@ GameEngine.prototype.startInput = function () {
         e.preventDefault();
     }, false);
 
->>>>>>> refs/remotes/origin/master
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         that.mouse = getXandY(e);		
     }, false);
@@ -127,20 +89,11 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
-<<<<<<< HEAD
-        if (e.code === "KeyD") that.d = true;
-<<<<<<< HEAD
-        if (e.code === "Space") that.space = true;
-=======
->>>>>>> refs/remotes/origin/master
-        that.chars[e.code] = true;
-=======
 		// var scrollSpeed = 5;
         // if (e.code === "KeyW") that.y += scrollSpeed;
 		// if (e.code === "KeyA") that.x += scrollSpeed;
 		// if (e.code === "KeyS") that.y -= scrollSpeed;
 		// if (e.code === "KeyD") that.x -= scrollSpeed;
->>>>>>> refs/remotes/origin/master
         console.log(e);
         console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
     }, false);
@@ -149,11 +102,7 @@ GameEngine.prototype.startInput = function () {
         console.log(e);
         console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
-<<<<<<< HEAD
-*/
-=======
 
->>>>>>> refs/remotes/origin/master
     console.log('Input started');
 }
 
@@ -247,15 +196,9 @@ GameEngine.prototype.draw = function () {
 	}
 
     this.ctx.font = "bold 16px Arial";
-<<<<<<< HEAD
-    this.ctx.fillText("L-Click: Spawn Zombie", 600, 20);
-    this.ctx.fillText("R-Click: Change Direction", 600, 36);
-    this.ctx.fillText("Num. of Zombies: " + this.entities.length, 600, 52);
-=======
     this.ctx.fillStyle = "white";
     this.ctx.fillText("L-Click: Death Animation", 600, 20);
     this.ctx.fillText("R-Click: Move Player", 600, 36);
->>>>>>> refs/remotes/origin/master
     this.ctx.restore();
 }
 
@@ -267,31 +210,13 @@ GameEngine.prototype.update = function () {
 
         entity.update();
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-	
-	this.entities.sort(function (a, b) {
-		return a.y - b.y;
 		
-	});
-	
->>>>>>> refs/remotes/origin/master
-=======
-		
->>>>>>> refs/remotes/origin/master
 }
 
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
     this.draw();
-<<<<<<< HEAD
-    //update event variables to false after update() is called and entities have had a chance to
-    //detect key events 
-    //this.space = false;
-=======
->>>>>>> refs/remotes/origin/master
 }
 
 function Timer() {
@@ -310,19 +235,10 @@ Timer.prototype.tick = function () {
     return gameDelta;
 }
 
-<<<<<<< HEAD
-function Entity(game, x, y, collX, collY) {
-    this.game = game;
-    this.x = x;
-    this.collX;
-    this.y = y;
-    this.collY;
-=======
 function Entity(game, x, y) {
     this.game = game;
     this.x = x;
     this.y = y;
->>>>>>> refs/remotes/origin/master
     this.removeFromWorld = false;
 }
 
