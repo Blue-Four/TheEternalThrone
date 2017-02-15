@@ -158,6 +158,9 @@ CharacterPC.prototype.update = function () {
 		var end = this.game.level.getTileFromPoint(this.game.rightclick.x - this.game.x, this.game.rightclick.y - this.game.y);
 		//console.log("Start tile: " + start.xIndex + " " + start.yIndex);
 		//console.log("End tile: " + end.xIndex + " " + end.yIndex);
+		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
+			return;
+		}
 		this.moveNodes = this.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
 		console.log(this.moveNodes.toString());
 		if	(end.type != "TYPE_WALL") {

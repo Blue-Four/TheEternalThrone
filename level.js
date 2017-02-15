@@ -48,8 +48,6 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 Level.prototype.getTileFromPoint = function(x, y) {
 	var calculated_x = Math.round((x / 30 + y / 15) / 2);
 	var calculated_y = Math.round((y / 15 - (x / 30)) / 2);
-	console.log(x + " " + y);
-	console.log(calculated_x + " " + calculated_y);
 	
 	if	(calculated_y >= this.array.length || calculated_x >= this.array[0].length ||
 		 calculated_y < 0 || calculated_x < 0) {
