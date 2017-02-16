@@ -1,5 +1,3 @@
-// This game shell was happily copied from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
-
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -11,6 +9,215 @@ window.requestAnimFrame = (function () {
             };
 })();
 
+function GameEngine() {
+    this.entities = [];
+    this.ctx = null;
+    this.surfaceWidth = null;
+    this.surfaceHeight = null;
+	this.level = null;
+	this.x = 0;
+	this.y = 0;
+}
+
+GameEngine.prototype.init = function (ctx) {
+    this.ctx = ctx;
+    this.surfaceWidth = this.ctx.canvas.width;
+    this.surfaceHeight = this.ctx.canvas.height;
+    this.timer = new Timer();
+    this.startInput();
+    console.log('game initialized');
+}
+
+GameEngine.prototype.start = function () {
+    console.log("starting game");
+    var that = this;
+    (function gameLoop() {
+        that.loop();
+        requestAnimFrame(gameLoop, that.ctx.canvas);
+    })();
+}
+
+GameEngine.prototype.startInput = function () {
+    console.log('Starting input');
+
+    var getXandY = function (e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+
+        return { x: x, y: y };
+    }
+
+    var that = this;
+
+    // event listeners are added here
+
+    this.ctx.canvas.addEventListener("click", function (e) {
+        that.leftclick = getXandY(e);
+		that.mouse_clicked_left = true;
+		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
+		console.log("Tile Type = " + tile.type);
+    }, false);
+	
+	this.ctx.canvas.addEventListener("mousedown", function (e) {
+		that.mouse_down = true;
+		that.mouse_anchor = getXandY(e);
+    }, false);
+	
+	this.ctx.canvas.addEventListener("mouseup", function (e) {
+		that.mouse_down = false;
+    }, false);
+
+    this.ctx.canvas.addEventListener("contextmenu", function (e) {
+        that.rightclick = getXandY(e);
+		that.mouse_clicked_right = true;
+        e.preventDefault();
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+        that.mouse = getXandY(e);		
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousewheel", function (e) {
+        console.log(e);
+        that.wheel = e;
+        console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
+    }, false);
+
+    this.ctx.canvas.addEventListener("keydown", function (e) {
+        console.log(e);
+        console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
+    }, false);
+
+    this.ctx.canvas.addEventListener("keypress", function (e) {
+		// var scrollSpeed = 5;
+        // if (e.code === "KeyW") that.y += scrollSpeed;
+		// if (e.code === "KeyA") that.x += scrollSpeed;
+		// if (e.code === "KeyS") that.y -= scrollSpeed;
+		// if (e.code === "KeyD") that.x -= scrollSpeed;
+        console.log(e);
+        console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
+    }, false);
+
+    this.ctx.canvas.addEventListener("keyup", function (e) {
+        console.log(e);
+        console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
+    }, false);
+
+    console.log('Input started');
+}
+
+GameEngine.prototype.addEntity = function (entity) {
+    console.log('added entity');
+    this.entities.push(entity);
+}
+
+GameEngine.prototype.setLevel = function (level) {
+    console.log('set level');
+    this.level = level;
+}
+
+GameEngine.prototype.draw = function () {
+    this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
+		
+	// Sort all entities by depth, so they can be drawn in the proper order.
+	this.entities.sort(function (a, b) {
+		return a.y - b.y;
+		
+	});
+
+	for	(var iFloorCount = 0; iFloorCount < this.level.floor.length; iFloorCount++) {
+		var tile = this.level.floor[iFloorCount];
+		
+		if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
+			&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
+				this.ctx.drawImage(this.level.spritesheet,
+					120 * tile.sprite_index, 0,
+					120, 120,
+					tile.x + this.x - 60, tile.y + this.y - 90,
+					120, 120);
+					
+		}
+		
+	}
+
+	var iWallCount = 0;
+	var iEntityCount = 0;
+	while	(true) {
+		if	(iEntityCount < this.entities.length && iWallCount < this.level.walls.length) {
+			var tile = this.level.walls[iWallCount];
+			var entity = this.entities[iEntityCount];
+			
+			if	(tile.y <= entity.y) {
+				// If this tile is within the bounds of the screen...
+				if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
+						&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
+					this.ctx.drawImage(this.level.spritesheet,
+								120 * tile.sprite_index, 0,
+								120, 120,
+								tile.x + this.x - 60, tile.y + this.y - 90,
+								120, 120);
+								
+				}
+							
+				iWallCount++;
+				
+			} else {
+				if	(entity.x + this.x > -120 && entity.x + this.x < SCREEN_WIDTH + 120 
+						&& entity.y + this.y > -120 && entity.y + this.y < SCREEN_HEIGHT + 120) {
+					entity.draw(this.ctx);
+					
+				}
+				
+				iEntityCount++;				
+			
+			}
+			
+		} else if (iWallCount < this.level.walls.length && iEntityCount >= this.entities.length) {
+			var tile = this.level.walls[iWallCount];
+			
+			this.ctx.drawImage(this.level.spritesheet,
+								120 * tile.sprite_index, 0,
+								120, 120,
+								tile.x + this.x - 60, tile.y + this.y - 90,
+								120, 120);
+			iWallCount++;	
+			
+		} else if (iWallCount >= this.level.walls.length && iEntityCount < this.entities.length) {
+			var entity = this.entities[iEntityCount];
+			
+			entity.draw(this.ctx);
+			iEntityCount++;	
+			
+		} else {
+			break;
+			
+		}
+		
+	}
+
+    this.ctx.font = "bold 16px Arial";
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("L-Click: Death Animation", 600, 20);
+    this.ctx.fillText("R-Click: Move Player", 600, 36);
+    this.ctx.restore();
+}
+
+GameEngine.prototype.update = function () {
+    var entitiesCount = this.entities.length;
+
+    for (var i = 0; i < entitiesCount; i++) {
+        var entity = this.entities[i];
+
+        entity.update();
+    }
+		
+}
+
+GameEngine.prototype.loop = function () {
+    this.clockTick = this.timer.tick();
+    this.update();
+    this.draw();
+}
 
 function Timer() {
     this.gameTime = 0;
@@ -26,87 +233,6 @@ Timer.prototype.tick = function () {
     var gameDelta = Math.min(wallDelta, this.maxStep);
     this.gameTime += gameDelta;
     return gameDelta;
-}
-
-function GameEngine() {
-    this.entities = [];
-    this.showOutlines = false;
-    this.ctx = null;
-    this.click = null;
-    this.mouse = null;
-    this.wheel = null;
-    this.surfaceWidth = null;
-    this.surfaceHeight = null;
-}
-
-GameEngine.prototype.init = function (ctx) {
-    this.ctx = ctx;
-    this.surfaceWidth = this.ctx.canvas.width;
-    this.surfaceHeight = this.ctx.canvas.height;
-    this.startInput();
-    this.timer = new Timer();
-    console.log('game initialized');
-}
-
-GameEngine.prototype.start = function () {
-    console.log("starting game");
-    var that = this;
-    (function gameLoop() {
-        that.loop();
-        requestAnimFrame(gameLoop, that.ctx.canvas);
-    })();
-}
-
-GameEngine.prototype.startInput = function () {
-    console.log('Starting input');
-    var that = this;
-
-    this.ctx.canvas.addEventListener("keydown", function (e) {
-        if (String.fromCharCode(e.which) === ' ') that.space = true;
-//        console.log(e);
-        e.preventDefault();
-    }, false);
-
-    console.log('Input started');
-}
-
-GameEngine.prototype.addEntity = function (entity) {
-    console.log('added entity');
-    this.entities.push(entity);
-}
-
-GameEngine.prototype.draw = function () {
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.save();
-    for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].draw(this.ctx);
-    }
-    this.ctx.restore();
-}
-
-GameEngine.prototype.update = function () {
-    var entitiesCount = this.entities.length;
-
-    for (var i = 0; i < entitiesCount; i++) {
-        var entity = this.entities[i];
-
-        if (!entity.removeFromWorld) {
-            entity.update();
-        }
-    }
-
-    for (var i = this.entities.length - 1; i >= 0; --i) {
-        if (this.entities[i].removeFromWorld) {
-            this.entities.splice(i, 1);
-        }
-    }
-}
-
-GameEngine.prototype.loop = function () {
-    this.clockTick = this.timer.tick();
-    this.update();
-    this.draw();
-    this.space = null;
 }
 
 function Entity(game, x, y) {
