@@ -157,7 +157,7 @@ var astar = {
 function Graph(gridIn, options) {
   options = options || {};
   this.nodes = [];
-  this.diagonal = !!options.diagonal;
+  this.diagonal = true;
   this.grid = [];
   for (var x = 0; x < gridIn.length; x++) {
     this.grid[x] = [];
