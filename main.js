@@ -24,7 +24,7 @@ AM.downloadAll(function () {
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 100, 200, 175, 1);
     gameEngine.addEntity(barbarianPC);
 	
-	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 110, 1);
+/*	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 110, 1);
     gameEngine.addEntity(missDemeanor);
 	apply_AI_Wander(missDemeanor);
 	
@@ -51,7 +51,7 @@ AM.downloadAll(function () {
 		var largeMcSwordface = new Large_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), rX, rY, 25, 2);
 	    gameEngine.addEntity(largeMcSwordface);
 	    apply_AI_Wander(largeMcSwordface);
-	}
+	}*/
 
     console.log("All Done!");
 	
