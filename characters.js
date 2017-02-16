@@ -117,11 +117,14 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
     this.game = game;
     this.ctx = game.ctx;
 	this.collision_radius = 24;
+	this.path_start = false;
 	
 	// Movement
 	this.is_moving = false;
 	this.desired_x = x;
 	this.desired_y = y;
+	this.end_x = x;
+	this.end_y = y;
 	this.moveNodes = [];
 }
 
@@ -130,6 +133,7 @@ BasicSprite.prototype.draw = function () {
 }
 
 BasicSprite.prototype.update = function () {
+	getPath(this);
 	handleMovement(this);
 	
 }
@@ -154,40 +158,18 @@ CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
 	if	(this.game.mouse_clicked_right) {
-		var start = this.game.level.getTileFromPoint(this.x, this.y);
-		var end = this.game.level.getTileFromPoint(this.game.rightclick.x - this.game.x, this.game.rightclick.y - this.game.y);
-		//console.log("Start tile: " + start.xIndex + " " + start.yIndex);
-		//console.log("End tile: " + end.xIndex + " " + end.yIndex);
-		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
-			return;
-		}
-		this.moveNodes = this.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
-		console.log(this.moveNodes.toString());
-		if	(end.type != "TYPE_WALL") {
-			var node = this.moveNodes.shift();
-			console.log(node);
-			var coords = this.game.level.getPointFromTile(node.x, node.y);
-			console.log(coords);
-			this.desired_x = coords[0];
-			this.desired_y = coords[1];
-			this.is_moving = true;
-			
-		}
+		this.end_x = this.game.rightclick.x;
+		this.end_y = this.game.rightclick.y;
+		this.path_start = true;
 		
 		this.game.mouse_clicked_right = false;	
-	} else if (this.moveNodes.length > 0 && this.x == this.desired_x && this.y == this.desired_y) {
-		var node = this.moveNodes.shift();
-		console.log(node);
-		var coords = this.game.level.getPointFromTile(node.x, node.y);
-		this.desired_x = coords[0];
-		this.desired_y = coords[1];
-		this.is_moving = true;
 	}
+	
+	getPath(this);
+	handleMovement(this);
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
-	
-	handleMovement(this);
 	
 }
 
@@ -240,9 +222,44 @@ Ally_Villager.prototype.constructor = BasicSprite;
 // ====================================
 
 
-// Handles movement for all Characters. Should be called from the Character.update() function.
-function handleMovement(character) {
+function getPath(character) {
+	if	(character.path_start === true) {
+		var start = character.game.level.getTileFromPoint(character.x, character.y);
+		var end = character.game.level.getTileFromPoint(character.end_x - character.game.x, character.end_y - character.game.y);
+		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
+			return;
+		}
+		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
+		console.log(character.moveNodes.toString());
+		
+		if	(end.type === "TYPE_FLOOR") {
+			var node = character.moveNodes.shift();
+			console.log(node);
+			var coords = character.game.level.getPointFromTile(node.x, node.y);
+			console.log(coords);
+			character.desired_x = coords[0];
+			character.desired_y = coords[1];
+			character.is_moving = true;
+			
+		}
+		
+		character.path_start = false;
+		
+	} else if (character.moveNodes.length > 0 && character.x == character.desired_x && character.y == character.desired_y) {
+		var node = character.moveNodes.shift();
+		console.log(node);
+		var coords = character.game.level.getPointFromTile(node.x, node.y);
+		character.desired_x = coords[0];
+		character.desired_y = coords[1];
+		character.is_moving = true;
+		
+	}
+	
+}
 
+
+// Handles movement for all Characters.
+function handleMovement(character) {
 	if	(character.is_moving === true) {
 		if	(Math.abs(character.x - character.desired_x) < 1 &&
 			 Math.abs(character.y - character.desired_y) < 1) {

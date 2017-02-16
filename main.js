@@ -24,10 +24,10 @@ AM.downloadAll(function () {
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 100, 200, 175, 1);
     gameEngine.addEntity(barbarianPC);
 	
-/*	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 110, 1);
+	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 100, 200, 110, 1);
     gameEngine.addEntity(missDemeanor);
 	apply_AI_Wander(missDemeanor);
-	
+	/*
 	for(var i = 0; i < 4; i++) {	
 		//spawn randomly for display purposes
 		rX = Math.floor(Math.random() * SCREEN_WIDTH);

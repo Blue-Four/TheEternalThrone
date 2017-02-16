@@ -3,8 +3,12 @@ function apply_AI_Wander(character) {
 	
 	var interval = setInterval(function () {
 		if	(character.ai_active) {
-			character.desired_x = character.desired_x + Math.floor(Math.random() * 100) - 50;
-			character.desired_y = character.desired_y + Math.floor(Math.random() * 100) - 50;
+			var tile = getRandomTile(character, 1);
+			
+			character.end_x = tile.x;
+			character.end_y = tile.y;
+			
+			character.path_start = true;
 			character.is_moving = true;
 			
 		} else {
@@ -14,5 +18,28 @@ function apply_AI_Wander(character) {
 	
 			
 	}, 5000 + (Math.floor(Math.random() * 2000) - 1000));
+	
+}
+
+function getRandomTile(character, radius) {
+	var tile = character.game.level.getTileFromPoint(character.x, character.y);
+	var tiles = [];
+	
+	var y = -1 * radius;
+	for	( ; y <= radius; y++) {
+		var x = -1 * radius;
+		for	( ; x <= radius; x++) {
+			if	(x + y !== 0 && character.game.level.array[tile.yIndex + y][tile.xIndex + x].type === "TYPE_FLOOR") {
+				tiles.push(character.game.level.array[tile.yIndex + y][tile.xIndex + x]);
+				
+			}
+			
+		}
+		
+	}
+	
+	var iTile = Math.floor(Math.random() * tiles.length);
+	
+	return tiles[iTile];
 	
 }
