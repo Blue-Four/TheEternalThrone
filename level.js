@@ -6,20 +6,24 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 	this.array = tile_sprite_array;
 	this.floor = [];
 	this.walls = [];
+	//height and width for spawning logic
+	this.width = tile_sprite_array[0].length;
+	this.height = tile_sprite_array.length;
+	//graph used for pathfinding
+	this.graph = new Graph(coll_test1);
 	
 	// Convert tile sprite array to an array of Tile objects, and integrate tile logic.
-	for	(var iX = 0; iX < tile_sprite_array[0].length; iX++) {
-		for	(var iY = 0; iY < tile_sprite_array.length; iY++) {
+	for	(var iX = 0; iX < this.width; iX++) {
+		for	(var iY = 0; iY < this.height; iY++) {
 			// var tile_x = (tile_sprite_array.length - iY + iX - 2) * 30;
 			// var tile_y = (15 * (iX + iY));
-			
 			var tile_x = (iX - iY) * 30;
 			var tile_y = 15 * (iX + iY);
 			
 			var tile = new Tile(tile_sprite_array[iY][iX],
 								tile_logic[tile_sprite_array[iY][iX]],
-								tile_x, tile_y);
-				
+								tile_x, tile_y,
+								iX, iY);				
 			this.array[iY][iX] = tile;
 			if	(tile.type === "TYPE_FLOOR") { this.floor.push(tile); }
 			else	{ this.walls.push(tile); }
@@ -53,6 +57,22 @@ Level.prototype.getTileFromPoint = function(x, y) {
 	}
 }
 
+Level.prototype.getPointFromTile = function(xIndex, yIndex) {
+	var findTile = this.array[yIndex][xIndex];
+	var coords = [findTile.x, findTile.y];
+	return coords;
+
+}
+
+//returns array representation of path to take
+Level.prototype.findPath = function(xStart, yStart, xEnd, yEnd) {
+	var startIndex = this.graph.grid[parseInt(xStart)][parseInt(yStart)];
+	var endIndex = this.graph.grid[parseInt(xEnd)][parseInt(yEnd)];
+	var result = astar.search(this.graph, startIndex, endIndex);
+	return result;
+}
+
+
 /*
 Tile Types
 	"TYPE_FLOOR"
@@ -62,9 +82,11 @@ Tile Types
 	Blocks traversal of all character entities. Obeys the order of depth when drawn.
 
 */
-function Tile(sprite_index, type, x, y) {
+function Tile(sprite_index, type, x, y, xIndex, yIndex) {
 	this.sprite_index = sprite_index;
 	this.type = type;
+	this.xIndex = xIndex;
+	this.yIndex = yIndex;
 	this.x = x;
 	this.y = y;
 }
