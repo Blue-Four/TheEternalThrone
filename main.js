@@ -23,11 +23,19 @@ AM.downloadAll(function () {
 
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 100, 200, 175, 1);
     gameEngine.addEntity(barbarianPC);
+
+    var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), 300, 300, 110, 1);
+	    gameEngine.addEntity(swordyMcSwordface);
+		apply_AI_Wander(swordyMcSwordface);
 	
-/*	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 110, 1);
+	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 110, 1);
     gameEngine.addEntity(missDemeanor);
 	apply_AI_Wander(missDemeanor);
-	
+
+	var largeMcSwordface = new Large_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), 300, 200, 25, 2);
+	    gameEngine.addEntity(largeMcSwordface);
+	    apply_AI_Wander(largeMcSwordface);
+/*
 	for(var i = 0; i < 4; i++) {	
 		//spawn randomly for display purposes
 		rX = Math.floor(Math.random() * SCREEN_WIDTH);

@@ -120,6 +120,9 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	
 	// Movement
 	this.is_moving = false;
+	this.is_attack = false;
+	this.is_dying = false;
+	this.is_dead = false;
 	this.desired_x = x;
 	this.desired_y = y;
 	this.moveNodes = [];
@@ -130,7 +133,19 @@ BasicSprite.prototype.draw = function () {
 }
 
 BasicSprite.prototype.update = function () {
-	handleMovement(this);
+	// Attack animation (hold down key)
+	if(this.game.Digit1) {
+		this.is_attack = true;
+		this.is_moving = false;
+	}
+	// Dying animation
+	if(this.game.Digit2) {
+		this.is_dying = true;
+		this.animation.state = 3;
+		this.is_dead = true;
+		this.is_moving = false;
+	}
+	else handleMovement(this);
 	
 }
 
@@ -187,7 +202,7 @@ CharacterPC.prototype.update = function () {
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
 	
-	handleMovement(this);
+	BasicSprite.prototype.update.call(this);
 	
 }
 
@@ -242,7 +257,6 @@ Ally_Villager.prototype.constructor = BasicSprite;
 
 // Handles movement for all Characters. Should be called from the Character.update() function.
 function handleMovement(character) {
-
 	if	(character.is_moving === true) {
 		if	(Math.abs(character.x - character.desired_x) < 1 &&
 			 Math.abs(character.y - character.desired_y) < 1) {
@@ -250,10 +264,11 @@ function handleMovement(character) {
 			character.y = character.desired_y;
 			character.is_moving = false;
 			character.animation.state = 0;
-			character.animation.state_switched = true;
-			
-		} else {
+			character.animation.state_switched = true;			
+		} 
+		else {
 			character.animation.state = 1;
+
 			
 			// Tests to make sure the character is facing the appropriate direction.
 			var desired_movement_arc = calculateMovementArc(character.x, character.y,
@@ -272,6 +287,12 @@ function handleMovement(character) {
 			
 		}
 	
+	}
+	// Attack animation
+	if (!(character.is_dying || character.is_dead) && character.is_attack === true){
+		character.animation.state = 2;
+		character.is_attack = false;
+		character.is_moving = true;
 	}
 	
 }
