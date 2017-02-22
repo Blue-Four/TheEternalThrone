@@ -84,27 +84,29 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
-        console.log(e);
-        console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
+        if (e.code === "Digit1") that.Digit1 = true;
+        if (e.code === "Digit2") that.Digit2 = true;
+        //console.log(e);
+        //console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (e.code === "Digit1") that.Digit1 = true;
-        if (e.code === "Digit2") that.Digit2 = true;
+        //if (e.code === "Digit1") that.Digit1 = true;
+        //if (e.code === "Digit2") that.Digit2 = true;
 		// var scrollSpeed = 5;
         // if (e.code === "KeyW") that.y += scrollSpeed;
 		// if (e.code === "KeyA") that.x += scrollSpeed;
 		// if (e.code === "KeyS") that.y -= scrollSpeed;
 		// if (e.code === "KeyD") that.x -= scrollSpeed;
-        console.log(e);
-        console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
+        //console.log(e);
+        //console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
     }, false);
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
         if (e.code === "Digit1") that.Digit1 = false;
         if (e.code === "Digit2") that.Digit2 = false;
-        console.log(e);
-        console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
+        //console.log(e);
+        //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
 
     console.log('Input started');
