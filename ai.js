@@ -1,25 +1,6 @@
 function apply_AI_Wander(character) {
-	character.ai_active = true;
-	
-	var interval = setInterval(function () {
-		if	(character.ai_active) {
-			character.desired_x = character.desired_x + Math.floor(Math.random() * 100) - 50;
-			character.desired_y = character.desired_y + Math.floor(Math.random() * 100) - 50;
-			if (character.is_dying || character.is_dead) character.is_moving = false;
-			else character.is_moving = true;
-			
-		} else {
-			clearInterval(interval);
-			
-		}
-	
-			
-	}, 5000 + (Math.floor(Math.random() * 2000) - 1000));
-	
-}
-function apply_AI_Wander(character) {
     character.ai_active = true;
-   
+    
     var interval = setInterval(function () {
         if  (character.ai_active) {
             //character.moveNodes = [];
@@ -29,7 +10,8 @@ function apply_AI_Wander(character) {
             character.desired_y = tile.y;
            
             character.path_start = true;
-            character.is_moving = true;
+            if (character.is_dying || character.is_dead) character.is_moving = false;
+            else character.is_moving = true;
            
         } else {
             clearInterval(interval);
@@ -43,6 +25,10 @@ function apply_AI_Wander(character) {
 
 function disable_AI_Wander(character) {
     character.ai_active = false;
+}
+
+function enable_AI_Wander(character) {
+    character.ai_active = true;
 }
  
 function getRandomTile(character, radius) {
