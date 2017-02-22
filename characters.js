@@ -125,7 +125,11 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_dying = false;
 	this.is_dead = false;
 
+	//Combat
+	this.damage_range = 10;
+
 	// Flags
+	this.is_aggro = false;
 	this.was_aggro = false;
 
 	this.desired_x = x;
@@ -148,59 +152,93 @@ BasicSprite.prototype.getHealth = function() {
 }
 
 BasicSprite.prototype.update = function () {
-	// find Player in entities list
-	for (i in this.game.entities) {
-		if (this.game.entities[i] instanceof CharacterPC) {
-			var player = this.game.entities[i];
-			break;
-		}
-	}
-
-	// Attack logic
-	if(this.type === "ENEMY") {
-		var isAggro = checkAggro(player, this);
-		if(isAggro) {
-			//disable AI wander so they don't change their mind
-			disable_AI_Wander(this);
-			this.desired_x = player.x;
-			this.desired_y = player.y;
-			this.path_start = true;
-			this.is_attack = true;
-			this.was_aggro = true;
-		}
-		else {
-			this.is_moving = true;
+	if (!this.is_dead) {
+		// find Player in entities list
+		for (i in this.game.entities) {
+			if (this.game.entities[i] instanceof CharacterPC) {
+				var player = this.game.entities[i];
+				break;
+			}
 		}
 
-		// Go back to wandering
-		if (this.was_aggro) {
-			enable_AI_Wander(this);
-			this.was_aggro = false;
-		}
-	}
+		// Attack logic
+		if(this.type === "ENEMY") {
+			var isAggro = checkAggro(player, this);
+			if(isAggro && !player.is_dead) {
+				//disable AI wander so they don't change their mind
+				disable_AI_Wander(this);
+				this.desired_x = player.x;
+				this.desired_y = player.y;
+				this.path_start = true;
+				
+				// Attack Player
+				if (checkAttack(player, this)) this.is_attack = true;
+				if (checkDistance(player, this) < this.damage_range) {
+					if (player.health > 0) {
+						player.health -= this.attack_power * 0.05;
+						if (player.health <= 0) {
+							player.health = 0;
+							this.attack = false;
+							killCharacter(player);
+						}
+					}
 
-	// Player attack
-	if (this.type === "PLAYER") {
-		if (this.game.Digit1) {
-			this.is_attack = true;
+					// Attack Enemy
+					if (player.game.Digit1) {
+						player.is_attack = true;
+						if (player.is_attack) {
+							this.health -= player.attack_power * 0.05;
+							if (this.health <= 0) {
+								this.health = 0;
+								killCharacter(this);
+								player.attack = false;
+							}
+					}
+						player.is_moving = false;
+					}
+					else {
+						player.is_attack = false;
+						player.is_moving = true;
+					}					
+				}
+				this.was_aggro = true;
+			}
+			else {
+				this.is_moving = true;
+			}
+
+			// Go back to wandering
+			if (this.was_aggro) {
+				enable_AI_Wander(this);
+				this.was_aggro = false;
+			}
+
+
+		}
+
+		// Player attack
+		/*if (this.type === "PLAYER") {
+			if (this.game.Digit1) {
+				this.is_attack = true;
+				this.is_moving = false;
+			}
+			else {
+				this.is_attack = false;
+				this.is_moving = true;
+			}	
+		}*/
+
+		// Death animation
+		if(this.game.Digit2) {
+			this.is_dying = true;
+			this.animation.state = 3;
+			this.is_dead = true;
 			this.is_moving = false;
-		}
+		} 
 		else {
-			this.is_attack = false;
-			this.is_moving = true;
+			//getPath(this);
+			handleMovement(this);
 		}
-	}
-
-	// Death animation
-	if(this.game.Digit2) {
-		this.is_dying = true;
-		this.animation.state = 3;
-		this.is_dead = true;
-		this.is_moving = false;
-	} 
-	else {
-		getPath(this);
-		handleMovement(this);
 	}
 }
 
@@ -218,6 +256,7 @@ BasicSprite.prototype.update = function () {
 function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
 	this.type = "PLAYER";
+	this.attack_power = 25;
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -253,6 +292,7 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
+	this.attack_power = 5;
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -265,6 +305,8 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
+	this.attack_power = 10;
+	this.damage_range = 20;
 }
 
 Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -358,7 +400,7 @@ function getPath(character) {
 			return;
 		}
 		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
-		console.log(character.moveNodes.toString());
+		//console.log(character.moveNodes.toString());
 		
 		if	(end.type === "TYPE_FLOOR") {
 			var node = character.moveNodes.shift();
@@ -392,17 +434,32 @@ function getPath(character) {
 function checkAggro(character, entity) {
 	var aggroRange = 90;
 	var aggro = false;
-	var x = Math.abs(character.x - entity.x);
-	var y = Math.abs(character.y - entity.y);
-	var distance = Math.sqrt(x*x + y*y);
+	var distance = checkDistance(character, entity);
 	if(distance < aggroRange) {
-		console.log("Aggro distance: " + distance);
+		//console.log("Aggro distance: " + distance);
 		aggro = true;
 	}
 	return aggro;
 }
 
-function killCharacter(character) {
-	
-	
+function checkAttack(character, entity) {
+	var attackRange = 25;
+	var attack = false;
+	var distance = checkDistance(character, entity);
+	if (distance < attackRange) attack = true;
+	return attack;
+}
+
+function checkDistance(character, entity) {
+	var x = Math.abs(character.x - entity.x);
+	var y = Math.abs(character.y - entity.y);
+	var distance = Math.sqrt(x*x + y*y);
+	return distance;
+}
+
+function killCharacter(character) {	
+	character.is_moving = false;
+	character.is_dying = true;
+	character.animation.state = 3;
+	character.is_dead = true;	
 } 
