@@ -124,6 +124,9 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_dying = false;
 	this.is_dead = false;
 
+	// Flags
+	this.was_aggro = false;
+
 	this.desired_x = x;
 	this.desired_y = y;
 	this.end_x = x;
@@ -136,30 +139,57 @@ BasicSprite.prototype.draw = function () {
 }
 
 BasicSprite.prototype.update = function () {
-	// Attack animation (hold down key)
-	if(this.game.Digit1) {
-		this.is_attack = true;
-		this.is_moving = false;
+	// find Player in entities list
+	for (i in this.game.entities) {
+		if (this.game.entities[i] instanceof CharacterPC) {
+			var player = this.game.entities[i];
+			break;
+		}
 	}
-	// Dying animation
+
+	// Attack logic
+	if(this.type === "ENEMY") {
+		var isAggro = checkAggro(player, this);
+		if(isAggro) {
+			//disable AI wander so they don't change their mind
+			disable_AI_Wander(this);
+			this.desired_x = player.x;
+			this.desired_y = player.y;
+			this.path_start = true;
+			this.is_attack = true;
+			this.was_aggro = true;
+		}
+		else {
+			this.is_moving = true;
+		}
+
+		// Go back to wandering
+		if (this.was_aggro) {
+			enable_AI_Wander(this);
+			this.was_aggro = false;
+		}
+	}
+
+	// Player attack
+	if (this.type === "PLAYER") {
+		if (this.game.Digit1) {
+			this.is_attack = true;
+			this.is_moving = false;
+		}
+		else {
+			this.is_attack = false;
+			this.is_moving = true;
+		}
+	}
+
+	// Death animation
 	if(this.game.Digit2) {
 		this.is_dying = true;
 		this.animation.state = 3;
 		this.is_dead = true;
 		this.is_moving = false;
-	} else {
-		if(this.type == "ENEMY") {
-			var player = this.game.entities[0];
-			var isAggro = checkAggro(player, this);
-			if(isAggro) {
-				//disable AI wander so they don't change their mind
-				disable_AI_Wander(this);
-				this.desired_x = player.x;
-				this.desired_y = player.y;
-				this.path_start = true;
-				this.is_moving = true;
-			}
-		}
+	} 
+	else {
 		getPath(this);
 		handleMovement(this);
 	}
@@ -185,7 +215,7 @@ CharacterPC.prototype = Object.create(BasicSprite.prototype);
 CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
-	if	(this.game.mouse_clicked_right) {
+	if	(!(this.is_dying || this.is_dead) && this.game.mouse_clicked_right) {
 		this.end_x = this.game.rightclick.x;
 		this.end_y = this.game.rightclick.y;
 		this.path_start = true;
@@ -290,7 +320,6 @@ function handleMovement(character) {
 	if (!(character.is_dying || character.is_dead) && character.is_attack === true){
 		character.animation.state = 2;
 		character.is_attack = false;
-		character.is_moving = true;
 	}
 	
 }
@@ -354,8 +383,8 @@ function getPath(character) {
 function checkAggro(character, entity) {
 	var aggroRange = 90;
 	var aggro = false;
-	var x = character.x - entity.x;
-	var y = character.y - entity.y;
+	var x = Math.abs(character.x - entity.x);
+	var y = Math.abs(character.y - entity.y);
 	var distance = Math.sqrt(x*x + y*y);
 	if(distance < aggroRange) {
 		console.log("Aggro distance: " + distance);

@@ -1,6 +1,6 @@
 function apply_AI_Wander(character) {
     character.ai_active = true;
-   
+    
     var interval = setInterval(function () {
         if  (character.ai_active) {
             //character.moveNodes = [];
@@ -8,6 +8,13 @@ function apply_AI_Wander(character) {
            
             character.desired_x = tile.x;
             character.desired_y = tile.y;
+<<<<<<< HEAD
+           
+            character.path_start = true;
+            if (character.is_dying || character.is_dead) character.is_moving = false;
+            else character.is_moving = true;
+           
+=======
             if (character.is_dying || character.is_dead) {
                 disable_AI_Wander(character);
             } else {
@@ -15,6 +22,7 @@ function apply_AI_Wander(character) {
                 character.path_start = true;
             }
          
+>>>>>>> refs/remotes/origin/master
         } else {
             clearInterval(interval);
            
@@ -29,6 +37,10 @@ function disable_AI_Wander(character) {
     character.is_moving = false;
     character.path_start = false;
     character.ai_active = false;
+}
+
+function enable_AI_Wander(character) {
+    character.ai_active = true;
 }
  
  
