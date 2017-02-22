@@ -123,8 +123,11 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_attack = false;
 	this.is_dying = false;
 	this.is_dead = false;
+
 	this.desired_x = x;
 	this.desired_y = y;
+	this.end_x = x;
+	this.end_y = y;
 	this.moveNodes = [];
 }
 
@@ -144,9 +147,22 @@ BasicSprite.prototype.update = function () {
 		this.animation.state = 3;
 		this.is_dead = true;
 		this.is_moving = false;
+	} else {
+		if(this.type == "ENEMY") {
+			var player = this.game.entities[0];
+			var isAggro = checkAggro(player, this);
+			if(isAggro) {
+				//disable AI wander so they don't change their mind
+				disable_AI_Wander(this);
+				this.desired_x = player.x;
+				this.desired_y = player.y;
+				this.path_start = true;
+				this.is_moving = true;
+			}
+		}
+		getPath(this);
+		handleMovement(this);
 	}
-	else handleMovement(this);
-	
 }
 
 // BasicSprite.prototype.getNearestBoundingPoint = function (x, y) {
@@ -162,6 +178,7 @@ BasicSprite.prototype.update = function () {
 // PC
 function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+	this.type = "PLAYER";
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -169,40 +186,18 @@ CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
 	if	(this.game.mouse_clicked_right) {
-		var start = this.game.level.getTileFromPoint(this.x, this.y);
-		var end = this.game.level.getTileFromPoint(this.game.rightclick.x - this.game.x, this.game.rightclick.y - this.game.y);
-		//console.log("Start tile: " + start.xIndex + " " + start.yIndex);
-		//console.log("End tile: " + end.xIndex + " " + end.yIndex);
-		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
-			return;
-		}
-		this.moveNodes = this.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
-		console.log(this.moveNodes.toString());
-		if	(end.type != "TYPE_WALL") {
-			var node = this.moveNodes.shift();
-			console.log(node);
-			var coords = this.game.level.getPointFromTile(node.x, node.y);
-			console.log(coords);
-			this.desired_x = coords[0];
-			this.desired_y = coords[1];
-			this.is_moving = true;
-			
-		}
-		
+		this.end_x = this.game.rightclick.x;
+		this.end_y = this.game.rightclick.y;
+		this.path_start = true;
 		this.game.mouse_clicked_right = false;	
-	} else if (this.moveNodes.length > 0 && this.x == this.desired_x && this.y == this.desired_y) {
-		var node = this.moveNodes.shift();
-		console.log(node);
-		var coords = this.game.level.getPointFromTile(node.x, node.y);
-		this.desired_x = coords[0];
-		this.desired_y = coords[1];
-		this.is_moving = true;
 	}
+	
+	getPath(this);
+	//check if PC is dead in update
+	BasicSprite.prototype.update.call(this);
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
-	
-	BasicSprite.prototype.update.call(this);
 	
 }
 
@@ -218,6 +213,7 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[0] = 7;
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
+	this.type = "ENEMY";
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -229,6 +225,7 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[0] = 7;
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
+	this.type = "ENEMY";
 }
 
 Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -244,6 +241,7 @@ Large_Skeleton_Melee.prototype.constructor = BasicSprite;
 // Basic Villager
 function Ally_Villager(game, spritesheet, x, y, offset, speed, scale) {
 	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+	this.type = "ALLY";
 }
 
 Ally_Villager.prototype = Object.create(BasicSprite.prototype);
@@ -313,31 +311,58 @@ function calculateMovementArc(current_x, current_y, desired_x, desired_y) {
 	else																				{ return 0; }
 	
 }
-/*
-function Path(x1, y1, x2, y2) {
-	
-	
-	function 
+
+function getPath(character) {
+	if	(character.path_start === true) {
+		var start = character.game.level.getTileFromPoint(character.x, character.y);
+		var end = character.game.level.getTileFromPoint(character.end_x - character.game.x, character.end_y - character.game.y);
+		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
+			return;
+		}
+		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
+		console.log(character.moveNodes.toString());
+		
+		if	(end.type === "TYPE_FLOOR") {
+			var node = character.moveNodes.shift();
+			if(typeof node == 'undefined') {
+				return;
+			}
+			//console.log(node);
+			var coords = character.game.level.getPointFromTile(node.x, node.y);
+			//console.log(coords);
+			character.desired_x = coords[0];
+			character.desired_y = coords[1];
+			character.is_moving = true;
+			
+		}
+		
+		character.path_start = false;
+		
+	} else if (character.moveNodes.length > 0 && character.x == character.desired_x && character.y == character.desired_y) {
+		var node = character.moveNodes.shift();
+		//console.log(node);
+		var coords = character.game.level.getPointFromTile(node.x, node.y);
+		character.desired_x = coords[0];
+		character.desired_y = coords[1];
+		character.is_moving = true;
+		
+	}
 	
 }
 
-Character.prototype.update = function () {
-	if	(this.game.mouse_clicked) {
-		this.desired_x = this.game.click.x;
-		this.desired_y = this.game.click.y;
-		
-		console.log(this.desired_x);
-		console.log(this.desired_y);
-		
-		this.is_moving = true;
-		
-		this.game.mouse_clicked = false;
-		
+//set aggro range in this function(in pixels)
+function checkAggro(character, entity) {
+	var aggroRange = 90;
+	var aggro = false;
+	var x = character.x - entity.x;
+	var y = character.y - entity.y;
+	var distance = Math.sqrt(x*x + y*y);
+	if(distance < aggroRange) {
+		console.log("Aggro distance: " + distance);
+		aggro = true;
 	}
-	handleMovement(this);
-	
+	return aggro;
 }
-*/
 
 function killCharacter(character) {
 	

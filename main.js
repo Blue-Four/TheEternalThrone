@@ -4,7 +4,7 @@ var SCREEN_WIDTH = 1280;
 var SCREEN_HEIGHT = 720;
 
 // Begin download queue.
-AM.queueDownload("./img/tiles/basic.png");
+AM.queueDownload("./img/tiles/tile_short.png");
 AM.queueDownload("./img/barbarian_spritesheet.png");
 AM.queueDownload("./img/skeleton_spritesheet.png");
 AM.queueDownload("./img/villager1_spritesheet.png");
@@ -16,50 +16,47 @@ AM.downloadAll(function () {
 
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);	
-	var level = new Level(gameEngine, AM.getAsset("./img/tiles/basic.png"), level_test1, tile_logic_basic);
+	var level = new Level(gameEngine, AM.getAsset("./img/tiles/tile_short.png"), path_test, tile_logic_basic);
     gameEngine.setLevel(level);
 	
     gameEngine.start();
 
-	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), 100, 200, 175, 1);
+    //player entity is first to be added
+    var randomCoords = level.getRandomLocation();
+	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), randomCoords.x, randomCoords.y, 175, 1);
     gameEngine.addEntity(barbarianPC);
-
-    var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), 300, 300, 110, 1);
-	    gameEngine.addEntity(swordyMcSwordface);
-		apply_AI_Wander(swordyMcSwordface);
 	
-	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 400, 200, 110, 1);
+	randomCoords = level.getRandomLocation();
+	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
     gameEngine.addEntity(missDemeanor);
 	apply_AI_Wander(missDemeanor);
-
-	var largeMcSwordface = new Large_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), 300, 200, 25, 2);
-	    gameEngine.addEntity(largeMcSwordface);
-	    apply_AI_Wander(largeMcSwordface);
-/*
-	for(var i = 0; i < 4; i++) {	
+	
+/*	for(var i = 0; i < 4; i++) {	
 		//spawn randomly for display purposes
-		rX = Math.floor(Math.random() * SCREEN_WIDTH);
-   		rY = Math.floor(Math.random() * SCREEN_HEIGHT);
-		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), rX, rY);
+		randomCoords = level.getRandomLocation();
+		//rX = Math.floor(Math.random() * SCREEN_WIDTH);
+   		//rY = Math.floor(Math.random() * SCREEN_HEIGHT);
+		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
-		apply_AI_Wander(zombie);
-	}
+		//apply_AI_Wander(zombie);
+	}*/
 
 	for(var i = 0; i < 4; i++) {
-		rX = Math.floor(Math.random() * SCREEN_WIDTH);
-   		rY = Math.floor(Math.random() * SCREEN_HEIGHT);
-		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), rX, rY, 110, 1);
+		randomCoords = level.getRandomLocation();
+		//rX = Math.floor(Math.random() * SCREEN_WIDTH);
+   		//rY = Math.floor(Math.random() * SCREEN_HEIGHT);
+		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
 		apply_AI_Wander(swordyMcSwordface);
 	}
 
 	for(var i = 0; i < 2; i++) {
-		rX = Math.floor(Math.random() * SCREEN_WIDTH);
-   		rY = Math.floor(Math.random() * SCREEN_HEIGHT);
-		var largeMcSwordface = new Large_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), rX, rY, 25, 2);
+		//rX = Math.floor(Math.random() * SCREEN_WIDTH);
+   		//rY = Math.floor(Math.random() * SCREEN_HEIGHT);
+		var largeMcSwordface = new Large_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 25, 2);
 	    gameEngine.addEntity(largeMcSwordface);
 	    apply_AI_Wander(largeMcSwordface);
-	}*/
+	}
 
     console.log("All Done!");
 	

@@ -10,7 +10,8 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 	this.width = tile_sprite_array[0].length;
 	this.height = tile_sprite_array.length;
 	//graph used for pathfinding
-	this.graph = new Graph(coll_test1);
+	var collMap = genCollMap(tile_sprite_array);
+ 	this.graph = new Graph(collMap, { diagonal: true });
 	
 	// Convert tile sprite array to an array of Tile objects, and integrate tile logic.
 	for	(var iX = 0; iX < this.width; iX++) {
@@ -70,6 +71,42 @@ Level.prototype.findPath = function(xStart, yStart, xEnd, yEnd) {
 	var endIndex = this.graph.grid[parseInt(xEnd)][parseInt(yEnd)];
 	var result = astar.search(this.graph, startIndex, endIndex);
 	return result;
+}
+
+Level.prototype.getRandomLocation = function() {
+	var tile;
+	var x, y;
+	do {
+		 x = Math.floor(Math.random() * (this.width));
+		 y = Math.floor(Math.random() * (this.height));
+		 tile = this.array[y][x];
+	} while (tile.type == "TYPE_WALL");
+	var coords = [];
+	coords.x = tile.x;
+	coords.y = tile.y;
+	return coords;
+}
+
+function genCollMap(tile_sprite_array) {
+	var width = tile_sprite_array[0].length;
+	var height = tile_sprite_array.length;
+    var collMap = [];
+    for(var i = 0; i < width; i++){
+        collMap.push([]);
+    };
+
+    for(var i = 0; i < width; i++){
+        for(var j = 0; j < height; j++){
+        	if(tile_sprite_array[i][j] == 1) {
+        		collMap[j].push(0);
+        	} else {
+        		collMap[j].push(1);
+        	}
+        };
+    };
+
+    console.log(collMap);
+    return(collMap);
 }
 
 
