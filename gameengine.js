@@ -201,7 +201,7 @@ GameEngine.prototype.draw = function () {
 
     this.ctx.font = "bold 16px Arial";
     this.ctx.fillStyle = "white";
-    this.ctx.fillText("L-Click: Death Animation", 600, 20);
+    this.ctx.fillText("Press Down 1 Key: PC Attack Animation", 600, 20);
     this.ctx.fillText("R-Click: Move Player", 600, 36);
     this.ctx.restore();
 }
