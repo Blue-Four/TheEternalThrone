@@ -185,21 +185,12 @@ BasicSprite.prototype.update = function () {
 
 					// Attack Enemy
 					if (player.game.Digit1) {
-						player.is_attack = true;
-						if (player.is_attack) {
-							this.health -= player.attack_power * 0.05;
-							if (this.health <= 0) {
-								this.health = 0;
-								killCharacter(this);
-								player.attack = false;
-							}
-					}
-						player.is_moving = false;
-					}
-					else {
-						player.is_attack = false;
-						player.is_moving = true;
-					}					
+						this.health -= player.attack_power * 0.05;
+						if (this.health <= 0) {
+							this.health = 0;
+							killCharacter(this);
+						}
+					}			
 				}
 				this.was_aggro = true;
 			}
@@ -217,7 +208,7 @@ BasicSprite.prototype.update = function () {
 		}
 
 		// Player attack
-		/*if (this.type === "PLAYER") {
+		if (this.type === "PLAYER") {
 			if (this.game.Digit1) {
 				this.is_attack = true;
 				this.is_moving = false;
@@ -226,7 +217,7 @@ BasicSprite.prototype.update = function () {
 				this.is_attack = false;
 				this.is_moving = true;
 			}	
-		}*/
+		}
 
 		// Death animation
 		if(this.game.Digit2) {
