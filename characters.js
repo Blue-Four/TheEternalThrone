@@ -117,6 +117,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
     this.game = game;
     this.ctx = game.ctx;
 	this.collision_radius = 24;
+	this.health = 100;
 	
 	// Movement
 	this.is_moving = false;
@@ -136,6 +137,14 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 
 BasicSprite.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x + this.game.x, this.y + this.game.y);
+}
+
+BasicSprite.prototype.setHealth = function(health) {
+	this.health = health;
+}
+
+BasicSprite.prototype.getHealth = function() {
+	return this.health;
 }
 
 BasicSprite.prototype.update = function () {

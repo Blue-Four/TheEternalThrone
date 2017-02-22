@@ -25,6 +25,8 @@ AM.downloadAll(function () {
     var randomCoords = level.getRandomLocation();
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), randomCoords.x, randomCoords.y, 175, 1);
     gameEngine.addEntity(barbarianPC);
+
+    var inventoryPC = new Inventory();
 	
 	randomCoords = level.getRandomLocation();
 	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
