@@ -8,21 +8,11 @@ function apply_AI_Wander(character) {
            
             character.desired_x = tile.x;
             character.desired_y = tile.y;
-<<<<<<< HEAD
            
             character.path_start = true;
             if (character.is_dying || character.is_dead) character.is_moving = false;
             else character.is_moving = true;
-           
-=======
-            if (character.is_dying || character.is_dead) {
-                disable_AI_Wander(character);
-            } else {
-                character.is_moving = true;
-                character.path_start = true;
-            }
          
->>>>>>> refs/remotes/origin/master
         } else {
             clearInterval(interval);
            
@@ -34,8 +24,6 @@ function apply_AI_Wander(character) {
 }
 
 function disable_AI_Wander(character) {
-    character.is_moving = false;
-    character.path_start = false;
     character.ai_active = false;
 }
 
