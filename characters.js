@@ -227,7 +227,7 @@ BasicSprite.prototype.update = function () {
 			this.is_moving = false;
 		} 
 		else {
-			//getPath(this);
+			getPath(this);
 			handleMovement(this);
 		}
 	}
