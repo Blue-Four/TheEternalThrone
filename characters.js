@@ -248,6 +248,7 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
 	this.type = "PLAYER";
 	this.attack_power = 25;
+	this.inventory = new Inventory();
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -266,8 +267,7 @@ CharacterPC.prototype.update = function () {
 	BasicSprite.prototype.update.call(this);
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
-	this.game.y = SCREEN_HEIGHT / 2 - this.y;
-	
+	this.game.y = SCREEN_HEIGHT / 2 - this.y;	
 }
 
 
