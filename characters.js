@@ -83,7 +83,7 @@ AnimationCharacter.prototype.drawFrame = function (tick, ctx, x, y) {
 	ctx.drawImage(sourceImage,
 		 source_x, source_y,  // Source from the sprite sheet.
 		 this.frameSize, this.frameSize,
-		 x - (this.frameSize / 2), y - (this.frameSize / 2),
+		 x - (this.frameSize * this.scale / 2), y - (this.frameSize * this.scale / 2),
 		 this.frameSize * this.scale,
 		 this.frameSize * this.scale);
 
@@ -173,7 +173,7 @@ BasicSprite.prototype.update = function () {
 				
 				// Attack Player
 				if (checkAttack(player, this)) {
-					this.is_moving = false;
+					//this.is_moving = false;
 					this.is_attack = true;
 				}
 				if (checkDistance(player, this) < this.damage_range) {
@@ -192,6 +192,14 @@ BasicSprite.prototype.update = function () {
 						if (this.health <= 0) {
 							this.health = 0;
 							killCharacter(this);
+							console.log("Gold: " + player.inventory.getGold());
+							player.inventory.setGold(this.gold);
+							console.log("Gold: " + player.inventory.getGold());
+							if (this instanceof Large_Skeleton_Melee) {
+								console.log("Key: " + player.inventory.getKey());
+								player.inventory.setKey(this.key);
+								console.log("Key: " + player.inventory.getKey());
+							}
 						}
 					}			
 				}
@@ -251,6 +259,7 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
 	this.type = "PLAYER";
 	this.attack_power = 25;
+	this.inventory = new Inventory();
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -287,6 +296,7 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 5;
+	this.gold = 25;
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -301,6 +311,8 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "ENEMY";
 	this.attack_power = 10;
 	this.damage_range = 20;
+	this.gold = 100;
+	this.key = 1;
 }
 
 Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
