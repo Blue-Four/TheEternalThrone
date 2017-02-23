@@ -167,8 +167,8 @@ BasicSprite.prototype.update = function () {
 			if(isAggro && !player.is_dead) {
 				//disable AI wander so they don't change their mind
 				disable_AI_Wander(this);
-				this.desired_x = player.x;
-				this.desired_y = player.y;
+				this.end_x = player.x;
+				this.end_y = player.y;
 				this.path_start = true;
 				
 				// Attack Player
@@ -227,7 +227,7 @@ BasicSprite.prototype.update = function () {
 			this.is_moving = false;
 		} 
 		else {
-			//getPath(this);
+			getPath(this);
 			handleMovement(this);
 		}
 	}
