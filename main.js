@@ -4,7 +4,7 @@ var SCREEN_WIDTH = 1280;
 var SCREEN_HEIGHT = 720;
 
 // Begin download queue.
-AM.queueDownload("./img/tiles/tile_short.png");
+AM.queueDownload("./img/tiles/dungeon1.png");
 AM.queueDownload("./img/barbarian_spritesheet.png");
 AM.queueDownload("./img/skeleton_spritesheet.png");
 AM.queueDownload("./img/villager1_spritesheet.png");
@@ -16,7 +16,7 @@ AM.downloadAll(function () {
 
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);	
-	var level = new Level(gameEngine, AM.getAsset("./img/tiles/tile_short.png"), path_test, tile_logic_basic);
+	var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), path_test, tile_logic_basic);
     gameEngine.setLevel(level);
 	
     gameEngine.start();
@@ -25,15 +25,11 @@ AM.downloadAll(function () {
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), randomCoords.x, randomCoords.y, 175, 1);
     gameEngine.addEntity(barbarianPC);
 	
-<<<<<<< HEAD
-	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), 100, 200, 110, 1);
-=======
 	randomCoords = level.getRandomLocation();
 	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
->>>>>>> refs/remotes/origin/master
     gameEngine.addEntity(missDemeanor);
 	apply_AI_Wander(missDemeanor);
-	/*
+	
 	for(var i = 0; i < 4; i++) {	
 		randomCoords = level.getRandomLocation();
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);

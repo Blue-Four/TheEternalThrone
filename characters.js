@@ -117,11 +117,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
     this.game = game;
     this.ctx = game.ctx;
 	this.collision_radius = 24;
-<<<<<<< HEAD
-	this.path_start = false;
-=======
 	this.health = 100;
->>>>>>> refs/remotes/origin/master
 	
 	// Movement
 	this.is_moving = false;
@@ -156,11 +152,6 @@ BasicSprite.prototype.getHealth = function() {
 }
 
 BasicSprite.prototype.update = function () {
-<<<<<<< HEAD
-	getPath(this);
-	handleMovement(this);
-	
-=======
 	if (!this.is_dead) {
 		// find Player in entities list
 		for (i in this.game.entities) {
@@ -251,7 +242,6 @@ BasicSprite.prototype.update = function () {
 			handleMovement(this);
 		}
 	}
->>>>>>> refs/remotes/origin/master
 }
 
 // BasicSprite.prototype.getNearestBoundingPoint = function (x, y) {
@@ -276,28 +266,16 @@ CharacterPC.prototype = Object.create(BasicSprite.prototype);
 CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
-<<<<<<< HEAD
-	if	(this.game.mouse_clicked_right) {
-		this.end_x = this.game.rightclick.x;
-		this.end_y = this.game.rightclick.y;
-		this.path_start = true;
-		
-=======
 	if	(!(this.is_dying || this.is_dead) && this.game.mouse_clicked_right) {
 		this.end_x = this.game.rightclick.x;
 		this.end_y = this.game.rightclick.y;
 		this.path_start = true;
->>>>>>> refs/remotes/origin/master
 		this.game.mouse_clicked_right = false;	
 	}
 	
 	getPath(this);
-<<<<<<< HEAD
-	handleMovement(this);
-=======
 	//check if PC is dead in update
 	BasicSprite.prototype.update.call(this);
->>>>>>> refs/remotes/origin/master
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
@@ -362,47 +340,7 @@ Ally_Villager.prototype.constructor = BasicSprite;
 // ====================================
 
 
-<<<<<<< HEAD
-function getPath(character) {
-	if	(character.path_start === true) {
-		var start = character.game.level.getTileFromPoint(character.x, character.y);
-		var end = character.game.level.getTileFromPoint(character.end_x - character.game.x, character.end_y - character.game.y);
-		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
-			return;
-		}
-		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
-		console.log(character.moveNodes.toString());
-		
-		if	(end.type === "TYPE_FLOOR") {
-			var node = character.moveNodes.shift();
-			console.log(node);
-			var coords = character.game.level.getPointFromTile(node.x, node.y);
-			console.log(coords);
-			character.desired_x = coords[0];
-			character.desired_y = coords[1];
-			character.is_moving = true;
-			
-		}
-		
-		character.path_start = false;
-		
-	} else if (character.moveNodes.length > 0 && character.x == character.desired_x && character.y == character.desired_y) {
-		var node = character.moveNodes.shift();
-		console.log(node);
-		var coords = character.game.level.getPointFromTile(node.x, node.y);
-		character.desired_x = coords[0];
-		character.desired_y = coords[1];
-		character.is_moving = true;
-		
-	}
-	
-}
-
-
-// Handles movement for all Characters.
-=======
 // Handles movement for all Characters. Should be called from the Character.update() function.
->>>>>>> refs/remotes/origin/master
 function handleMovement(character) {
 	if	(character.is_moving === true) {
 		if	(Math.abs(character.x - character.desired_x) < 1 &&
