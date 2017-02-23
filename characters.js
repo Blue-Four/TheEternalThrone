@@ -83,7 +83,7 @@ AnimationCharacter.prototype.drawFrame = function (tick, ctx, x, y) {
 	ctx.drawImage(sourceImage,
 		 source_x, source_y,  // Source from the sprite sheet.
 		 this.frameSize, this.frameSize,
-		 x - (this.frameSize / 2), y - (this.frameSize / 2),
+		 x - (this.frameSize * this.scale / 2), y - (this.frameSize * this.scale / 2),
 		 this.frameSize * this.scale,
 		 this.frameSize * this.scale);
 
@@ -173,7 +173,7 @@ BasicSprite.prototype.update = function () {
 				
 				// Attack Player
 				if (checkAttack(player, this)) {
-					this.is_moving = false;
+					//this.is_moving = false;
 					this.is_attack = true;
 				}
 				if (checkDistance(player, this) < this.damage_range) {
