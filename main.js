@@ -25,21 +25,24 @@ AM.downloadAll(function () {
     var randomCoords = level.getRandomLocation();
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), randomCoords.x, randomCoords.y, 175, 1);
     gameEngine.addEntity(barbarianPC);
+
+    var inventoryPC = new Inventory();
 	
 	randomCoords = level.getRandomLocation();
 	var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
     gameEngine.addEntity(missDemeanor);
 	apply_AI_Wander(missDemeanor);
 	
-/*	for(var i = 0; i < 4; i++) {	
+	for(var i = 0; i < 4; i++) {	
 		//spawn randomly for display purposes
 		randomCoords = level.getRandomLocation();
 		//rX = Math.floor(Math.random() * SCREEN_WIDTH);
    		//rY = Math.floor(Math.random() * SCREEN_HEIGHT);
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
+		apply_AI_Wander(zombie);
 		//apply_AI_Wander(zombie);
-	}*/
+	}
 
 	for(var i = 0; i < 4; i++) {
 		randomCoords = level.getRandomLocation();
