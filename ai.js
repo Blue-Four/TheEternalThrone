@@ -6,8 +6,8 @@ function apply_AI_Wander(character) {
             //character.moveNodes = [];
             var tile = getRandomTile(character, 3);
            
-            character.desired_x = tile.x;
-            character.desired_y = tile.y;
+            character.end_x = tile.x;
+            character.end_y = tile.y;
            
             character.path_start = true;
             if (character.is_dying || character.is_dead) character.is_moving = false;
