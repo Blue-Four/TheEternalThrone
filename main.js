@@ -30,19 +30,21 @@ AM.downloadAll(function () {
     // gameEngine.addEntity(missDemeanor);
 	// apply_AI_Wander(missDemeanor);
 	
-/*	for(var i = 0; i < 4; i++) {	
+
+for(var i = 0; i < 4; i++) {
 		randomCoords = level.getRandomLocation();
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
 		apply_AI_Wander(zombie);
-	}*/
 
-	for(var i = 0; i < 4; i++) {
+}
+  
+	/*for(var i = 0; i < 4; i++) {
 		randomCoords = level.getRandomLocation();
 		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
 		apply_AI_Wander(swordyMcSwordface);
-	}
+	}*/
 
 	// for(var i = 0; i < 2; i++) {
 		// randomCoords = level.getRandomLocation();
