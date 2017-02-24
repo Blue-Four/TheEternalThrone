@@ -16,47 +16,26 @@ AssetManager.prototype.isDone = function () {
 
 AssetManager.prototype.downloadAll = function (callback) {
     for (var i = 0; i < this.downloadQueue.length; i++) {
+        var img = new Image();
         var that = this;
+
         var path = this.downloadQueue[i];
         console.log(path);
-		
-		if	(path.includes(".png") || path.includes(".jpg")) {
-			var img = new Image();
 
-			img.addEventListener("load", function () {
-				console.log("Loaded " + this.src);
-				that.successCount++;
-				if(that.isDone()) callback();
-			});
+        img.addEventListener("load", function () {
+            console.log("Loaded " + this.src);
+            that.successCount++;
+            if(that.isDone()) callback();
+        });
 
-			img.addEventListener("error", function () {
-				console.log("Error loading " + this.src);
-				that.errorCount++;
-				if (that.isDone()) callback();
-			});
+        img.addEventListener("error", function () {
+            console.log("Error loading " + this.src);
+            that.errorCount++;
+            if (that.isDone()) callback();
+        });
 
-			img.src = path;
-			this.cache[path] = img;
-			
-		} else if	(path.includes(".mp3") || path.includes(".wav")) {
-			var snd = new Audio();
-
-			snd.addEventListener("load", function () {
-				console.log("Loaded " + this.src);
-				that.successCount++;
-				if(that.isDone()) callback();
-			});
-
-			snd.addEventListener("error", function () {
-				console.log("Error loading " + this.src);
-				that.errorCount++;
-				if (that.isDone()) callback();
-			});
-
-			snd.src = path;
-			this.cache[path] = snd;
-			
-		}
+        img.src = path;
+        this.cache[path] = img;
     }
 }
 
