@@ -53,9 +53,20 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("click", function (e) {
         that.leftclick = getXandY(e);
-		that.mouse_clicked_left = true;
 		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
-		console.log("Tile Type = " + tile.type);
+		
+		// Checks to see if the mouse click was within 64 pixels of the PC.
+		// If so, and the clicked tile happens to be a door, interact with it.
+		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.leftclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.leftclick.y, 2))) < 64) {
+			if (tile.type === "TYPE_DOOR_OPEN") {
+				tile.type = "TYPE_DOOR_CLOSED";
+				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 0;
+			} else if (tile.type === "TYPE_DOOR_CLOSED") {
+				tile.type = "TYPE_DOOR_OPEN";
+				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+			}
+			
+		}
     }, false);
 	
 	this.ctx.canvas.addEventListener("mousedown", function (e) {
@@ -132,11 +143,7 @@ GameEngine.prototype.draw = function () {
 		
 		if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
 			&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
-				this.ctx.drawImage(this.level.spritesheet,
-					120 * tile.sprite_index, 0,
-					120, 120,
-					tile.x + this.x - 60, tile.y + this.y - 90,
-					120, 120);
+				tile.draw();
 					
 		}
 		
@@ -153,11 +160,7 @@ GameEngine.prototype.draw = function () {
 				// If this tile is within the bounds of the screen...
 				if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
 						&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
-					this.ctx.drawImage(this.level.spritesheet,
-								120 * tile.sprite_index, 0,
-								120, 120,
-								tile.x + this.x - 60, tile.y + this.y - 90,
-								120, 120);
+					tile.draw();
 								
 				}
 							
@@ -177,11 +180,8 @@ GameEngine.prototype.draw = function () {
 		} else if (iWallCount < this.level.walls.length && iEntityCount >= this.entities.length) {
 			var tile = this.level.walls[iWallCount];
 			
-			this.ctx.drawImage(this.level.spritesheet,
-								120 * tile.sprite_index, 0,
-								120, 120,
-								tile.x + this.x - 60, tile.y + this.y - 90,
-								120, 120);
+			tile.draw();
+								
 			iWallCount++;	
 			
 		} else if (iWallCount >= this.level.walls.length && iEntityCount < this.entities.length) {
