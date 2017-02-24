@@ -230,6 +230,11 @@ BasicSprite.prototype.update = function () {
 				this.is_attack = false;
 				this.is_moving = true;
 			}	
+
+			if (this.game.Digit1 && this.inventory.health_potion > 0) {
+				this.health += 25;
+				this.inventory.health_potion -= 1;
+			}
 		}
 
 		// Death animation
