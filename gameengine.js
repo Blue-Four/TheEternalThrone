@@ -198,18 +198,29 @@ GameEngine.prototype.draw = function () {
 		
 	}
 
+    //draw UI 
     this.ctx.font = "bold 16px Arial";
     this.ctx.fillStyle = "white";
     this.ctx.fillText("L-Click: PC Attack Animation", 900, 20);
     this.ctx.fillText("R-Click: Move Player", 900, 36);
-    this.ctx.fillText("Gold: " + this.playerGold, 20, 60);
+    this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.strokeStyle="#FF0000";
     this.ctx.rect(20,20,200,20);
     this.ctx.stroke();
     this.ctx.fillStyle = "red";
     this.ctx.fillRect(20, 20, this.playerHealth * 2, 20);
+    this.ctx.stroke();
+    this.ctx.fillStyle = "blue";
+    this.ctx.strokestyle ="#0000FF";
+    this.ctx.rect(20, 50, 200, 20);
+    this.ctx.fillRect(20, 50, this.playerExperience * 200, 20);
+    this.ctx.stroke();
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("Level " + this.playerLevel, 25, 65);
+    //this.ctx.filRect(20, 100, this.)
     this.ctx.restore();
     if(this.playerHealth <= 0) {
+        this.ctx.fillStyle = "red";
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
     }
@@ -223,6 +234,9 @@ GameEngine.prototype.update = function () {
         if (entity instanceof CharacterPC) {
                 this.playerHealth = entity.health;
                 this.playerGold = entity.inventory.gold;
+                this.playerLevel = entity.currentLevel;
+                this.playerExperience = (entity.experience / entity.levels[this.playerLevel]);
+                this.levelUp = entity.leveledUp;
         }
 
         entity.update();
