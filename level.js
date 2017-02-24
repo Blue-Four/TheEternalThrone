@@ -102,7 +102,7 @@ function genCollMap(array) {
 	var width = array[0].length;
 	var height = array.length;
     var collMap = [];
-    for(var i = 0; i < width; i++){
+    for(var i = 0; i < height; i++){
         collMap.push([]);
     };
 
