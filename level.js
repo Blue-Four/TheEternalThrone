@@ -91,12 +91,12 @@ function genCollMap(tile_sprite_array) {
 	var width = tile_sprite_array[0].length;
 	var height = tile_sprite_array.length;
     var collMap = [];
-    for(var i = 0; i < width; i++){
+    for(var i = 0; i < height; i++){
         collMap.push([]);
     };
 
-    for(var i = 0; i < width; i++){
-        for(var j = 0; j < height; j++){
+    for(var i = 0; i < height; i++){
+        for(var j = 0; j < width; j++){
         	if(tile_sprite_array[i][j] == 1) {
         		collMap[j].push(0);
         	} else {
