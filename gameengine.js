@@ -71,12 +71,19 @@ GameEngine.prototype.startInput = function () {
 	
 	this.ctx.canvas.addEventListener("mousedown", function (e) {
 		that.mouse_down = true;
+        if(e.which == 1) {
+            that.hold_left = true;
+        }
 		that.mouse_anchor = getXandY(e);
         //console.log("Click at " + e.x + " " + e.y);
     }, false);
 	
 	this.ctx.canvas.addEventListener("mouseup", function (e) {
 		that.mouse_down = false;
+        if(e.which == 1) {
+            that.hold_left = false;
+        }
+
     }, false);
 
     this.ctx.canvas.addEventListener("contextmenu", function (e) {
@@ -206,6 +213,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.fillText("1-Key: Use Potion", 900, 52);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
+    this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
     this.ctx.strokeStyle="#FF0000";
     this.ctx.rect(20,20,200,20);
     this.ctx.stroke();
@@ -240,6 +248,7 @@ GameEngine.prototype.update = function () {
                 this.playerExperience = (entity.experience / entity.levels[this.playerLevel]);
                 this.levelUp = entity.leveledUp;
                 this.playerPotions = entity.inventory.health_potion;
+                this.playerKeys = entity.inventory.key;
         }
 
         entity.update();
