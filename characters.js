@@ -188,13 +188,14 @@ BasicSprite.prototype.update = function () {
 					}
 
 					// Attack Enemy
-					if (player.game.mouse_down) {
+					if (player.game.hold_left) {
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
 							killCharacter(this);
 							//console.log("Gold: " + player.inventory.getGold());
 							player.inventory.setGold(this.gold);
+							player.experience += this.expGain;
 							//console.log("Gold: " + player.inventory.getGold());
 							if (this instanceof Large_Skeleton_Melee) {
 								//console.log("Key: " + player.inventory.getKey());
@@ -208,6 +209,7 @@ BasicSprite.prototype.update = function () {
 			}
 			else {
 				this.is_moving = true;
+				if (player.health < 100) player.heatlh += 5 * .025
 			}
 
 			// Go back to wandering
@@ -221,7 +223,7 @@ BasicSprite.prototype.update = function () {
 
 		// Player attack
 		if (this.type === "PLAYER") {
-			if (this.game.mouse_down) {
+			if (this.game.hold_left) {
 				this.is_attack = true;
 				this.is_moving = false;
 			}
@@ -229,6 +231,14 @@ BasicSprite.prototype.update = function () {
 				this.is_attack = false;
 				this.is_moving = true;
 			}	
+
+			if (this.game.Digit1) {
+				if (this.health < 100 && this.inventory.health_potion > 0) {
+					this.health += 25;
+					if (this.health > 100) this.health = 100;
+					this.inventory.health_potion -= 1;
+				}
+			}
 		}
 
 		// Death animation
@@ -261,6 +271,10 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "PLAYER";
 	this.attack_power = 25;
 	this.inventory = new Inventory();
+	this.experience = 0;
+	//xp needed to level
+	this.levels = [0, 100, 200, 300, 500];
+	this.currentLevel = 1;
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -272,6 +286,12 @@ CharacterPC.prototype.update = function () {
 		this.end_y = this.game.rightclick.y;
 		this.path_start = true;
 		this.game.mouse_clicked_right = false;	
+	}
+	if(this.experience >= this.levels[this.currentLevel]) {
+		this.leveledUp = true;
+		this.currentLevel++;
+		this.experience = 0;
+		this.attack_power += Math.floor(this.attack_power * .1);
 	}
 	
 	getPath(this);
@@ -297,7 +317,9 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 5;
-	this.gold = 25;
+	this.gold = Math.floor((Math.random() * 25) + 10);
+	this.expGain = 25;
+
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -312,8 +334,9 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "ENEMY";
 	this.attack_power = 10;
 	this.damage_range = 20;
-	this.gold = 100;
+	this.gold = Math.floor((Math.random() * 100) + 50);
 	this.key = 1;
+	this.expGain = 50;
 }
 
 Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
