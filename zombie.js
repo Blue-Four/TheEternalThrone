@@ -90,6 +90,7 @@ function Zombie(game, spritesheet, x, y) {
     this.x = x;
     this.y = y;
     this.animation = this.animations['idle0'];
+    this.collision_radius = 24;
     this.speed = 110;
     this.game = game;
     this.ctx = game.ctx;

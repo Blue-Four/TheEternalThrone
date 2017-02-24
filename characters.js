@@ -177,6 +177,7 @@ BasicSprite.prototype.update = function () {
 					this.is_attack = true;
 				}
 				if (checkDistance(player, this) < this.damage_range) {
+					this.is_moving = false;
 					if (player.health > 0) {
 						player.health -= this.attack_power * 0.05;
 						if (player.health <= 0) {
@@ -187,16 +188,16 @@ BasicSprite.prototype.update = function () {
 					}
 
 					// Attack Enemy
-					if (player.game.Digit1) {
+					if (player.game.mouse_down) {
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
 							killCharacter(this);
-							console.log("Gold: " + player.inventory.getGold());
+							//console.log("Gold: " + player.inventory.getGold());
 							player.inventory.setGold(this.gold);
-							console.log("Gold: " + player.inventory.getGold());
+							//console.log("Gold: " + player.inventory.getGold());
 							if (this instanceof Large_Skeleton_Melee) {
-								console.log("Key: " + player.inventory.getKey());
+								//console.log("Key: " + player.inventory.getKey());
 								player.inventory.setKey(this.key);
 								console.log("Key: " + player.inventory.getKey());
 							}
@@ -220,7 +221,7 @@ BasicSprite.prototype.update = function () {
 
 		// Player attack
 		if (this.type === "PLAYER") {
-			if (this.game.Digit1) {
+			if (this.game.mouse_down) {
 				this.is_attack = true;
 				this.is_moving = false;
 			}
@@ -408,7 +409,7 @@ function getPath(character) {
 		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
 		//console.log(character.moveNodes.toString());
 		
-		if	(end.type === "TYPE_FLOOR") {
+		if	(end.isWalkable === true) {
 			var node = character.moveNodes.shift();
 			if(typeof node == 'undefined') {
 				return;
@@ -424,7 +425,7 @@ function getPath(character) {
 		
 		character.path_start = false;
 		
-	} else if (character.moveNodes.length > 0 && character.x == character.desired_x && character.y == character.desired_y) {
+	} else if (character.moveNodes.length > 0 && distanceFromNode(character) < 10) {
 		var node = character.moveNodes.shift();
 		//console.log(node);
 		var coords = character.game.level.getPointFromTile(node.x, node.y);
@@ -434,6 +435,13 @@ function getPath(character) {
 		
 	}
 	
+}
+
+function distanceFromNode(character) {
+	var x = Math.abs(character.x - character.desired_x);
+	var y = Math.abs(character.y - character.desired_y);
+	var distance = Math.sqrt(x*x + y*y);
+	return distance;
 }
 
 //set aggro range in this function(in pixels)
