@@ -408,7 +408,7 @@ function getPath(character) {
 		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
 		//console.log(character.moveNodes.toString());
 		
-		if	(end.type === "TYPE_FLOOR") {
+		if	(end.isWalkable === true) {
 			var node = character.moveNodes.shift();
 			if(typeof node == 'undefined') {
 				return;
