@@ -177,6 +177,7 @@ BasicSprite.prototype.update = function () {
 					this.is_attack = true;
 				}
 				if (checkDistance(player, this) < this.damage_range) {
+					this.is_moving = false;
 					if (player.health > 0) {
 						player.health -= this.attack_power * 0.05;
 						if (player.health <= 0) {
@@ -187,7 +188,7 @@ BasicSprite.prototype.update = function () {
 					}
 
 					// Attack Enemy
-					if (player.game.Digit1) {
+					if (player.game.mouse_down) {
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
@@ -220,7 +221,7 @@ BasicSprite.prototype.update = function () {
 
 		// Player attack
 		if (this.type === "PLAYER") {
-			if (this.game.Digit1) {
+			if (this.game.mouse_down) {
 				this.is_attack = true;
 				this.is_moving = false;
 			}

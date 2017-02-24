@@ -16,7 +16,7 @@ AM.downloadAll(function () {
 
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);	
-	var level = new Level(gameEngine, AM.getAsset("./img/tiles/tile_short.png"), path_test, tile_logic_basic);
+	var level = new Level(gameEngine, AM.getAsset("./img/tiles/tile_short.png"), large_test, tile_logic_basic);
     gameEngine.setLevel(level);
 	
     gameEngine.start();
