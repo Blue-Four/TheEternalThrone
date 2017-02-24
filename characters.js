@@ -188,7 +188,7 @@ BasicSprite.prototype.update = function () {
 					}
 
 					// Attack Enemy
-					if (player.game.mouse_down) {
+					if (player.game.hold_left) {
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
@@ -223,7 +223,7 @@ BasicSprite.prototype.update = function () {
 
 		// Player attack
 		if (this.type === "PLAYER") {
-			if (this.game.mouse_down) {
+			if (this.game.hold_left) {
 				this.is_attack = true;
 				this.is_moving = false;
 			}
