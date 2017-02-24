@@ -9,7 +9,7 @@ window.requestAnimFrame = (function () {
             };
 })();
 
-function GameEngine() {
+function GameEngine(objective_sprite_sheet) {
     this.entities = [];
     this.ctx = null;
     this.surfaceWidth = null;
@@ -17,6 +17,7 @@ function GameEngine() {
 	this.level = null;
 	this.x = 0;
 	this.y = 0;
+	this.objectives = new Objectives(this, objective_sprite_sheet);
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -64,6 +65,11 @@ GameEngine.prototype.startInput = function () {
 			} else if (tile.type === "TYPE_DOOR_CLOSED") {
 				tile.type = "TYPE_DOOR_OPEN";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+			} else if (tile.type === "TYPE_EXIT_CLOSED") {
+				if	(that.playerKeys > 0) {
+				tile.type = "TYPE_EXIT_OPEN";
+				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+				}
 			}
 			
 		}
@@ -112,6 +118,7 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("keyup", function (e) {
         if (e.code === "Digit1") that.Digit1 = false;
         if (e.code === "Digit2") that.Digit2 = false;
+        if (e.code === "KeyL") that.objectives.complete(objective_killgorganthor);
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
@@ -212,6 +219,9 @@ GameEngine.prototype.draw = function () {
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
     }
+	
+	this.objectives.draw();
+	
 }
 
 GameEngine.prototype.update = function () {
@@ -222,6 +232,7 @@ GameEngine.prototype.update = function () {
         if (entity instanceof CharacterPC) {
                 this.playerHealth = entity.health;
                 this.playerGold = entity.inventory.gold;
+                this.playerKeys = entity.inventory.key;
         }
 
         entity.update();
@@ -286,4 +297,68 @@ Entity.prototype.rotateAndCache = function (image, angle) {
     //offscreenCtx.strokeStyle = "red";
     //offscreenCtx.strokeRect(0,0,size,size);
     return offscreenCanvas;
+}
+
+
+// An entity for holding the player's objectives.
+function Objectives(game) {
+	this.game = game;
+	this.objectives = [];
+	this.count = 0;
+	
+}
+
+// Adds an objective with the given words and sprite.
+Objectives.prototype.add = function(words, sprite) {
+	var objective = [this.count, words, sprite];
+	this.count++;
+	
+	this.objectives.push(objective);
+	
+	// Keep objectives in order.
+	this.objectives.sort(function (a, b) {
+		return a[0] - b[0];
+		
+	});
+	
+}
+
+// Completes an objective, removing it from the list.
+Objectives.prototype.complete = function(id) {
+	for	(var count = 0; count < this.objectives.length; count++) {
+		if	(this.objectives[count][0] === id) {
+			this.objectives.splice(count, 1);
+			break;
+			
+		}
+		
+	}
+	
+}
+
+// Draws all objective text to the screen.
+Objectives.prototype.draw = function() {
+	var ctx = this.game.ctx;
+	ctx.save();
+	
+	// Fancy gold font.
+	ctx.font = "bold 12px Times New Roman";
+	ctx.fillStyle = "#DDDD55";
+	
+	for	(var count = 0; count < this.objectives.length; count++) {
+		// Draw the objective icon.
+		ctx.drawImage(this.objectives[count][2],
+						SCREEN_WIDTH - 240,
+						(SCREEN_HEIGHT / 4) - 15 + (30 * count),
+						21, 21);
+		
+		// And the objective itself.
+		ctx.fillText(this.objectives[count][1],
+					SCREEN_WIDTH - 210, 
+					(SCREEN_HEIGHT / 4) + (30 * count));
+		
+	}
+	
+	ctx.restore();
+	
 }

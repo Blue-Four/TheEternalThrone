@@ -278,6 +278,11 @@ CharacterPC.prototype.update = function () {
 	//check if PC is dead in update
 	BasicSprite.prototype.update.call(this);
 	
+	// If the player finds the exit door, complete the associated objective.
+	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
+		this.game.objectives.complete(objective_findexit);
+	}
+	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
 	
@@ -319,6 +324,36 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
 Large_Skeleton_Melee.prototype.constructor = BasicSprite;
 
+
+// GORGANTHOR THE DEFILER
+function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, 2);
+	this.animation.frames_state[0] = 7;
+	this.animation.frames_state[2] = 10;
+	this.animation.frames_state[3] = 10;
+	this.type = "ENEMY";
+	this.attack_power = 10;
+	this.damage_range = 20;
+	this.gold = 100;
+	this.key = 1;
+	this.objective_complete = false;
+	
+}
+
+GORGANTHOR.prototype = Object.create(Large_Skeleton_Melee.prototype);
+GORGANTHOR.prototype.constructor = BasicSprite;
+
+GORGANTHOR.prototype.update = function() {
+	BasicSprite.prototype.update.call(this);
+	
+	// If Gorganthor dies, complete its objective.
+	if	(this.objective_complete === false &&
+		 this.is_dead === true) {
+		this.game.objectives.complete(objective_killgorganthor);
+		this.objective_complete = true;
+	}
+	
+}
 
 
 // ====================================
