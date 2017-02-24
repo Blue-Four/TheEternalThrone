@@ -1,13 +1,13 @@
-#[Play Game!](./game.html)
+[Play Game!](./game.html)
 
-##This is The Eternal Throne. Our hero finds himself in a strange dungeon looking for a key to escape. Eventually he will travel the land determined to find the ever elusive Eternal Throne. With the help of strangers throughout the land, our hero will learn of the true destination of the throne and his ultimate fate.
+This is The Eternal Throne. Our hero finds himself in a strange dungeon looking for a key to escape. Eventually he will travel the land determined to find the ever elusive Eternal Throne. With the help of strangers throughout the land, our hero will learn of the true destination of the throne and his ultimate fate.
 
-###Mouse Controls:
+Mouse Controls:
 
 Left Mouse Click - Interact with items or attack
 
 Right Mouse Click - Move player
 
-###Keys:
+Keys:
 1 - Consume Health Potion
 
