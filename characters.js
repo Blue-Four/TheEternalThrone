@@ -195,6 +195,7 @@ BasicSprite.prototype.update = function () {
 							killCharacter(this);
 							//console.log("Gold: " + player.inventory.getGold());
 							player.inventory.setGold(this.gold);
+							player.experience += this.expGain;
 							//console.log("Gold: " + player.inventory.getGold());
 							if (this instanceof Large_Skeleton_Melee) {
 								//console.log("Key: " + player.inventory.getKey());
@@ -261,6 +262,10 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "PLAYER";
 	this.attack_power = 25;
 	this.inventory = new Inventory();
+	this.experience = 0;
+	//xp needed to level
+	this.levels = [0, 100, 200, 300, 500];
+	this.currentLevel = 1;
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -272,6 +277,12 @@ CharacterPC.prototype.update = function () {
 		this.end_y = this.game.rightclick.y;
 		this.path_start = true;
 		this.game.mouse_clicked_right = false;	
+	}
+	if(this.experience >= this.levels[this.currentLevel]) {
+		this.leveledUp = true;
+		this.currentLevel++;
+		this.experience = 0;
+		this.attack_power += Math.floor(this.attack_power * .1);
 	}
 	
 	getPath(this);
@@ -297,7 +308,9 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 5;
-	this.gold = 25;
+	this.gold = Math.floor((Math.random() * 25) + 10);
+	this.expGain = 25;
+
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -312,8 +325,9 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "ENEMY";
 	this.attack_power = 10;
 	this.damage_range = 20;
-	this.gold = 100;
+	this.gold = Math.floor((Math.random() * 100) + 50);
 	this.key = 1;
+	this.expGain = 50;
 }
 
 Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
