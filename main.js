@@ -30,12 +30,12 @@ AM.downloadAll(function () {
     // gameEngine.addEntity(missDemeanor);
 	// apply_AI_Wander(missDemeanor);
 	
-	// for(var i = 0; i < 4; i++) {	
-		// randomCoords = level.getRandomLocation();
-		// var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
-		// gameEngine.addEntity(zombie);
-		// apply_AI_Wander(zombie);
-	// }
+/*	for(var i = 0; i < 4; i++) {	
+		randomCoords = level.getRandomLocation();
+		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
+		gameEngine.addEntity(zombie);
+		apply_AI_Wander(zombie);
+	}*/
 
 	for(var i = 0; i < 4; i++) {
 		randomCoords = level.getRandomLocation();

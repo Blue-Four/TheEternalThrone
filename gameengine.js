@@ -71,12 +71,19 @@ GameEngine.prototype.startInput = function () {
 	
 	this.ctx.canvas.addEventListener("mousedown", function (e) {
 		that.mouse_down = true;
+        if(e.which == 1) {
+            that.hold_left = true;
+        }
 		that.mouse_anchor = getXandY(e);
         //console.log("Click at " + e.x + " " + e.y);
     }, false);
 	
 	this.ctx.canvas.addEventListener("mouseup", function (e) {
 		that.mouse_down = false;
+        if(e.which == 1) {
+            that.hold_left = false;
+        }
+
     }, false);
 
     this.ctx.canvas.addEventListener("contextmenu", function (e) {
