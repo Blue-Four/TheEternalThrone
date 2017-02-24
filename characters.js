@@ -232,9 +232,12 @@ BasicSprite.prototype.update = function () {
 				this.is_moving = true;
 			}	
 
-			if (this.game.Digit1 && this.inventory.health_potion > 0) {
-				this.health += 25;
-				this.inventory.health_potion -= 1;
+			if (this.game.Digit1) {
+				if (this.health < 100 && this.inventory.health_potion > 0) {
+					this.health += 25;
+					if (this.health > 100) this.health = 100;
+					this.inventory.health_potion -= 1;
+				}
 			}
 		}
 
