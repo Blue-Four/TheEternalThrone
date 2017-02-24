@@ -156,7 +156,7 @@ Zombie.prototype.update = function () {
                         player.health -= this.attack_power * 0.05;
                         if (player.health <= 0) {
                             player.health = 0;
-                            this.attack = false;
+                            this.is_attack = false;
                             killCharacter(player);
                         }
                     }
@@ -167,7 +167,7 @@ Zombie.prototype.update = function () {
                         console.log(this.health);
                         if (this.health <= 0) {
                             this.health = 0;
-                            killCharacter(this);
+                            killZombie(this);
                             player.inventory.setGold(this.gold);
                             player.experience += this.expGain;
                             if (this instanceof Large_Skeleton_Melee) {
@@ -266,7 +266,7 @@ function zombieMovement(character) {
     
 }
 
-function killCharacter(character) { 
+function killZombie(character) { 
     character.is_moving = false;
     character.is_dying = true;
     character.animation = character.animations['death0'];
