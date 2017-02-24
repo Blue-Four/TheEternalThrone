@@ -206,6 +206,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.fillText("1-Key: Use Potion", 900, 52);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
+    this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
     this.ctx.strokeStyle="#FF0000";
     this.ctx.rect(20,20,200,20);
     this.ctx.stroke();
@@ -240,6 +241,7 @@ GameEngine.prototype.update = function () {
                 this.playerExperience = (entity.experience / entity.levels[this.playerLevel]);
                 this.levelUp = entity.leveledUp;
                 this.playerPotions = entity.inventory.health_potion;
+                this.playerKeys = entity.inventory.key;
         }
 
         entity.update();
