@@ -99,8 +99,7 @@ function Zombie(game, spritesheet, x, y) {
     //Combat
     this.damage_range = 10;
     this.type = "ENEMY";
-    this.attack_power = 5;
-    this.health = 100;
+    this.attack_power = 0;
     this.gold = 10;
 
     // Flags
@@ -151,7 +150,6 @@ Zombie.prototype.update = function () {
                     this.is_attack = true;
                 }
                 if (checkDistance(player, this) < this.damage_range) {
-                    this.is_moving = false;
                     if (player.health > 0) {
                         player.health -= this.attack_power * 0.05;
                         if (player.health <= 0) {
@@ -162,16 +160,18 @@ Zombie.prototype.update = function () {
                     }
 
                     // Attack Enemy
-                    if (player.game.mouse_down) {
+                    if (player.game.Digit1) {
                         this.health -= player.attack_power * 0.05;
-                        console.log(this.health);
                         if (this.health <= 0) {
                             this.health = 0;
+
                             killZombie(this);
                             player.inventory.setGold(this.gold);
-                            player.experience += this.expGain;
+                            console.log("Gold: " + player.inventory.getGold());
                             if (this instanceof Large_Skeleton_Melee) {
+                                console.log("Key: " + player.inventory.getKey());
                                 player.inventory.setKey(this.key);
+                                console.log("Key: " + player.inventory.getKey());
                             }
                         }
                     }           
@@ -180,7 +180,6 @@ Zombie.prototype.update = function () {
             }
             else {
                 this.is_moving = true;
-                if (player.health < 100) player.heatlh += 5 * .025
             }
 
             // Go back to wandering
@@ -194,7 +193,7 @@ Zombie.prototype.update = function () {
 
         // Player attack
         if (this.type === "PLAYER") {
-            if (this.game.mouse_down) {
+            if (this.game.Digit1) {
                 this.is_attack = true;
                 this.is_moving = false;
             }
@@ -202,14 +201,6 @@ Zombie.prototype.update = function () {
                 this.is_attack = false;
                 this.is_moving = true;
             }   
-
-            if (this.game.Digit1) {
-                if (this.health < 100 && this.inventory.health_potion > 0) {
-                    this.health += 25;
-                    if (this.health > 100) this.health = 100;
-                    this.inventory.health_potion -= 1;
-                }
-            }
         }
 
         // Death animation
@@ -224,8 +215,8 @@ Zombie.prototype.update = function () {
             zombieMovement(this);
         }
     }
+    
 }
-
 
 
 //handle zombie movement, adapted from handleMovement
