@@ -209,6 +209,7 @@ BasicSprite.prototype.update = function () {
 			}
 			else {
 				this.is_moving = true;
+				if (player.health < 100) player.heatlh += 5 * .025
 			}
 
 			// Go back to wandering
