@@ -126,7 +126,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_dead = false;
 
 	//Combat
-	this.damage_range = 25;
+	this.damage_range = 15;
 
 	// Flags
 	this.is_aggro = false;
@@ -169,17 +169,12 @@ BasicSprite.prototype.update = function () {
 				disable_AI_Wander(this);
 				this.desired_x = player.x;
 				this.desired_y = player.y;
+				this.is_moving = true;
 				//this.path_start = true;
 				
 				// Enemy Attack
 				if (checkAttack(player, this)) {
-					//this.is_moving = false;
 					this.is_attack = true;
-					if(checkDistance(player,this) > this.damage_range) {
-						this.desired_x = player.x;
-						this.desired_y = player.y;
-						this.is_moving = true;
-					}
 				}
 				if (checkDistance(player, this) < this.damage_range) {
 					this.is_moving = false;
@@ -256,7 +251,6 @@ BasicSprite.prototype.update = function () {
 			if (this.game.Digit1) {
 				if (this.health < 100 && this.inventory.health_potion > 0) {
 					this.health += 25;
-					console.log("Potion");
 					if (this.health > 50 && this.help_played) this.help_played = false;
 					if (this.health > 100) this.health = 100;
 					this.inventory.health_potion -= 1;
@@ -281,15 +275,6 @@ BasicSprite.prototype.update = function () {
 	}
 }
 
-// BasicSprite.prototype.getNearestBoundingPoint = function (x, y) {
-	// var point = Math.atan2(y - character.y, x - character.x);
-	
-	// var x_bound = Math.abs(this.x - this.collision_radius * Math.cos(direction));
-	// var y_bound = Math.abs(this.y - this.collision_radius * Math.sin(direction) / 2);
-	
-	// return array = [x_bound, y_bound];
-	
-// }
 
 // PC
 function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
@@ -414,7 +399,7 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 10;
-	this.damage_range = 30;
+	this.damage_range = 20;
 	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.health_potion = 1;
 	this.key = 1;
@@ -593,7 +578,6 @@ function checkAggro(character, entity) {
 	var aggro = false;
 	var distance = checkDistance(character, entity);
 	if(distance < aggroRange && !(character.game.gameVictory)) {
-		//console.log("Aggro distance: " + distance);
 		aggro = true;
 	}
 	return aggro;
