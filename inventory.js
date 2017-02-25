@@ -4,6 +4,24 @@ function Inventory() {
 	this.sword = "Bronze";
 	this.health_potion = 1;
 	this.mana_potion = 2;
+	this.potionSound = document.getElementById("potion");
+	this.coinSound = document.getElementById("coin");
+	this.pickupSound = document.getElementById("pickup");
+}
+
+Inventory.prototype.playPotion = function() {
+    this.potionSound.loop = false;
+    this.potionSound.play();
+}
+
+Inventory.prototype.playCoin = function() {
+    this.coinSound.loop = false;
+    this.coinSound.play();
+}
+
+Inventory.prototype.playPickup = function() {
+    this.pickupSound.loop = false;
+    this.pickupSound.play();
 }
 
 Inventory.prototype.getGold = function() {

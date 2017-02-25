@@ -171,7 +171,7 @@ BasicSprite.prototype.update = function () {
 				this.desired_y = player.y;
 				//this.path_start = true;
 				
-				// Attack Player
+				// Enemy Attack
 				if (checkAttack(player, this)) {
 					//this.is_moving = false;
 					this.is_attack = true;
@@ -192,24 +192,19 @@ BasicSprite.prototype.update = function () {
 						}
 					}
 
-					// Attack Enemy
+					// Player Attack
 					if (player.game.hold_left) {
-						// var desired_movement_arc = calculateMovementArc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2	,
-														// player.game.leftclick.x, player.game.leftclick.y);
-						// console.log(desired_movement_arc);
-						// player.animation.facing = desired_movement_arc;
+
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
 							killCharacter(this);
-							//console.log("Gold: " + player.inventory.getGold());
 							player.inventory.setGold(this.gold);
+							player.inventory.playCoin();
 							player.experience += this.expGain;
-							//console.log("Gold: " + player.inventory.getGold());
-							if (this instanceof Large_Skeleton_Melee) {
-								//console.log("Key: " + player.inventory.getKey());
+							if (this instanceof GORGANTHOR) {
 								player.inventory.setKey(this.key);
-								console.log("Key: " + player.inventory.getKey());
+								player.inventory.playPickup();
 							}
 						}
 					}			
@@ -234,7 +229,9 @@ BasicSprite.prototype.update = function () {
 		if (this.type === "PLAYER") {
 			if (this.game.hold_left) {
 				this.is_attack = true;
-				this.is_moving = false;
+				this.is_moving = false
+				if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
+					this.playSwing();				}
 			}
 			else {
 				this.is_attack = false;
@@ -245,6 +242,7 @@ BasicSprite.prototype.update = function () {
 					this.health += 25;
 					if (this.health > 100) this.health = 100;
 					this.inventory.health_potion -= 1;
+					this.inventory.playPotion();
 				}
 			}
 		}
@@ -283,6 +281,8 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	//xp needed to level
 	this.levels = [0, 100, 200, 300, 500];
 	this.currentLevel = 1;
+	this.swingSound = document.getElementById("attack");
+	this.swingSound.playbackRate = 0.5;
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -316,6 +316,10 @@ CharacterPC.prototype.update = function () {
 	
 }
 
+CharacterPC.prototype.playSwing = function() {
+	this.swingSound.loop = false;
+    this.swingSound.play();
+}
 
 
 // ====================================
