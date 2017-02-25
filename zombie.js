@@ -136,12 +136,8 @@ function Zombie(game, spritesheet, x, y) {
 
     //Sound
     this.zombieSound = document.getElementById("zombie");
+    this.zombieDeathSound = document.getElementById("zombie_death");
     
-}
-
-Zombie.prototype.playZombie = function() {
-    this.zombieSound.loop = false;
-    this.zombieSound.play();
 }
 
 Zombie.prototype.draw = function () {
@@ -205,11 +201,10 @@ Zombie.prototype.update = function () {
                         if (this.health <= 0) {
                             this.health = 0;
                             killZombie(this);
+                            this.playZombieDeath();
                             player.inventory.setGold(this.gold);
+                            player.inventory.playCoin();
                             player.experience += this.expGain;
-                            if (this instanceof Large_Skeleton_Melee) {
-                                player.inventory.setKey(this.key);
-                            }
                         }
                     }           
                 }
@@ -263,7 +258,15 @@ Zombie.prototype.update = function () {
     }
 }
 
+Zombie.prototype.playZombie = function() {
+    this.zombieSound.loop = false;
+    this.zombieSound.play();
+}
 
+Zombie.prototype.playZombieDeath = function() {
+    this.zombieDeathSound.loop = false;
+    this.zombieDeathSound.play();
+}
 
 //handle zombie movement, adapted from handleMovement
 function zombieMovement(character) {

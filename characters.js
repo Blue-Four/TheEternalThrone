@@ -213,9 +213,13 @@ BasicSprite.prototype.update = function () {
 							player.inventory.health_potion += this.health_potion;
 							player.inventory.playCoin();
 							player.experience += this.expGain;
+							if (this instanceof Enemy_Skeleton_Melee) {
+								this.playSkeletonDeath();
+							}
 							if (this instanceof GORGANTHOR) {
 								player.inventory.setKey(this.key);
 								player.inventory.playPickup();
+								this.playGiantDeath();
 							}
 						}
 					}			
@@ -371,12 +375,18 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 25;
 	this.skeletonSound = document.getElementById("skeleton");
+	this.skeletonDeathSound = document.getElementById("zombie_death");
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
 Enemy_Skeleton_Melee.prototype.constructor = BasicSprite;
 
 Enemy_Skeleton_Melee.prototype.playSkeleton = function() {
+	this.skeletonDeathSound.loop = false;
+    this.skeletonDeathSound.play();
+}
+
+Enemy_Skeleton_Melee.prototype.playSkeletonDeath = function() {
 	this.skeletonSound.loop = false;
     this.skeletonSound.play();
 }
@@ -410,8 +420,8 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.key = 1;
 	this.objective_complete = false;
-	this.giantSound = document.getElementById("giant");
-	
+	this.giantSound = document.getElementById("giant");	
+	this.giantDeathSound = document.getElementById("zombie_death");
 }
 
 GORGANTHOR.prototype = Object.create(Large_Skeleton_Melee.prototype);
@@ -445,6 +455,11 @@ GORGANTHOR.prototype.update = function() {
 }
 
 GORGANTHOR.prototype.playGiant = function() {
+	this.giantSound.loop = false;
+    this.giantSound.play();
+}
+
+GORGANTHOR.prototype.playGiantDeath = function() {
 	this.giantSound.loop = false;
     this.giantSound.play();
 }
