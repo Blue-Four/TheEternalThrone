@@ -27,7 +27,7 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 			if	(tile.type === "TYPE_FLOOR") { this.floor.push(tile); }
 			else	{
 				// If this tile is a doorway, draw an additional generic floor tile underneath it.
-				if	(tile.type === "TYPE_DOOR_CLOSED") {
+				if	(tile.type === "TYPE_DOOR_CLOSED" || tile.type === "TYPE_EXIT_CLOSED") {
 					this.floor.push(new Tile(spritesheet, 0, "TYPE_FLOOR",
 									tile_x, tile_y, iX, iY, game));
 				}
@@ -73,7 +73,6 @@ Level.prototype.getPointFromTile = function(xIndex, yIndex) {
 	var findTile = this.array[yIndex][xIndex];
 	var coords = [findTile.x, findTile.y];
 	return coords;
-
 }
 
 //returns array representation of path to take
@@ -121,7 +120,6 @@ function genCollMap(array) {
 	
 }
 
-
 /*
 Tile Types
 	"TYPE_FLOOR"
@@ -135,6 +133,13 @@ Tile Types
 	
 	"TYPE_DOOR_CLOSED"
 	Blocks traversal of all character entities. Obeys the order of depth when drawn.
+	
+	"TYPE_EXIT_OPEN"
+	Allows traversal of all character entities. Obeys the order of depth when drawn.
+	
+	"TYPE_EXIT_OPEN"
+	Blocks traversal of all character entities. Obeys the order of depth when drawn.
+	
 */
 function Tile(spritesheet, sprite_index, type, x, y, xIndex, yIndex, game) {
 	this.spritesheet = spritesheet;
@@ -149,8 +154,8 @@ function Tile(spritesheet, sprite_index, type, x, y, xIndex, yIndex, game) {
 
 Tile.prototype.draw = function() {
 	var iIndexAddition = 0;
-	if	(this.type === "TYPE_DOOR_OPEN") { iIndexAddition = 1; }
-	this.drawnX = this.x + this.game.x - 60;
+	if	(this.type === "TYPE_DOOR_OPEN" || this.type === "TYPE_EXIT_OPEN") { iIndexAddition = 1; }
+	this.drawnX = this.x + this.game.x - 60;		
 	this.drawnY = this.y + this.game.y - 90;
 	this.game.ctx.drawImage(this.spritesheet,
 			120 * (this.sprite_index + iIndexAddition), 0,
@@ -178,5 +183,5 @@ Tile.prototype.isCollision = function(x, y) {
 }
 
 function isWalkable(tile) {
-	return (tile.type === "TYPE_FLOOR" || tile.type === "TYPE_DOOR_OPEN");
+	return (tile.type === "TYPE_FLOOR" || tile.type === "TYPE_DOOR_OPEN" || tile.type === "TYPE_EXIT_OPEN");
 }

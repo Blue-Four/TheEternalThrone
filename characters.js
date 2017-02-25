@@ -189,13 +189,13 @@ BasicSprite.prototype.update = function () {
 
 					// Attack Enemy
 					if (player.game.hold_left) {
-						var desired_movement_arc = calculateMovementArc(player.x, player.y,
-														player.game.leftclick.x, player.game.leftclick.y);
-						if	(desired_movement_arc !== player.animation.facing) {
-							player.animation.state_switched = true;
-							player.animation.facing = desired_movement_arc;
+						// var desired_movement_arc = calculateMovementArc(player.x, player.y,
+						// 								player.game.leftclick.x, player.game.leftclick.y);
+						// if	(desired_movement_arc !== player.animation.facing) {
+						// 	player.animation.state_switched = true;
+						// 	player.animation.facing = desired_movement_arc;
 							
-						}
+						// }
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
@@ -216,7 +216,7 @@ BasicSprite.prototype.update = function () {
 			}
 			else {
 				this.is_moving = true;
-				if (player.health < 100) player.heatlh += 5 * .025
+				if (player.health < 100) player.heatlh += 5 * .025;
 			}
 
 			// Go back to wandering
@@ -238,7 +238,6 @@ BasicSprite.prototype.update = function () {
 				this.is_attack = false;
 				this.is_moving = true;
 			}	
-
 			if (this.game.Digit1) {
 				if (this.health < 100 && this.inventory.health_potion > 0) {
 					this.health += 25;
@@ -305,6 +304,11 @@ CharacterPC.prototype.update = function () {
 	//check if PC is dead in update
 	BasicSprite.prototype.update.call(this);
 	
+	// If the player finds the exit door, complete the associated objective.
+	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
+		this.game.objectives.complete(objective_findexit);
+	}
+	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
 	
@@ -326,7 +330,6 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.attack_power = 5;
 	this.gold = Math.floor((Math.random() * 25) + 10);
 	this.expGain = 25;
-
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
@@ -342,13 +345,42 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.attack_power = 10;
 	this.damage_range = 20;
 	this.gold = Math.floor((Math.random() * 100) + 50);
-	this.key = 1;
 	this.expGain = 50;
 }
 
 Large_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
 Large_Skeleton_Melee.prototype.constructor = BasicSprite;
 
+
+// GORGANTHOR THE DEFILER
+function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, 2);
+	this.animation.frames_state[0] = 7;
+	this.animation.frames_state[2] = 10;
+	this.animation.frames_state[3] = 10;
+	this.type = "ENEMY";
+	this.attack_power = 10;
+	this.damage_range = 20;
+	this.gold = 100;
+	this.key = 1;
+	this.objective_complete = false;
+	
+}
+
+GORGANTHOR.prototype = Object.create(Large_Skeleton_Melee.prototype);
+GORGANTHOR.prototype.constructor = BasicSprite;
+
+GORGANTHOR.prototype.update = function() {
+	BasicSprite.prototype.update.call(this);
+	
+	// If Gorganthor dies, complete its objective.
+	if	(this.objective_complete === false &&
+		 this.is_dead === true) {
+		this.game.objectives.complete(objective_killgorganthor);
+		this.objective_complete = true;
+	}
+	
+}
 
 
 // ====================================
