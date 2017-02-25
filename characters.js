@@ -137,6 +137,8 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.end_x = x;
 	this.end_y = y;
 	this.moveNodes = [];
+
+	this.count = 0;
 }
 
 BasicSprite.prototype.draw = function () {
@@ -160,7 +162,7 @@ BasicSprite.prototype.update = function () {
 				break;
 			}
 		}
-
+		
 		// Attack logic
 		if(this.type === "ENEMY") {
 			var isAggro = checkAggro(player, this);
@@ -238,11 +240,11 @@ BasicSprite.prototype.update = function () {
 		// Player attack
 		if (this.type === "PLAYER") {
 			if (this.game.hold_left) {
+				if ((this.count += 1) % 41 === 0) {
+					this.playSwing();
+				}
 				this.is_attack = true;
 				this.is_moving = false
-				/*if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
-					this.playSwing();				
-				}*/
 			}
 			else {
 				this.is_attack = false;
@@ -289,7 +291,6 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.swingSound = document.getElementById("attack");
 	this.helpSound = document.getElementById("help");
 	this.pcDeathSound = document.getElementById("pc_death");
-	this.swingSound.playbackRate = 0.5;
 	this.help_played = false;
 }
 

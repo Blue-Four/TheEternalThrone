@@ -133,7 +133,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
         if (e.code === "Digit1") that.Digit1 = false;
-        if (e.code === "Digit2") that.Digit2 = false;
+        //if (e.code === "Digit2") that.Digit2 = false;
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);

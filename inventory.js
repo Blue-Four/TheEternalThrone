@@ -73,6 +73,7 @@ function HealthPotion(game, sprite, x, y, player) {
 	this.sprite = sprite;
 	this.exists = true;
 	this.player = player;
+	this.pickupSound = document.getElementById("pickup");
 }
 
 HealthPotion.prototype.draw = function () {
@@ -87,6 +88,8 @@ HealthPotion.prototype.update = function () {
 			var player;
 			
 			this.player.inventory.setHealthPotion(1);
+			this.pickupSound.loop = false;
+    		this.pickupSound.play();
 			this.exists = false;
 			
 		}
