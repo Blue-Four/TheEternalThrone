@@ -312,7 +312,7 @@ CharacterPC.prototype = Object.create(BasicSprite.prototype);
 CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
-	if	(!(this.is_dying || this.is_dead) && this.game.mouse_clicked_right) {
+	if	(!(this.is_dying || this.is_dead || this.game.gameVictory) && this.game.mouse_clicked_right) {
 		this.end_x = this.game.rightclick.x;
 		this.end_y = this.game.rightclick.y;
 		this.path_start = true;
@@ -332,6 +332,7 @@ CharacterPC.prototype.update = function () {
 	// If the player finds the exit door, complete the associated objective.
 	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
 		this.game.objectives.complete(objective_findexit);
+		this.game.gameVictory = true;
 	}
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
@@ -591,7 +592,7 @@ function checkAggro(character, entity) {
 	var aggroRange = 90;
 	var aggro = false;
 	var distance = checkDistance(character, entity);
-	if(distance < aggroRange) {
+	if(distance < aggroRange && !(character.game.gameVictory)) {
 		//console.log("Aggro distance: " + distance);
 		aggro = true;
 	}
