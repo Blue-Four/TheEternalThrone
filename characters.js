@@ -171,15 +171,25 @@ BasicSprite.prototype.update = function () {
 				this.desired_y = player.y;
 				//this.path_start = true;
 				
-				// Attack Player
+				// Enemy Attack
 				if (checkAttack(player, this)) {
 					//this.is_moving = false;
 					this.is_attack = true;
+					if(checkDistance(player,this) > this.damage_range) {
+						this.desired_x = player.x;
+						this.desired_y = player.y;
+						this.is_moving = true;
+					}
 				}
 				if (checkDistance(player, this) < this.damage_range) {
 					this.is_moving = false;
 					if (player.health > 0) {
 						player.health -= this.attack_power * 0.05;
+						if (player.health < 50 && !player.help_played) {
+							player.playHelp();
+							console.log("Help!");
+							player.help_played = true;
+						}
 						if (player.health <= 0) {
 							player.health = 0;
 							this.is_attack = false;
@@ -187,24 +197,18 @@ BasicSprite.prototype.update = function () {
 						}
 					}
 
-					// Attack Enemy
+					// Player Attack
 					if (player.game.hold_left) {
-						// var desired_movement_arc = calculateMovementArc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2	,
-														// player.game.leftclick.x, player.game.leftclick.y);
-						// console.log(desired_movement_arc);
-						// player.animation.facing = desired_movement_arc;
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
 							killCharacter(this);
-							//console.log("Gold: " + player.inventory.getGold());
 							player.inventory.setGold(this.gold);
+							player.inventory.playCoin();
 							player.experience += this.expGain;
-							//console.log("Gold: " + player.inventory.getGold());
-							if (this instanceof Large_Skeleton_Melee) {
-								//console.log("Key: " + player.inventory.getKey());
+							if (this instanceof GORGANTHOR) {
 								player.inventory.setKey(this.key);
-								console.log("Key: " + player.inventory.getKey());
+								player.inventory.playPickup();
 							}
 						}
 					}			
@@ -229,7 +233,10 @@ BasicSprite.prototype.update = function () {
 		if (this.type === "PLAYER") {
 			if (this.game.hold_left) {
 				this.is_attack = true;
-				this.is_moving = false;
+				this.is_moving = false
+				if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
+					this.playSwing();				
+				}
 			}
 			else {
 				this.is_attack = false;
@@ -238,8 +245,10 @@ BasicSprite.prototype.update = function () {
 			if (this.game.Digit1) {
 				if (this.health < 100 && this.inventory.health_potion > 0) {
 					this.health += 25;
+					if (this.health > 50 && this.help_played) this.help_played = false;
 					if (this.health > 100) this.health = 100;
 					this.inventory.health_potion -= 1;
+					this.inventory.playPotion();
 				}
 			}
 		}
@@ -278,6 +287,11 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	//xp needed to level
 	this.levels = [0, 100, 200, 300, 500];
 	this.currentLevel = 1;
+	this.swingSound = document.getElementById("attack");
+	this.helpSound = document.getElementById("help");
+	this.victorySound = document.getElementById("victory");
+	this.swingSound.playbackRate = 0.5;
+	this.help_played = false;
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
@@ -304,6 +318,7 @@ CharacterPC.prototype.update = function () {
 	// If the player finds the exit door, complete the associated objective.
 	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
 		this.game.objectives.complete(objective_findexit);
+		this.playVictory();
 	}
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
@@ -311,6 +326,20 @@ CharacterPC.prototype.update = function () {
 	
 }
 
+CharacterPC.prototype.playSwing = function() {
+	this.swingSound.loop = false;
+    this.swingSound.play();
+}
+
+CharacterPC.prototype.playHelp = function() {
+	this.helpSound.loop = false;
+    this.helpSound.play();
+}
+
+CharacterPC.prototype.playVictory = function() {
+	this.victorySound.loop = false;
+    this.victorySound.play();
+}
 
 
 // ====================================
