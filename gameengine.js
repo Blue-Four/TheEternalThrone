@@ -221,7 +221,7 @@ GameEngine.prototype.draw = function () {
 	this.ctx.drawImage(this.overlay_sprite, -1, -1,
 						SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2);
 
-	ctx.save();
+	this.ctx.save();
     this.ctx.font = "bold 18px Times New Roman";
     this.ctx.fillStyle = "#FF2d2d";    
     this.ctx.fillText("L-Click: Attack/Interact", SCREEN_WIDTH - 240, 40);
