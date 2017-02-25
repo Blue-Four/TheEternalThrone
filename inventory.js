@@ -85,7 +85,6 @@ HealthPotion.prototype.update = function () {
 			Math.sqrt(Math.pow(this.x + this.game.x - this.game.mouse_anchor.x, 2) + Math.pow(this.y  + this.game.y - this.game.mouse_anchor.y, 2)) < 24 &&
 			Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - this.x - this.game.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - this.y - this.game.y, 2)) < 64) {
 			var player;
-			console.log("Update");
 			
 			this.player.inventory.setHealthPotion(1);
 			this.exists = false;
