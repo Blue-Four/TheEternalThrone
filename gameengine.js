@@ -74,6 +74,7 @@ GameEngine.prototype.startInput = function () {
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
                 playDoorOpen();
 				}
+                else playLocked();
 			}
 			
 		}
@@ -346,5 +347,11 @@ function playPickup() {
     var pickupFX = document.getElementById("pickup");
     pickupFX.loop = false;
     pickupFX.play();
+}
+
+function playLocked() {
+    var locked = document.getElementById("door_locked");
+    locked.loop = false;
+    locked.play();
 }
 
