@@ -212,15 +212,15 @@ GameEngine.prototype.draw = function () {
 		
 	}
 
-    this.ctx.font = "bold 16px Arial";
-    this.ctx.fillStyle = "white";
+    this.ctx.font = "bold 18px Times New Roman";
+    this.ctx.fillStyle = "#DDDD55";
     this.ctx.fillText("L-Click: PC Attack Animation", 900, 20);
     this.ctx.fillText("R-Click: Move Player", 900, 36);
     this.ctx.fillText("1-Key: Use Potion", 900, 52);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
     this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
-    this.ctx.strokeStyle="#FF0000";
+    this.ctx.strokeStyle="#FFFFFF";
     this.ctx.rect(20,20,200,20);
     this.ctx.stroke();
     this.ctx.fillStyle = "red";
