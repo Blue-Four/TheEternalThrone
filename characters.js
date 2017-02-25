@@ -238,7 +238,7 @@ BasicSprite.prototype.update = function () {
 		}
 
 		// Player attack
-		if (this.type === "PLAYER") {
+		if (this.type === "PLAYER" && !(this.game.gameVictory)) {
 			if (this.game.hold_left) {
 				if ((this.count += 1) % 41 === 0) {
 					this.playSwing();
@@ -271,7 +271,7 @@ BasicSprite.prototype.update = function () {
 			this.is_moving = false;
 		} 
 		else {
-			if(!isAggro) getPath(this);
+			if(this instanceof CharacterPC) getPath(this);
 			handleMovement(this);
 		}
 	}
