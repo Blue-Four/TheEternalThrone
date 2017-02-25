@@ -133,6 +133,10 @@ function Zombie(game, spritesheet, x, y) {
     this.end_x = x;
     this.end_y = y;
     this.moveNodes = [];
+
+    //Sound
+    this.zombieSound = document.getElementById("zombie");
+    this.zombieDeathSound = document.getElementById("zombie_death");
     
 }
 
@@ -167,15 +171,26 @@ Zombie.prototype.update = function () {
                     this.is_attack = true;
                     //var attackAnim = 'attack' + this.desired_movement_arc;
                     //this.animation = this.animations[attackAnim];
+                    if(checkDistance(player,this) > this.damage_range) {
+                        this.desired_x = player.x;
+                        this.desired_y = player.y;
+                        this.is_moving = true;
+                    }
                 }
                 if (checkDistance(player, this) < this.damage_range) {
                     this.is_moving = false;
                     if (player.health > 0) {
                         player.health -= this.attack_power * 0.05;
+                        this.playZombie();
+                        if (player.health < 50 && !player.help_played) {
+                            player.playHelp();
+                            player.help_played = true;
+                        }
                         if (player.health <= 0) {
                             player.health = 0;
                             this.is_attack = false;
                             killCharacter(player);
+                            player.playPCDeath();
                         }
                     }
 
@@ -186,11 +201,10 @@ Zombie.prototype.update = function () {
                         if (this.health <= 0) {
                             this.health = 0;
                             killZombie(this);
+                            this.playZombieDeath();
                             player.inventory.setGold(this.gold);
+                            player.inventory.playCoin();
                             player.experience += this.expGain;
-                            if (this instanceof Large_Skeleton_Melee) {
-                                player.inventory.setKey(this.key);
-                            }
                         }
                     }           
                 }
@@ -244,7 +258,15 @@ Zombie.prototype.update = function () {
     }
 }
 
+Zombie.prototype.playZombie = function() {
+    this.zombieSound.loop = false;
+    this.zombieSound.play();
+}
 
+Zombie.prototype.playZombieDeath = function() {
+    this.zombieDeathSound.loop = false;
+    this.zombieDeathSound.play();
+}
 
 //handle zombie movement, adapted from handleMovement
 function zombieMovement(character) {

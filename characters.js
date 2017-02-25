@@ -185,15 +185,21 @@ BasicSprite.prototype.update = function () {
 					this.is_moving = false;
 					if (player.health > 0) {
 						player.health -= this.attack_power * 0.05;
+						if (this instanceof Enemy_Skeleton_Melee) {
+							this.playSkeleton();
+						}
+						if (this instanceof GORGANTHOR) {
+							this.playGiant();
+						}
 						if (player.health < 50 && !player.help_played) {
 							player.playHelp();
-							console.log("Help!");
 							player.help_played = true;
 						}
 						if (player.health <= 0) {
 							player.health = 0;
 							this.is_attack = false;
 							killCharacter(player);
+							player.playPCDeath();
 						}
 					}
 
@@ -204,11 +210,16 @@ BasicSprite.prototype.update = function () {
 							this.health = 0;
 							killCharacter(this);
 							player.inventory.setGold(this.gold);
+							player.inventory.health_potion += this.health_potion;
 							player.inventory.playCoin();
 							player.experience += this.expGain;
+							if (this instanceof Enemy_Skeleton_Melee) {
+								this.playSkeletonDeath();
+							}
 							if (this instanceof GORGANTHOR) {
 								player.inventory.setKey(this.key);
 								player.inventory.playPickup();
+								this.playGiantDeath();
 							}
 						}
 					}			
@@ -234,9 +245,9 @@ BasicSprite.prototype.update = function () {
 			if (this.game.hold_left) {
 				this.is_attack = true;
 				this.is_moving = false
-				if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
+				/*if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
 					this.playSwing();				
-				}
+				}*/
 			}
 			else {
 				this.is_attack = false;
@@ -245,9 +256,11 @@ BasicSprite.prototype.update = function () {
 			if (this.game.Digit1) {
 				if (this.health < 100 && this.inventory.health_potion > 0) {
 					this.health += 25;
+					console.log("Potion");
 					if (this.health > 50 && this.help_played) this.help_played = false;
 					if (this.health > 100) this.health = 100;
 					this.inventory.health_potion -= 1;
+					this.game.Digit1 = false;
 					this.inventory.playPotion();
 				}
 				this.game.Digit1 = false;
@@ -290,7 +303,7 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.currentLevel = 1;
 	this.swingSound = document.getElementById("attack");
 	this.helpSound = document.getElementById("help");
-	this.victorySound = document.getElementById("victory");
+	this.pcDeathSound = document.getElementById("pc_death");
 	this.swingSound.playbackRate = 0.5;
 	this.help_played = false;
 }
@@ -319,7 +332,6 @@ CharacterPC.prototype.update = function () {
 	// If the player finds the exit door, complete the associated objective.
 	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
 		this.game.objectives.complete(objective_findexit);
-		this.playVictory();
 	}
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
@@ -337,9 +349,9 @@ CharacterPC.prototype.playHelp = function() {
     this.helpSound.play();
 }
 
-CharacterPC.prototype.playVictory = function() {
-	this.victorySound.loop = false;
-    this.victorySound.play();
+CharacterPC.prototype.playPCDeath = function() {
+	this.pcDeathSound.loop = false;
+    this.pcDeathSound.play();
 }
 
 
@@ -356,11 +368,24 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "ENEMY";
 	this.attack_power = 5;
 	this.gold = Math.floor((Math.random() * 25) + 10);
+	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 25;
+	this.skeletonSound = document.getElementById("skeleton");
+	this.skeletonDeathSound = document.getElementById("zombie_death");
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
 Enemy_Skeleton_Melee.prototype.constructor = BasicSprite;
+
+Enemy_Skeleton_Melee.prototype.playSkeleton = function() {
+	this.skeletonDeathSound.loop = false;
+    this.skeletonDeathSound.play();
+}
+
+Enemy_Skeleton_Melee.prototype.playSkeletonDeath = function() {
+	this.skeletonSound.loop = false;
+    this.skeletonSound.play();
+}
 
 // Enemy Large Melee Skeleton
 function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
@@ -372,6 +397,7 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.attack_power = 10;
 	this.damage_range = 20;
 	this.gold = Math.floor((Math.random() * 100) + 50);
+	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 50;
 }
 
@@ -389,9 +415,11 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.attack_power = 10;
 	this.damage_range = 20;
 	this.gold = Math.floor((Math.random() * 100) + 200);
+	this.health_potion = 1;
 	this.key = 1;
 	this.objective_complete = false;
-	
+	this.giantSound = document.getElementById("giant");	
+	this.giantDeathSound = document.getElementById("zombie_death");
 }
 
 GORGANTHOR.prototype = Object.create(Large_Skeleton_Melee.prototype);
@@ -422,6 +450,16 @@ GORGANTHOR.prototype.update = function() {
 		this.objective_complete = true;
 	}
 	
+}
+
+GORGANTHOR.prototype.playGiant = function() {
+	this.giantSound.loop = false;
+    this.giantSound.play();
+}
+
+GORGANTHOR.prototype.playGiantDeath = function() {
+	this.giantSound.loop = false;
+    this.giantSound.play();
 }
 
 
