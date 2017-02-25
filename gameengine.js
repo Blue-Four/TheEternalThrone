@@ -18,6 +18,7 @@ function GameEngine(objective_sprite_sheet) {
 	this.x = 0;
 	this.y = 0;
 	this.objectives = new Objectives(this, objective_sprite_sheet);
+    this.door = false;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -62,13 +63,16 @@ GameEngine.prototype.startInput = function () {
 			if (tile.type === "TYPE_DOOR_OPEN") {
 				tile.type = "TYPE_DOOR_CLOSED";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 0;
+                playDoorClose();
 			} else if (tile.type === "TYPE_DOOR_CLOSED") {
 				tile.type = "TYPE_DOOR_OPEN";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+                playDoorOpen();
 			} else if (tile.type === "TYPE_EXIT_CLOSED") {
 				if	(that.playerKeys > 0) {
 				tile.type = "TYPE_EXIT_OPEN";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+                playDoorOpen();
 				}
 			}
 			
@@ -213,11 +217,9 @@ GameEngine.prototype.draw = function () {
 	}
 
 
-    this.ctx.font = "bold 16px Arial";
-    this.ctx.fillStyle = "white";
-    this.ctx.fillText("L-Click: Attack/Interact", 900, 20);
     this.ctx.font = "bold 18px Times New Roman";
-    this.ctx.fillStyle = "#DDDD55";
+    this.ctx.fillStyle = "#DDDD55";    
+    this.ctx.fillText("L-Click: Attack/Interact", 900, 20);
     this.ctx.fillText("R-Click: Move Player", 900, 36);
     this.ctx.fillText("1-Key: Use Potion", 900, 52);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
@@ -327,3 +329,22 @@ Entity.prototype.rotateAndCache = function (image, angle) {
     //offscreenCtx.strokeRect(0,0,size,size);
     return offscreenCanvas;
 }
+
+function playDoorOpen() {
+    var doorOpen = document.getElementById("door_open");
+    doorOpen.loop = false;
+    doorOpen.play();
+}
+
+function playDoorClose() {
+    var doorClose = document.getElementById("door_close");
+    doorClose.loop = false;
+    doorClose.play();
+}
+
+function playPickup() {
+    var pickupFX = document.getElementById("pickup_fx");
+    pickupFX.loop = false;
+    pickupFX.play();
+}
+
