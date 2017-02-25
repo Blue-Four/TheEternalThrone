@@ -126,7 +126,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_dead = false;
 
 	//Combat
-	this.damage_range = 10;
+	this.damage_range = 25;
 
 	// Flags
 	this.is_aggro = false;
@@ -412,7 +412,7 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 10;
-	this.damage_range = 20;
+	this.damage_range = 30;
 	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.health_potion = 1;
 	this.key = 1;
