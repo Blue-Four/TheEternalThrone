@@ -12,14 +12,13 @@ AM.queueDownload("./img/villager1_spritesheet.png");
 AM.queueDownload("./img/zombie.png");
 AM.queueDownload("./img/gui/objective.png");
 
-// AM.queueDownload("./sound/effects/door1.mp3");
-// AM.queueDownload("./sound/effects/knock1.mp3");
-// AM.queueDownload("./sound/effects/pickup1.mp3");
-// AM.queueDownload("./sound/music/dungeon.mp3");
-
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
+
+    var musicDungeon = document.getElementById("dungeon_music");
+	musicDungeon.loop = true;
+    musicDungeon.play();
 
     var gameEngine = new GameEngine(AM.getAsset("./img/gui/objective.png"));
     gameEngine.init(ctx);	
@@ -43,13 +42,13 @@ AM.downloadAll(function () {
     // gameEngine.addEntity(missDemeanor);
 	// apply_AI_Wander(missDemeanor);
 	
-	// for(var i = 0; i < 4; i++) {	
-		// randomCoords = level.getRandomLocation();
-		// var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
-		// gameEngine.addEntity(zombie);
-		// apply_AI_Wander(zombie);
-	// }
-
+	/*for(var i = 0; i < 2; i++) {	
+		randomCoords = level.getRandomLocation();
+		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
+		gameEngine.addEntity(zombie);
+		apply_AI_Wander(zombie);
+	}*/
+  
 	for(var i = 0; i < 30; i++) {
 		randomCoords = level.getRandomLocation();
 		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
@@ -64,9 +63,6 @@ AM.downloadAll(function () {
 	    // apply_AI_Wander(largeMcSwordface);
 	// }
 
-	// Add music!
-	// var music = new Audio(AM.getAsset("./sound/music/dungeon.mp3"));
-	// music.play();
 	
 	// Add objectives
 	gameEngine.objectives.add(objective_killgorganthor);

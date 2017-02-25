@@ -81,10 +81,14 @@ function Zombie(game, spritesheet, x, y) {
     this.animations['idle7'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 180);
 
     //death animations
-    this.animations['death4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 99);
-    this.animations['death0'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 243);
-    this.animations['death2'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 27);
-    this.animations['death6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 171);
+    this.animations['death4'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 107);
+    this.animations['death0'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 251);
+    this.animations['death2'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 35);
+    this.animations['death6'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 179);
+    this.animations['death3'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 71);
+    this.animations['death5'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 143);
+    this.animations['death7'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 215);
+    this.animations['death1'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 251);
 
     //animation
     this.x = x;
@@ -102,6 +106,8 @@ function Zombie(game, spritesheet, x, y) {
     this.attack_power = 5;
     this.health = 100;
     this.gold = 10;
+    this.expGain = 25;
+    this.gold = Math.floor((Math.random() * 25) + 10);
 
     // Flags
     this.is_aggro = false;
@@ -164,7 +170,7 @@ Zombie.prototype.update = function () {
                     // Attack Enemy
                     if (player.game.mouse_down) {
                         this.health -= player.attack_power * 0.05;
-                        console.log(this.health);
+                        //console.log(this.health);
                         if (this.health <= 0) {
                             this.health = 0;
                             killZombie(this);
@@ -232,7 +238,7 @@ Zombie.prototype.update = function () {
 function zombieMovement(character) {
     if  (character.is_moving === true) {
         //var frameHalfSize = (character.animation.frameWidth / 2);
-        var desired_movement_arc = calculateMovementArc(character.x, character.y,
+        this.desired_movement_arc = calculateMovementArc(character.x, character.y,
                                             character.desired_x, character.desired_y);
         if  (Math.abs(character.x - character.desired_x) < 1 &&
              Math.abs(character.y - character.desired_y) < 1) {
@@ -269,6 +275,7 @@ function zombieMovement(character) {
 function killZombie(character) { 
     character.is_moving = false;
     character.is_dying = true;
-    character.animation = character.animations['death0'];
+    var deathAnim = "death" + this.desired_movement_arc;
+    character.animation = character.animations[deathAnim];
     character.is_dead = true;   
 } 

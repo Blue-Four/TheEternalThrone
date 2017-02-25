@@ -169,7 +169,7 @@ BasicSprite.prototype.update = function () {
 				disable_AI_Wander(this);
 				this.desired_x = player.x;
 				this.desired_y = player.y;
-				this.path_start = true;
+				//this.path_start = true;
 				
 				// Attack Player
 				if (checkAttack(player, this)) {
@@ -252,7 +252,7 @@ BasicSprite.prototype.update = function () {
 			this.is_moving = false;
 		} 
 		else {
-			getPath(this);
+			if(!isAggro) getPath(this);
 			handleMovement(this);
 		}
 	}
