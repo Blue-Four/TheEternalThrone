@@ -77,11 +77,19 @@ GameEngine.prototype.startInput = function () {
 	
 	this.ctx.canvas.addEventListener("mousedown", function (e) {
 		that.mouse_down = true;
+        if(e.which == 1) {
+            that.hold_left = true;
+        }
 		that.mouse_anchor = getXandY(e);
+        //console.log("Click at " + e.x + " " + e.y);
     }, false);
 	
 	this.ctx.canvas.addEventListener("mouseup", function (e) {
 		that.mouse_down = false;
+        if(e.which == 1) {
+            that.hold_left = false;
+        }
+
     }, false);
 
     this.ctx.canvas.addEventListener("contextmenu", function (e) {
@@ -208,14 +216,27 @@ GameEngine.prototype.draw = function () {
     this.ctx.fillStyle = "white";
     this.ctx.fillText("L-Click: PC Attack Animation", 900, 20);
     this.ctx.fillText("R-Click: Move Player", 900, 36);
-    this.ctx.fillText("Gold: " + this.playerGold, 20, 60);
+    this.ctx.fillText("1-Key: Use Potion", 900, 52);
+    this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
+    this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
+    this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
     this.ctx.strokeStyle="#FF0000";
     this.ctx.rect(20,20,200,20);
     this.ctx.stroke();
     this.ctx.fillStyle = "red";
     this.ctx.fillRect(20, 20, this.playerHealth * 2, 20);
+    this.ctx.stroke();
+    this.ctx.fillStyle = "blue";
+    this.ctx.strokestyle ="#0000FF";
+    this.ctx.rect(20, 50, 200, 20);
+    this.ctx.fillRect(20, 50, this.playerExperience * 200, 20);
+    this.ctx.stroke();
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("Level " + this.playerLevel, 25, 65);
+    //this.ctx.filRect(20, 100, this.)
     this.ctx.restore();
     if(this.playerHealth <= 0) {
+        this.ctx.fillStyle = "red";
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
     }
@@ -232,6 +253,11 @@ GameEngine.prototype.update = function () {
         if (entity instanceof CharacterPC) {
                 this.playerHealth = entity.health;
                 this.playerGold = entity.inventory.gold;
+                this.playerGold = entity.inventory.gold;
+                this.playerLevel = entity.currentLevel;
+                this.playerExperience = (entity.experience / entity.levels[this.playerLevel]);
+                this.levelUp = entity.leveledUp;
+                this.playerPotions = entity.inventory.health_potion;
                 this.playerKeys = entity.inventory.key;
         }
 
@@ -297,68 +323,4 @@ Entity.prototype.rotateAndCache = function (image, angle) {
     //offscreenCtx.strokeStyle = "red";
     //offscreenCtx.strokeRect(0,0,size,size);
     return offscreenCanvas;
-}
-
-
-// An entity for holding the player's objectives.
-function Objectives(game) {
-	this.game = game;
-	this.objectives = [];
-	this.count = 0;
-	
-}
-
-// Adds an objective with the given words and sprite.
-Objectives.prototype.add = function(words, sprite) {
-	var objective = [this.count, words, sprite];
-	this.count++;
-	
-	this.objectives.push(objective);
-	
-	// Keep objectives in order.
-	this.objectives.sort(function (a, b) {
-		return a[0] - b[0];
-		
-	});
-	
-}
-
-// Completes an objective, removing it from the list.
-Objectives.prototype.complete = function(id) {
-	for	(var count = 0; count < this.objectives.length; count++) {
-		if	(this.objectives[count][0] === id) {
-			this.objectives.splice(count, 1);
-			break;
-			
-		}
-		
-	}
-	
-}
-
-// Draws all objective text to the screen.
-Objectives.prototype.draw = function() {
-	var ctx = this.game.ctx;
-	ctx.save();
-	
-	// Fancy gold font.
-	ctx.font = "bold 12px Times New Roman";
-	ctx.fillStyle = "#DDDD55";
-	
-	for	(var count = 0; count < this.objectives.length; count++) {
-		// Draw the objective icon.
-		ctx.drawImage(this.objectives[count][2],
-						SCREEN_WIDTH - 240,
-						(SCREEN_HEIGHT / 4) - 15 + (30 * count),
-						21, 21);
-		
-		// And the objective itself.
-		ctx.fillText(this.objectives[count][1],
-					SCREEN_WIDTH - 210, 
-					(SCREEN_HEIGHT / 4) + (30 * count));
-		
-	}
-	
-	ctx.restore();
-	
 }
