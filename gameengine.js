@@ -343,7 +343,7 @@ function playDoorClose() {
 }
 
 function playPickup() {
-    var pickupFX = document.getElementById("pickup_fx");
+    var pickupFX = document.getElementById("pickup");
     pickupFX.loop = false;
     pickupFX.play();
 }

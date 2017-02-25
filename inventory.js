@@ -6,6 +6,12 @@ function Inventory() {
 	this.mana_potion = 2;
 }
 
+}
+
+}
+
+}
+
 Inventory.prototype.getGold = function() {
 	return this.gold;
 }
