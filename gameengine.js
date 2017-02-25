@@ -74,6 +74,7 @@ GameEngine.prototype.startInput = function () {
 				tile.type = "TYPE_EXIT_OPEN";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
                 playDoorOpen();
+                playVictory();
 				}
                 else playLocked();
 			}
@@ -115,14 +116,14 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
-        if (e.code === "Digit1") that.Digit1 = true;
-        if (e.code === "Digit2") that.Digit2 = true;
+        //if (e.code === "Digit1") that.Digit1 = true;
+        //if (e.code === "Digit2") that.Digit2 = true;
         //console.log(e);
         //console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
-        //if (e.code === "Digit1") that.Digit1 = true;
+        if (e.code === "Digit1") that.Digit1 = true;
         //if (e.code === "Digit2") that.Digit2 = true;
 		// var scrollSpeed = 5;
         //console.log(e);
@@ -356,5 +357,11 @@ function playLocked() {
     var locked = document.getElementById("door_locked");
     locked.loop = false;
     locked.play();
+}
+
+function playVictory() {
+    victorySound = document.getElementById("victory");
+    victorySound.loop = false;
+    victorySound.play();
 }
 

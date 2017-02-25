@@ -2,7 +2,7 @@ function Inventory() {
 	this.gold = 100;
 	this.key = 0;
 	this.sword = "Bronze";
-	this.health_potion = 1;
+	this.health_potion = 2;
 	this.mana_potion = 2;
 	this.potionSound = document.getElementById("potion");
 	this.coinSound = document.getElementById("coin");
