@@ -232,7 +232,7 @@ BasicSprite.prototype.update = function () {
 			}
 
 			// Go back to wandering
-			if (this.was_aggro) {
+			if (this.was_aggro && !this.is_dead) {
 				enable_AI_Wander(this);
 				this.was_aggro = false;
 			}
