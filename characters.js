@@ -189,13 +189,13 @@ BasicSprite.prototype.update = function () {
 
 					// Attack Enemy
 					if (player.game.hold_left) {
-						var desired_movement_arc = calculateMovementArc(player.x, player.y,
-														player.game.leftclick.x, player.game.leftclick.y);
-						if	(desired_movement_arc !== player.animation.facing) {
-							player.animation.state_switched = true;
-							player.animation.facing = desired_movement_arc;
+						// var desired_movement_arc = calculateMovementArc(player.x, player.y,
+														// player.game.leftclick.x, player.game.leftclick.y);
+						// if	(desired_movement_arc !== player.animation.facing) {
+							// player.animation.state_switched = true;
+							// player.animation.facing = desired_movement_arc;
 							
-						}
+						// }
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
