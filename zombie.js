@@ -227,7 +227,7 @@ Zombie.prototype.update = function () {
             this.is_moving = false;
         } 
         else {
-            if (!isAggro) getPath(this);
+            //if (!isAggro) getPath(this);
             zombieMovement(this);
         }
     }
