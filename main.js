@@ -11,6 +11,7 @@ AM.queueDownload("./img/skeleton_gorganthor_spritesheet.png");
 AM.queueDownload("./img/villager1_spritesheet.png");
 AM.queueDownload("./img/zombie.png");
 AM.queueDownload("./img/gui/objective.png");
+AM.queueDownload("./img/gui/overlay.png");
 
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
@@ -20,7 +21,7 @@ AM.downloadAll(function () {
 	musicDungeon.loop = true;
     musicDungeon.play();
 
-    var gameEngine = new GameEngine(AM.getAsset("./img/gui/objective.png"));
+    var gameEngine = new GameEngine(AM.getAsset("./img/gui/objective.png"), AM.getAsset("./img/gui/overlay.png"));
     gameEngine.init(ctx);	
 	var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_dungeon1, tile_logic_dungeon1);
 	//var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_test0, tile_logic_dungeon1);
