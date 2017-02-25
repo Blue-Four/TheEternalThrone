@@ -345,7 +345,6 @@ function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.attack_power = 10;
 	this.damage_range = 20;
 	this.gold = Math.floor((Math.random() * 100) + 50);
-	this.gold = 100;
 	this.expGain = 50;
 }
 
@@ -362,7 +361,7 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "ENEMY";
 	this.attack_power = 10;
 	this.damage_range = 20;
-	this.gold = 100;
+	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.key = 1;
 	this.objective_complete = false;
 	
