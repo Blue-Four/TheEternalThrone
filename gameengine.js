@@ -27,6 +27,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
+    this.gameVictory = false;
     this.startInput();
     console.log('game initialized');
 }
@@ -75,6 +76,7 @@ GameEngine.prototype.startInput = function () {
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
                 playDoorOpen();
                 playVictory();
+		that.gameVictory = true;
 				}
                 else playLocked();
 			}
@@ -249,6 +251,11 @@ GameEngine.prototype.draw = function () {
         this.ctx.fillStyle = "red";
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
+    }
+    if(this.gameVictory) {
+        this.ctx.fillStyle = "#DDDD55";
+        this.ctx.font = "bold 96px Arial";
+        this.ctx.fillText("VICTORY!", this.surfaceWidth/3, this.surfaceHeight/2);
     }
 	
 	this.objectives.draw();
