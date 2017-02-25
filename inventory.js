@@ -1,6 +1,6 @@
 function Inventory() {
 	this.gold = 100;
-	this.key = 0;
+	this.key = 0
 	this.sword = "Bronze";
 	this.health_potion = 2;
 	this.mana_potion = 2;

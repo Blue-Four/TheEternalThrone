@@ -76,7 +76,6 @@ GameEngine.prototype.startInput = function () {
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
                 playDoorOpen();
                 playVictory();
-		that.gameVictory = true;
 				}
                 else playLocked();
 			}
