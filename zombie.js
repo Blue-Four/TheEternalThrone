@@ -133,7 +133,15 @@ function Zombie(game, spritesheet, x, y) {
     this.end_x = x;
     this.end_y = y;
     this.moveNodes = [];
+
+    //Sound
+    this.zombieSound = document.getElementById("zombie");
     
+}
+
+Zombie.prototype.playZombie = function() {
+    this.zombieSound.loop = false;
+    this.zombieSound.play();
 }
 
 Zombie.prototype.draw = function () {
@@ -177,10 +185,16 @@ Zombie.prototype.update = function () {
                     this.is_moving = false;
                     if (player.health > 0) {
                         player.health -= this.attack_power * 0.05;
+                        this.playZombie();
+                        if (player.health < 50 && !player.help_played) {
+                            player.playHelp();
+                            player.help_played = true;
+                        }
                         if (player.health <= 0) {
                             player.health = 0;
                             this.is_attack = false;
                             killCharacter(player);
+                            player.playPCDeath();
                         }
                     }
 

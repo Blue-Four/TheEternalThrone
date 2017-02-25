@@ -185,15 +185,21 @@ BasicSprite.prototype.update = function () {
 					this.is_moving = false;
 					if (player.health > 0) {
 						player.health -= this.attack_power * 0.05;
+						if (this instanceof Enemy_Skeleton_Melee) {
+							this.playSkeleton();
+						}
+						if (this instanceof GORGANTHOR) {
+							this.playGiant();
+						}
 						if (player.health < 50 && !player.help_played) {
 							player.playHelp();
-							console.log("Help!");
 							player.help_played = true;
 						}
 						if (player.health <= 0) {
 							player.health = 0;
 							this.is_attack = false;
 							killCharacter(player);
+							player.playPCDeath();
 						}
 					}
 
@@ -235,9 +241,9 @@ BasicSprite.prototype.update = function () {
 			if (this.game.hold_left) {
 				this.is_attack = true;
 				this.is_moving = false
-				if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
+				/*if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
 					this.playSwing();				
-				}
+				}*/
 			}
 			else {
 				this.is_attack = false;
@@ -291,6 +297,7 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.swingSound = document.getElementById("attack");
 	this.helpSound = document.getElementById("help");
 	this.victorySound = document.getElementById("victory");
+	this.pcDeathSound = document.getElementById("pc_death");
 	this.swingSound.playbackRate = 0.5;
 	this.help_played = false;
 }
@@ -342,6 +349,11 @@ CharacterPC.prototype.playVictory = function() {
     this.victorySound.play();
 }
 
+CharacterPC.prototype.playPCDeath = function() {
+	this.pcDeathSound.loop = false;
+    this.pcDeathSound.play();
+}
+
 
 // ====================================
 //            E N E M I E S
@@ -358,10 +370,16 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.gold = Math.floor((Math.random() * 25) + 10);
 	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 25;
+	this.skeletonSound = document.getElementById("skeleton");
 }
 
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
 Enemy_Skeleton_Melee.prototype.constructor = BasicSprite;
+
+Enemy_Skeleton_Melee.prototype.playSkeleton = function() {
+	this.skeletonSound.loop = false;
+    this.skeletonSound.play();
+}
 
 // Enemy Large Melee Skeleton
 function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
@@ -392,6 +410,7 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.key = 1;
 	this.objective_complete = false;
+	this.giantSound = document.getElementById("giant");
 	
 }
 
@@ -423,6 +442,11 @@ GORGANTHOR.prototype.update = function() {
 		this.objective_complete = true;
 	}
 	
+}
+
+GORGANTHOR.prototype.playGiant = function() {
+	this.giantSound.loop = false;
+    this.giantSound.play();
 }
 
 
