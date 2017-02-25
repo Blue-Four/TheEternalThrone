@@ -27,6 +27,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
+    this.gameVictory = false;
     this.startInput();
     console.log('game initialized');
 }
@@ -75,6 +76,7 @@ GameEngine.prototype.startInput = function () {
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
                 playDoorOpen();
                 playVictory();
+		that.gameVictory = true;
 				}
                 else playLocked();
 			}
@@ -132,8 +134,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
         if (e.code === "Digit1") that.Digit1 = false;
-       // if (e.code === "Digit2") that.Digit2 = false;
-        if (e.code === "KeyL") that.objectives.complete(objective_killgorganthor);
+        if (e.code === "Digit2") that.Digit2 = false;
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
@@ -250,6 +251,11 @@ GameEngine.prototype.draw = function () {
         this.ctx.fillStyle = "red";
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
+    }
+    if(this.gameVictory) {
+        this.ctx.fillStyle = "#DDDD55";
+        this.ctx.font = "bold 96px Arial";
+        this.ctx.fillText("VICTORY!", this.surfaceWidth/3, this.surfaceHeight/2);
     }
 	
 	this.objectives.draw();
