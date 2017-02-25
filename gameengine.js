@@ -221,11 +221,12 @@ GameEngine.prototype.draw = function () {
 	this.ctx.drawImage(this.overlay_sprite, -1, -1,
 						SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2);
 
+	this.ctx.save();
     this.ctx.font = "bold 18px Times New Roman";
-    this.ctx.fillStyle = "#DDDD55";    
-    this.ctx.fillText("L-Click: Attack/Interact", 900, 20);
-    this.ctx.fillText("R-Click: Move Player", 900, 36);
-    this.ctx.fillText("1-Key: Use Potion", 900, 52);
+    this.ctx.fillStyle = "#FF2d2d";    
+    this.ctx.fillText("L-Click: Attack/Interact", SCREEN_WIDTH - 240, 40);
+    this.ctx.fillText("R-Click: Move Player", SCREEN_WIDTH - 240, 60);
+    this.ctx.fillText("1-Key: Use Potion", SCREEN_WIDTH - 240, 80);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
     this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);

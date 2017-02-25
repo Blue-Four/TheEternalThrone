@@ -210,6 +210,7 @@ BasicSprite.prototype.update = function () {
 							this.health = 0;
 							killCharacter(this);
 							player.inventory.setGold(this.gold);
+							player.inventory.health_potion += this.health_potion;
 							player.inventory.playCoin();
 							player.experience += this.expGain;
 							if (this instanceof GORGANTHOR) {
@@ -361,6 +362,7 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "ENEMY";
 	this.attack_power = 5;
 	this.gold = Math.floor((Math.random() * 25) + 10);
+	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 25;
 	this.skeletonSound = document.getElementById("skeleton");
 }
