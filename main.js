@@ -10,6 +10,7 @@ AM.queueDownload("./img/skeleton_spritesheet.png");
 AM.queueDownload("./img/skeleton_gorganthor_spritesheet.png");
 AM.queueDownload("./img/villager1_spritesheet.png");
 AM.queueDownload("./img/zombie.png");
+AM.queueDownload("./img/healthpot.png");
 AM.queueDownload("./img/gui/objective.png");
 AM.queueDownload("./img/gui/overlay.png");
 
@@ -44,19 +45,26 @@ AM.downloadAll(function () {
     // gameEngine.addEntity(missDemeanor);
 	// apply_AI_Wander(missDemeanor);
 	
-	for(var i = 0; i < 20; i++) {	
+	for(var i = 0; i < 15; i++) {	
 		randomCoords = level.getRandomLocation();
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
 		apply_AI_Wander(zombie);
 	}
   
-	for(var i = 0; i < 20; i++) {
+	for(var i = 0; i < 15; i++) {
 		randomCoords = level.getRandomLocation();
 		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
 
 		apply_AI_Wander(swordyMcSwordface);
+
+	}
+	
+	for(var i = 0; i < 30; i++) {
+		randomCoords = level.getRandomLocation();
+		var healthPot = new HealthPotion(gameEngine, AM.getAsset("./img/healthpot.png"), randomCoords.x, randomCoords.y, barbarianPC);
+	    gameEngine.addEntity(healthPot);
 
 	}
 

@@ -263,6 +263,7 @@ BasicSprite.prototype.update = function () {
 					this.game.Digit1 = false;
 					this.inventory.playPotion();
 				}
+				this.game.Digit1 = false;
 			}
 		}
 
