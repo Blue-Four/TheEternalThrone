@@ -4,7 +4,7 @@ This is The Eternal Throne. Our hero finds himself in a strange dungeon looking 
 
 Mouse Controls:
 
-Left Mouse Click - Attack or Interact With Items (When in range of doors click on lower right to open)
+Left Mouse Click - Attack or Interact With Items (When in range of doors click on lower hinge side to open)
 
 Right Mouse Click - Move player
 
