@@ -250,6 +250,7 @@ BasicSprite.prototype.update = function () {
 					this.inventory.health_potion -= 1;
 					this.inventory.playPotion();
 				}
+				this.game.Digit1 = false;
 			}
 		}
 
