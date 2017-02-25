@@ -6,8 +6,8 @@ function apply_AI_Wander(character) {
             //character.moveNodes = [];
             var tile = getRandomTile(character, 3);
            
-            character.end_x = tile.drawnX;
-            character.end_y = tile.drawnY;
+            character.end_x = tile.x;
+            character.end_y = tile.y;
            
             character.path_start = true;
             if (character.is_dying || character.is_dead) character.is_moving = false;
@@ -19,7 +19,7 @@ function apply_AI_Wander(character) {
         }
    
            
-    }, 5000 + (Math.floor(Math.random() * 2000) - 1000));
+    }, 3000 + (Math.floor(Math.random() * 2000) - 1000));
    
 }
 
@@ -56,7 +56,6 @@ function getRandomTile(character, radius) {
          x = Math.floor(Math.random() * (character.game.level.width));
          y = Math.floor(Math.random() * (character.game.level.height));
          tile = character.game.level.array[y][x];
-    } while (!isWalkable(tile));
-    //console.log("Tile found:" + tile.drawnX + " " +  tile.drawnY)
+    } while (tile.type == "TYPE_WALL");
     return tile;
 }
