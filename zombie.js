@@ -90,6 +90,16 @@ function Zombie(game, spritesheet, x, y) {
     this.animations['death7'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 215);
     this.animations['death1'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 251);
 
+    //attack animations
+    // this.animations['attack4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 84);
+    // this.animations['attack0'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 228);
+    // this.animations['attack2'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 12);
+    // this.animations['attack6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 156);
+    // this.animations['attack3'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 48);
+    // this.animations['attack5'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 120);
+    // this.animations['attack7'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 192);
+    // this.animations['attack1'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 264);
+
     //animation
     this.x = x;
     this.y = y;
@@ -155,6 +165,8 @@ Zombie.prototype.update = function () {
                 if (checkAttack(player, this)) {
                     //this.is_moving = false;
                     this.is_attack = true;
+                    //var attackAnim = 'attack' + this.desired_movement_arc;
+                    //this.animation = this.animations[attackAnim];
                 }
                 if (checkDistance(player, this) < this.damage_range) {
                     this.is_moving = false;

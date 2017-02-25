@@ -175,6 +175,11 @@ BasicSprite.prototype.update = function () {
 				if (checkAttack(player, this)) {
 					//this.is_moving = false;
 					this.is_attack = true;
+					if(checkDistance(player,this) > this.damage_range) {
+						this.desired_x = player.x;
+						this.desired_y = player.y;
+						this.is_moving = true;
+					}
 				}
 				if (checkDistance(player, this) < this.damage_range) {
 					this.is_moving = false;
