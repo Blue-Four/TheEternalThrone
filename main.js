@@ -32,6 +32,14 @@ AM.downloadAll(function () {
     var randomCoords = level.getRandomLocation();
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), randomCoords.x, randomCoords.y, 175, 1);
     gameEngine.addEntity(barbarianPC);
+<<<<<<< HEAD
+=======
+	
+
+	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, AM.getAsset("./img/skeleton_gorganthor_spritesheet.png"), level.array[2][2].x, level.array[2][2].y, 110, 2);
+	gameEngine.addEntity(gorganthorTheDefiler);
+	//apply_AI_Wander(gorganthorTheDefiler);	
+>>>>>>> origin/master
 
 	randomCoords = level.getRandomLocation();
 	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, AM.getAsset("./img/skeleton_gorganthor_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 2);
