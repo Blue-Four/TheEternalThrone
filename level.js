@@ -90,7 +90,7 @@ Level.prototype.getRandomLocation = function() {
 		 x = Math.floor(Math.random() * (this.width));
 		 y = Math.floor(Math.random() * (this.height));
 		 tile = this.array[y][x];
-	} while (tile.type == "TYPE_WALL");
+	} while (!isWalkable(tile));
 	var coords = [];
 	coords.x = tile.x;
 	coords.y = tile.y;
@@ -155,10 +155,12 @@ function Tile(spritesheet, sprite_index, type, x, y, xIndex, yIndex, game) {
 Tile.prototype.draw = function() {
 	var iIndexAddition = 0;
 	if	(this.type === "TYPE_DOOR_OPEN" || this.type === "TYPE_EXIT_OPEN") { iIndexAddition = 1; }
+	this.drawnX = this.x + this.game.x - 60;		
+	this.drawnY = this.y + this.game.y - 90;
 	this.game.ctx.drawImage(this.spritesheet,
 			120 * (this.sprite_index + iIndexAddition), 0,
 			120, 120,
-			this.x + this.game.x - 60, this.y + this.game.y - 90,
+			this.drawnX, this.drawnY,
 			120, 120);
 }
 
