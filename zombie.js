@@ -170,7 +170,7 @@ Zombie.prototype.update = function () {
                     // Attack Enemy
                     if (player.game.mouse_down) {
                         this.health -= player.attack_power * 0.05;
-                        //console.log(this.health);
+                        console.log(this.health);
                         if (this.health <= 0) {
                             this.health = 0;
                             killZombie(this);
