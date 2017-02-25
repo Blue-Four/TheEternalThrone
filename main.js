@@ -23,6 +23,7 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine(AM.getAsset("./img/gui/objective.png"));
     gameEngine.init(ctx);	
 	var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_dungeon1, tile_logic_dungeon1);
+	//var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_test0, tile_logic_dungeon1);
     gameEngine.setLevel(level);
 	
     gameEngine.start();
@@ -31,9 +32,16 @@ AM.downloadAll(function () {
 	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), randomCoords.x, randomCoords.y, 175, 1);
     gameEngine.addEntity(barbarianPC);
 	
+
 	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, AM.getAsset("./img/skeleton_gorganthor_spritesheet.png"), level.array[2][2].x, level.array[2][2].y, 110, 2);
 	gameEngine.addEntity(gorganthorTheDefiler);
 	apply_AI_Wander(gorganthorTheDefiler);	
+
+	randomCoords = level.getRandomLocation();
+	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, AM.getAsset("./img/skeleton_gorganthor_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 2);
+	gameEngine.addEntity(gorganthorTheDefiler);	
+	// apply_AI_Wander(gorganthorTheDefiler);
+
 	
 	// randomCoords = level.getRandomLocation();
 	// var missDemeanor = new Ally_Villager(gameEngine, AM.getAsset("./img/villager1_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
@@ -45,13 +53,17 @@ AM.downloadAll(function () {
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
 		apply_AI_Wander(zombie);
-	}
-
-	for(var i = 0; i < 2; i++) {
+	}*/
+  
+	for(var i = 0; i < 30; i++) {
 		randomCoords = level.getRandomLocation();
 		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
+
 		apply_AI_Wander(swordyMcSwordface);
+
+		//apply_AI_Wander(swordyMcSwordface);
+
 	}
 
 	// for(var i = 0; i < 2; i++) {
