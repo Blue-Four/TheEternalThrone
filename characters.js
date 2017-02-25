@@ -199,6 +199,7 @@ BasicSprite.prototype.update = function () {
 							killCharacter(this);
 							//console.log("Gold: " + player.inventory.getGold());
 							player.inventory.setGold(this.gold);
+							player.inventory.health_potion += this.health_potion;
 							player.experience += this.expGain;
 							//console.log("Gold: " + player.inventory.getGold());
 							if (this instanceof Large_Skeleton_Melee) {
@@ -325,6 +326,8 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 5;
+	var potionDrop = (Math.random() < 0.5 ? 1 : 0);
+	this.health_potion = potionDrop;
 	this.gold = Math.floor((Math.random() * 25) + 10);
 	this.expGain = 25;
 }
