@@ -54,7 +54,7 @@ AM.downloadAll(function () {
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
 		apply_AI_Wander(zombie);
-	}*/
+	}
   
 	for(var i = 0; i < 30; i++) {
 		randomCoords = level.getRandomLocation();
