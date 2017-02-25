@@ -9,7 +9,7 @@ window.requestAnimFrame = (function () {
             };
 })();
 
-function GameEngine() {
+function GameEngine(objective_sprite_sheet) {
     this.entities = [];
     this.ctx = null;
     this.surfaceWidth = null;
@@ -17,6 +17,7 @@ function GameEngine() {
 	this.level = null;
 	this.x = 0;
 	this.y = 0;
+	this.objectives = new Objectives(this, objective_sprite_sheet);
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -64,6 +65,11 @@ GameEngine.prototype.startInput = function () {
 			} else if (tile.type === "TYPE_DOOR_CLOSED") {
 				tile.type = "TYPE_DOOR_OPEN";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+			} else if (tile.type === "TYPE_EXIT_CLOSED") {
+				if	(that.playerKeys > 0) {
+				tile.type = "TYPE_EXIT_OPEN";
+				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+				}
 			}
 			
 		}
@@ -120,6 +126,7 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("keyup", function (e) {
         if (e.code === "Digit1") that.Digit1 = false;
         if (e.code === "Digit2") that.Digit2 = false;
+        if (e.code === "KeyL") that.objectives.complete(objective_killgorganthor);
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
@@ -205,7 +212,6 @@ GameEngine.prototype.draw = function () {
 		
 	}
 
-    //draw UI 
     this.ctx.font = "bold 16px Arial";
     this.ctx.fillStyle = "white";
     this.ctx.fillText("L-Click: PC Attack Animation", 900, 20);
@@ -234,6 +240,9 @@ GameEngine.prototype.draw = function () {
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
     }
+	
+	this.objectives.draw();
+	
 }
 
 GameEngine.prototype.update = function () {
@@ -243,6 +252,7 @@ GameEngine.prototype.update = function () {
         var entity = this.entities[i];
         if (entity instanceof CharacterPC) {
                 this.playerHealth = entity.health;
+                this.playerGold = entity.inventory.gold;
                 this.playerGold = entity.inventory.gold;
                 this.playerLevel = entity.currentLevel;
                 this.playerExperience = (entity.experience / entity.levels[this.playerLevel]);
