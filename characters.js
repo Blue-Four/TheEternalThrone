@@ -189,13 +189,10 @@ BasicSprite.prototype.update = function () {
 
 					// Attack Enemy
 					if (player.game.hold_left) {
-						// var desired_movement_arc = calculateMovementArc(player.x, player.y,
+						// var desired_movement_arc = calculateMovementArc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2	,
 														// player.game.leftclick.x, player.game.leftclick.y);
-						// if	(desired_movement_arc !== player.animation.facing) {
-							// player.animation.state_switched = true;
-							// player.animation.facing = desired_movement_arc;
-							
-						// }
+						// console.log(desired_movement_arc);
+						// player.animation.facing = desired_movement_arc;
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
@@ -370,6 +367,21 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 GORGANTHOR.prototype = Object.create(Large_Skeleton_Melee.prototype);
 GORGANTHOR.prototype.constructor = BasicSprite;
 
+GORGANTHOR.prototype.draw = function() {
+	BasicSprite.prototype.draw.call(this);
+	
+	if	(!(this.is_dead || this.is_dying)) {
+		this.ctx.save();
+		this.ctx.font = "italic bold 10px Times New Roman";
+		this.ctx.fillStyle = "#FF0000";
+		this.ctx.fillText("GORGANTHOR THE DEFILER",
+					this.x + this.game.x - 65, this.y + this.game.y - 65);		
+		this.ctx.restore();
+		
+	}
+	
+}
+
 GORGANTHOR.prototype.update = function() {
 	BasicSprite.prototype.update.call(this);
 	
@@ -406,8 +418,8 @@ Ally_Villager.prototype.constructor = BasicSprite;
 // Handles movement for all Characters. Should be called from the Character.update() function.
 function handleMovement(character) {
 	if	(character.is_moving === true) {
-		if	(Math.abs(character.x - character.desired_x) < 1 &&
-			 Math.abs(character.y - character.desired_y) < 1) {
+		if	(Math.abs(character.x - character.desired_x) < 5 &&
+			 Math.abs(character.y - character.desired_y) < 5) {
 			character.x = character.desired_x;
 			character.y = character.desired_y;
 			character.is_moving = false;

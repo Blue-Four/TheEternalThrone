@@ -40,7 +40,7 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 		
 	//graph used for pathfinding
 	var collMap = genCollMap(this.array);
- 	this.graph = new Graph(collMap, { diagonal: true });
+ 	this.graph = new Graph(collMap, { diagonal: false });
 		
 	}
 	
@@ -61,9 +61,11 @@ Level.prototype.getTileFromPoint = function(x, y) {
 	var calculated_x = Math.round((x / 30 + y / 15) / 2);
 	var calculated_y = Math.round((y / 15 - (x / 30)) / 2);
 	
-	if	(calculated_y >= this.array.length || calculated_x >= this.array[0].length ||
-		 calculated_y < 0 || calculated_x < 0) {
-		return new Tile(null, "TYPE_WALL", x, y);
+	if	(calculated_y > this.array.length - 1 ||
+		 calculated_x > this.array[0].length - 1 ||
+		 calculated_y < 0 ||
+		 calculated_x < 0) {
+		return new Tile(null, 0, "TYPE_WALL", x, y, 0, 0, null);
 	} else {
 		return this.array[calculated_y][calculated_x];
 	}
@@ -101,21 +103,20 @@ function genCollMap(array) {
 	var width = array[0].length;
 	var height = array.length;
     var collMap = [];
-    for(var i = 0; i < height; i++){
+    for(var i = 0; i < width; i++){
         collMap.push([]);
     };
 
-    for(var i = 0; i < width; i++){
-        for(var j = 0; j < height; j++){
-        	if(isWalkable(array[i][j])) {
-        		collMap[j].push(1);
+    for(var x = 0; x < width; x++){
+        for(var y = 0; y < height; y++){
+        	if(isWalkable(array[y][x])) {
+        		collMap[x].push(1);
         	} else {
-        		collMap[j].push(0);
+        		collMap[x].push(0);
         	}
         };
     };
-
-    console.log(collMap);
+	
     return(collMap);
 	
 }
