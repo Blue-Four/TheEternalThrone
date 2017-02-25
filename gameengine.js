@@ -9,7 +9,7 @@ window.requestAnimFrame = (function () {
             };
 })();
 
-function GameEngine(objective_sprite_sheet) {
+function GameEngine(objective_sprite_sheet, overlay_sprite) {
     this.entities = [];
     this.ctx = null;
     this.surfaceWidth = null;
@@ -19,6 +19,7 @@ function GameEngine(objective_sprite_sheet) {
 	this.y = 0;
 	this.objectives = new Objectives(this, objective_sprite_sheet);
     this.door = false;
+	this.overlay_sprite = overlay_sprite;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -215,7 +216,9 @@ GameEngine.prototype.draw = function () {
 		}
 		
 	}
-
+	
+	this.ctx.drawImage(this.overlay_sprite, -1, -1,
+						SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2);
 
     this.ctx.font = "bold 18px Times New Roman";
     this.ctx.fillStyle = "#DDDD55";    
