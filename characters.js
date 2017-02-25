@@ -302,7 +302,6 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.currentLevel = 1;
 	this.swingSound = document.getElementById("attack");
 	this.helpSound = document.getElementById("help");
-	this.victorySound = document.getElementById("victory");
 	this.pcDeathSound = document.getElementById("pc_death");
 	this.swingSound.playbackRate = 0.5;
 	this.help_played = false;
@@ -332,7 +331,6 @@ CharacterPC.prototype.update = function () {
 	// If the player finds the exit door, complete the associated objective.
 	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
 		this.game.objectives.complete(objective_findexit);
-		this.playVictory();
 	}
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
@@ -348,11 +346,6 @@ CharacterPC.prototype.playSwing = function() {
 CharacterPC.prototype.playHelp = function() {
 	this.helpSound.loop = false;
     this.helpSound.play();
-}
-
-CharacterPC.prototype.playVictory = function() {
-	this.victorySound.loop = false;
-    this.victorySound.play();
 }
 
 CharacterPC.prototype.playPCDeath = function() {

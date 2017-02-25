@@ -74,6 +74,7 @@ GameEngine.prototype.startInput = function () {
 				tile.type = "TYPE_EXIT_OPEN";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
                 playDoorOpen();
+                playVictory();
 				}
                 else playLocked();
 			}
@@ -357,5 +358,11 @@ function playLocked() {
     var locked = document.getElementById("door_locked");
     locked.loop = false;
     locked.play();
+}
+
+function playVictory() {
+    victorySound = document.getElementById("victory");
+    victorySound.loop = false;
+    victorySound.play();
 }
 
