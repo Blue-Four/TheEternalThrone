@@ -22,6 +22,7 @@ AM.downloadAll(function () {
     var ctx = canvas.getContext("2d");
 
     var musicDungeon = document.getElementById("dungeon_music");
+	musicDungeon.loop = true;
     musicDungeon.play();
 
     var gameEngine = new GameEngine(AM.getAsset("./img/gui/objective.png"));

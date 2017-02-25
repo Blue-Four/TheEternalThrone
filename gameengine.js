@@ -214,7 +214,7 @@ GameEngine.prototype.draw = function () {
 
     this.ctx.font = "bold 16px Arial";
     this.ctx.fillStyle = "white";
-    this.ctx.fillText("L-Click: PC Attack Animation", 900, 20);
+    this.ctx.fillText("L-Click: Attack/Interact", 900, 20);
     this.ctx.fillText("R-Click: Move Player", 900, 36);
     this.ctx.fillText("1-Key: Use Potion", 900, 52);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
