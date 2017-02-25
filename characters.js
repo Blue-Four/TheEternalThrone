@@ -193,13 +193,13 @@ BasicSprite.prototype.update = function () {
 						}
 						if (player.health < 50 && !player.help_played) {
 							player.playHelp();
-							console.log("Help!");
 							player.help_played = true;
 						}
 						if (player.health <= 0) {
 							player.health = 0;
 							this.is_attack = false;
 							killCharacter(player);
+							player.playPCDeath();
 						}
 					}
 
@@ -297,6 +297,7 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.swingSound = document.getElementById("attack");
 	this.helpSound = document.getElementById("help");
 	this.victorySound = document.getElementById("victory");
+	this.pcDeathSound = document.getElementById("pc_death");
 	this.swingSound.playbackRate = 0.5;
 	this.help_played = false;
 }
@@ -346,6 +347,11 @@ CharacterPC.prototype.playHelp = function() {
 CharacterPC.prototype.playVictory = function() {
 	this.victorySound.loop = false;
     this.victorySound.play();
+}
+
+CharacterPC.prototype.playPCDeath = function() {
+	this.pcDeathSound.loop = false;
+    this.pcDeathSound.play();
 }
 
 

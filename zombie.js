@@ -186,10 +186,15 @@ Zombie.prototype.update = function () {
                     if (player.health > 0) {
                         player.health -= this.attack_power * 0.05;
                         this.playZombie();
+                        if (player.health < 50 && !player.help_played) {
+                            player.playHelp();
+                            player.help_played = true;
+                        }
                         if (player.health <= 0) {
                             player.health = 0;
                             this.is_attack = false;
                             killCharacter(player);
+                            player.playPCDeath();
                         }
                     }
 
