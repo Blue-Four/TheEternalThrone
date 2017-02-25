@@ -175,6 +175,11 @@ BasicSprite.prototype.update = function () {
 				if (checkAttack(player, this)) {
 					//this.is_moving = false;
 					this.is_attack = true;
+					if(checkDistance(player,this) > this.damage_range) {
+						this.desired_x = player.x;
+						this.desired_y = player.y;
+						this.is_moving = true;
+					}
 				}
 				if (checkDistance(player, this) < this.damage_range) {
 					this.is_moving = false;
@@ -189,6 +194,7 @@ BasicSprite.prototype.update = function () {
 
 					// Player Attack
 					if (player.game.hold_left) {
+
 						this.health -= player.attack_power * 0.05;
 						if (this.health <= 0) {
 							this.health = 0;
@@ -361,7 +367,7 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.type = "ENEMY";
 	this.attack_power = 10;
 	this.damage_range = 20;
-	this.gold = 100;
+	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.key = 1;
 	this.objective_complete = false;
 	
@@ -369,6 +375,21 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 
 GORGANTHOR.prototype = Object.create(Large_Skeleton_Melee.prototype);
 GORGANTHOR.prototype.constructor = BasicSprite;
+
+GORGANTHOR.prototype.draw = function() {
+	BasicSprite.prototype.draw.call(this);
+	
+	if	(!(this.is_dead || this.is_dying)) {
+		this.ctx.save();
+		this.ctx.font = "italic bold 10px Times New Roman";
+		this.ctx.fillStyle = "#FF0000";
+		this.ctx.fillText("GORGANTHOR THE DEFILER",
+					this.x + this.game.x - 65, this.y + this.game.y - 65);		
+		this.ctx.restore();
+		
+	}
+	
+}
 
 GORGANTHOR.prototype.update = function() {
 	BasicSprite.prototype.update.call(this);
@@ -406,8 +427,8 @@ Ally_Villager.prototype.constructor = BasicSprite;
 // Handles movement for all Characters. Should be called from the Character.update() function.
 function handleMovement(character) {
 	if	(character.is_moving === true) {
-		if	(Math.abs(character.x - character.desired_x) < 1 &&
-			 Math.abs(character.y - character.desired_y) < 1) {
+		if	(Math.abs(character.x - character.desired_x) < 5 &&
+			 Math.abs(character.y - character.desired_y) < 5) {
 			character.x = character.desired_x;
 			character.y = character.desired_y;
 			character.is_moving = false;
