@@ -126,7 +126,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_dead = false;
 
 	//Combat
-	this.damage_range = 10;
+	this.damage_range = 15;
 
 	// Flags
 	this.is_aggro = false;
@@ -137,6 +137,8 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.end_x = x;
 	this.end_y = y;
 	this.moveNodes = [];
+
+	this.count = 0;
 }
 
 BasicSprite.prototype.draw = function () {
@@ -160,7 +162,7 @@ BasicSprite.prototype.update = function () {
 				break;
 			}
 		}
-
+		
 		// Attack logic
 		if(this.type === "ENEMY") {
 			var isAggro = checkAggro(player, this);
@@ -169,17 +171,12 @@ BasicSprite.prototype.update = function () {
 				disable_AI_Wander(this);
 				this.desired_x = player.x;
 				this.desired_y = player.y;
+				this.is_moving = true;
 				//this.path_start = true;
 				
 				// Enemy Attack
 				if (checkAttack(player, this)) {
-					//this.is_moving = false;
 					this.is_attack = true;
-					if(checkDistance(player,this) > this.damage_range) {
-						this.desired_x = player.x;
-						this.desired_y = player.y;
-						this.is_moving = true;
-					}
 				}
 				if (checkDistance(player, this) < this.damage_range) {
 					this.is_moving = false;
@@ -232,7 +229,7 @@ BasicSprite.prototype.update = function () {
 			}
 
 			// Go back to wandering
-			if (this.was_aggro) {
+			if (this.was_aggro && !this.is_dead) {
 				enable_AI_Wander(this);
 				this.was_aggro = false;
 			}
@@ -241,13 +238,13 @@ BasicSprite.prototype.update = function () {
 		}
 
 		// Player attack
-		if (this.type === "PLAYER") {
+		if (this.type === "PLAYER" && !(this.game.gameVictory)) {
 			if (this.game.hold_left) {
+				if ((this.count += 1) % 41 === 0) {
+					this.playSwing();
+				}
 				this.is_attack = true;
 				this.is_moving = false
-				/*if((Math.floor(this.game.timer.gameTime) / 2) % 2 === 0) {
-					this.playSwing();				
-				}*/
 			}
 			else {
 				this.is_attack = false;
@@ -256,7 +253,6 @@ BasicSprite.prototype.update = function () {
 			if (this.game.Digit1) {
 				if (this.health < 100 && this.inventory.health_potion > 0) {
 					this.health += 25;
-					console.log("Potion");
 					if (this.health > 50 && this.help_played) this.help_played = false;
 					if (this.health > 100) this.health = 100;
 					this.inventory.health_potion -= 1;
@@ -275,21 +271,12 @@ BasicSprite.prototype.update = function () {
 			this.is_moving = false;
 		} 
 		else {
-			if(!isAggro) getPath(this);
+			if(this instanceof CharacterPC) getPath(this);
 			handleMovement(this);
 		}
 	}
 }
 
-// BasicSprite.prototype.getNearestBoundingPoint = function (x, y) {
-	// var point = Math.atan2(y - character.y, x - character.x);
-	
-	// var x_bound = Math.abs(this.x - this.collision_radius * Math.cos(direction));
-	// var y_bound = Math.abs(this.y - this.collision_radius * Math.sin(direction) / 2);
-	
-	// return array = [x_bound, y_bound];
-	
-// }
 
 // PC
 function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
@@ -304,7 +291,6 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.swingSound = document.getElementById("attack");
 	this.helpSound = document.getElementById("help");
 	this.pcDeathSound = document.getElementById("pc_death");
-	this.swingSound.playbackRate = 0.5;
 	this.help_played = false;
 }
 
@@ -312,7 +298,7 @@ CharacterPC.prototype = Object.create(BasicSprite.prototype);
 CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
-	if	(!(this.is_dying || this.is_dead) && this.game.mouse_clicked_right) {
+	if	(!(this.is_dying || this.is_dead || this.game.gameVictory) && this.game.mouse_clicked_right) {
 		this.end_x = this.game.rightclick.x;
 		this.end_y = this.game.rightclick.y;
 		this.path_start = true;
@@ -332,6 +318,7 @@ CharacterPC.prototype.update = function () {
 	// If the player finds the exit door, complete the associated objective.
 	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
 		this.game.objectives.complete(objective_findexit);
+		this.game.gameVictory = true;
 	}
 	
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
@@ -591,8 +578,7 @@ function checkAggro(character, entity) {
 	var aggroRange = 90;
 	var aggro = false;
 	var distance = checkDistance(character, entity);
-	if(distance < aggroRange) {
-		//console.log("Aggro distance: " + distance);
+	if(distance < aggroRange && !(character.game.gameVictory)) {
 		aggro = true;
 	}
 	return aggro;

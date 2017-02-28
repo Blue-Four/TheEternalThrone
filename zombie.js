@@ -163,19 +163,14 @@ Zombie.prototype.update = function () {
                 disable_AI_Wander(this);
                 this.desired_x = player.x;
                 this.desired_y = player.y;
-                this.path_start = true;
+                this.is_moving = true;
+                //this.path_start = true;
                 
                 // Attack Player
                 if (checkAttack(player, this)) {
-                    //this.is_moving = false;
                     this.is_attack = true;
                     //var attackAnim = 'attack' + this.desired_movement_arc;
                     //this.animation = this.animations[attackAnim];
-                    if(checkDistance(player,this) > this.damage_range) {
-                        this.desired_x = player.x;
-                        this.desired_y = player.y;
-                        this.is_moving = true;
-                    }
                 }
                 if (checkDistance(player, this) < this.damage_range) {
                     this.is_moving = false;
@@ -224,26 +219,6 @@ Zombie.prototype.update = function () {
 
         }
 
-        // Player attack
-        if (this.type === "PLAYER") {
-            if (this.game.mouse_down) {
-                this.is_attack = true;
-                this.is_moving = false;
-            }
-            else {
-                this.is_attack = false;
-                this.is_moving = true;
-            }   
-
-            if (this.game.Digit1) {
-                if (this.health < 100 && this.inventory.health_potion > 0) {
-                    this.health += 25;
-                    if (this.health > 100) this.health = 100;
-                    this.inventory.health_potion -= 1;
-                }
-            }
-        }
-
         // Death animation
         if(this.game.Digit2) {
             this.is_dying = true;
@@ -252,7 +227,7 @@ Zombie.prototype.update = function () {
             this.is_moving = false;
         } 
         else {
-            getPath(this);
+            //if (!isAggro) getPath(this);
             zombieMovement(this);
         }
     }

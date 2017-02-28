@@ -37,7 +37,7 @@ AM.downloadAll(function () {
 	randomCoords = level.getRandomLocation();
 	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, AM.getAsset("./img/skeleton_gorganthor_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 2);
 	gameEngine.addEntity(gorganthorTheDefiler);	
-	// apply_AI_Wander(gorganthorTheDefiler);
+	//apply_AI_Wander(gorganthorTheDefiler);
 
 	
 	// randomCoords = level.getRandomLocation();
@@ -49,7 +49,7 @@ AM.downloadAll(function () {
 		randomCoords = level.getRandomLocation();
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
-		apply_AI_Wander(zombie);
+		//apply_AI_Wander(zombie);
 	}
   
 	for(var i = 0; i < 15; i++) {
@@ -57,7 +57,7 @@ AM.downloadAll(function () {
 		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
 
-		apply_AI_Wander(swordyMcSwordface);
+		//apply_AI_Wander(swordyMcSwordface);
 
 	}
 	
