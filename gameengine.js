@@ -280,6 +280,22 @@ GameEngine.prototype.update = function () {
         }
 
         entity.update();
+		
+		if (entity.is_dead) {
+			if	(!entity.deathflag) {
+				entity.dateofdeath = new Date();
+				entity.deathflag = true;
+			}
+			
+			if	(new Date() - entity.dateofdeath > 5000) {
+				console.log("testificate");
+				this.entities.splice(i, 1);
+				entitiesCount--;
+
+			}
+			
+        }
+		
     }
 		
 }
