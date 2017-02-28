@@ -118,6 +118,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
     this.ctx = game.ctx;
 	this.collision_radius = 24;
 	this.health = 100;
+	this.player = game.player;
 	
 	// Movement
 	this.is_moving = false;
@@ -153,69 +154,75 @@ BasicSprite.prototype.getHealth = function() {
 	return this.health;
 }
 
+BasicSprite.prototype.bounceBack = function () {
+	console.log("x: " + this.x + "y: " + this.y);
+	console.log("Facing x: " + this.x + "y: " + this.y);
+	if (this.x < 0) this.x += 30;
+	else this.x -= 30;
+	if (this.y < 0) this.y += 30;
+	else this.y -= 30;
+	console.log("New x: " + this.x + "y: " + this.y);
+}
+
 BasicSprite.prototype.update = function () {
 	if (!this.is_dead) {
-		// find Player in entities list
-		for (i in this.game.entities) {
-			if (this.game.entities[i] instanceof CharacterPC) {
-				var player = this.game.entities[i];
-				break;
-			}
-		}
 		
 		// Attack logic
 		if(this.type === "ENEMY") {
-			var isAggro = checkAggro(player, this);
-			if(isAggro && !player.is_dead) {
+			var isAggro = checkAggro(this.player, this);
+			if(isAggro && !this.player.is_dead) {
 				//disable AI wander so they don't change their mind
 				disable_AI_Wander(this);
-				this.desired_x = player.x;
-				this.desired_y = player.y;
+				this.desired_x = this.player.x;
+				this.desired_y = this.player.y;
 				this.is_moving = true;
 				//this.path_start = true;
 				
 				// Enemy Attack
-				if (checkAttack(player, this)) {
+				if (checkAttack(this.player, this)) {
 					this.is_attack = true;
 				}
-				if (checkDistance(player, this) < this.damage_range) {
+				if (checkDistance(this.player, this) < this.damage_range) {
 					this.is_moving = false;
-					if (player.health > 0) {
-						player.health -= this.attack_power * 0.05;
+					if (this.player.health > 0) {
+						this.player.health -= this.attack_power * 0.05;
 						if (this instanceof Enemy_Skeleton_Melee) {
 							this.playSkeleton();
 						}
 						if (this instanceof GORGANTHOR) {
 							this.playGiant();
 						}
-						if (player.health < 50 && !player.help_played) {
-							player.playHelp();
-							player.help_played = true;
+						if (this.player.health < 50 && !this.player.help_played) {
+							this.player.playHelp();
+							this.player.help_played = true;
 						}
-						if (player.health <= 0) {
-							player.health = 0;
+						if (this.player.health <= 0) {
+							this.player.health = 0;
 							this.is_attack = false;
-							killCharacter(player);
-							player.playPCDeath();
+							killCharacter(this.player);
+							this.player.playPCDeath();
 						}
 					}
 
 					// Player Attack
-					if (player.game.hold_left) {
-						this.health -= player.attack_power * 0.05;
+					if (this.player.game.hold_left) {
+						this.health -= this.player.attack_power * 0.05;
+						//this.bounceBack();
+						//console.log(this.health);
 						if (this.health <= 0) {
 							this.health = 0;
 							killCharacter(this);
-							player.inventory.setGold(this.gold);
-							player.inventory.health_potion += this.health_potion;
-							player.inventory.playCoin();
-							player.experience += this.expGain;
+							this.player.inventory.setGold(this.gold);
+							this.player.inventory.health_potion += this.health_potion;
+							this.player.inventory.playCoin();
+							this.player.experience += this.expGain;
+							//this.bounceBack();
 							if (this instanceof Enemy_Skeleton_Melee) {
 								this.playSkeletonDeath();
 							}
 							if (this instanceof GORGANTHOR) {
-								player.inventory.setKey(this.key);
-								player.inventory.playPickup();
+								this.player.inventory.setKey(this.key);
+								this.player.inventory.playPickup();
 								this.playGiantDeath();
 							}
 						}
@@ -225,7 +232,7 @@ BasicSprite.prototype.update = function () {
 			}
 			else {
 				this.is_moving = true;
-				if (player.health < 100) player.heatlh += 5 * .025;
+				if (this.player.health < 100) this.player.heatlh += 5 * .025;
 			}
 
 			// Go back to wandering
@@ -244,6 +251,8 @@ BasicSprite.prototype.update = function () {
 					this.playSwing();
 				}
 				this.is_attack = true;
+				/*this.desired_x = this.game.leftclick.x;
+				this.desired_y = this.game.leftclick.y;*/
 				this.is_moving = false
 			}
 			else {
@@ -496,7 +505,7 @@ function handleMovement(character) {
 			
 			var direction = Math.atan2(character.desired_y - (character.y),
 										character.desired_x - (character.x));
-			
+
 			character.x += character.game.clockTick * character.speed * Math.cos(direction);
 			character.y += character.game.clockTick * character.speed * Math.sin(direction) / 2;
 			
@@ -506,6 +515,15 @@ function handleMovement(character) {
 	// Attack animation
 	if (!(character.is_dying || character.is_dead) && character.is_attack === true){
 		character.animation.state = 2;
+		/*var desired_movement_arc = calculateMovementArc(character.x, character.y,
+														character.desired_x, character.desired_y);
+		if	(desired_movement_arc !== character.animation.facing) {
+			character.animation.state_switched = true;
+			character.animation.facing = desired_movement_arc;
+			
+		}*/
+		/*var direction = Math.atan2(character.desired_y - (character.y),
+									character.desired_x - (character.x));*/
 		character.is_attack = false;
 	}
 	

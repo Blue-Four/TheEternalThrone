@@ -137,6 +137,9 @@ function Zombie(game, spritesheet, x, y) {
     //Sound
     this.zombieSound = document.getElementById("zombie");
     this.zombieDeathSound = document.getElementById("zombie_death");
+
+    //Set Player
+    this.player = game.player;
     
 }
 
@@ -146,60 +149,53 @@ Zombie.prototype.draw = function () {
 }
 
 Zombie.prototype.update = function () {
-        if (!this.is_dead) {
-        // find Player in entities list
-        for (i in this.game.entities) {
-            if (this.game.entities[i] instanceof CharacterPC) {
-                var player = this.game.entities[i];
-                break;
-            }
-        }
-
+    if (!this.is_dead) {
+        
         // Attack logic
         if(this.type === "ENEMY") {
-            var isAggro = checkAggro(player, this);
-            if(isAggro && !player.is_dead) {
+            var isAggro = checkAggro(this.player, this);
+            if(isAggro && !this.player.is_dead) {
                 //disable AI wander so they don't change their mind
                 disable_AI_Wander(this);
-                this.desired_x = player.x;
-                this.desired_y = player.y;
+                this.desired_x = this.player.x;
+                this.desired_y = this.player.y;
                 this.is_moving = true;
                 //this.path_start = true;
                 
                 // Attack Player
-                if (checkAttack(player, this)) {
+                if (checkAttack(this.player, this)) {
                     this.is_attack = true;
                     //var attackAnim = 'attack' + this.desired_movement_arc;
                     //this.animation = this.animations[attackAnim];
                 }
-                if (checkDistance(player, this) < this.damage_range) {
+                if (checkDistance(this.player, this) < this.damage_range) {
                     this.is_moving = false;
-                    if (player.health > 0) {
-                        player.health -= this.attack_power * 0.05;
+                    if (this.player.health > 0) {
+                        this.player.health -= this.attack_power * 0.05;
                         this.playZombie();
-                        if (player.health < 50 && !player.help_played) {
-                            player.playHelp();
-                            player.help_played = true;
+                        if (this.player.health < 50 && !this.player.help_played) {
+                            this.player.playHelp();
+                            this.player.help_played = true;
                         }
-                        if (player.health <= 0) {
-                            player.health = 0;
+                        if (this.player.health <= 0) {
+                            this.player.health = 0;
                             this.is_attack = false;
-                            killCharacter(player);
-                            player.playPCDeath();
+                            killCharacter(this.player);
+                            this.player.playPCDeath();
                         }
                     }
 
                     // Attack Enemy
-                    if (player.game.mouse_down) {
-                        this.health -= player.attack_power * 0.05;
+                    if (this.player.game.mouse_down) {
+                        this.health -= this.player.attack_power * 0.05;
                         //console.log(this.health);
                         if (this.health <= 0) {
                             this.health = 0;
                             killZombie(this);
                             this.playZombieDeath();
-                            player.inventory.setGold(this.gold);
-                            player.inventory.playCoin();
-                            player.experience += this.expGain;
+                            this.player.inventory.setGold(this.gold);
+                            this.player.inventory.playCoin();
+                            this.player.experience += this.expGain;
                         }
                     }           
                 }
@@ -207,7 +203,7 @@ Zombie.prototype.update = function () {
             }
             else {
                 this.is_moving = true;
-                if (player.health < 100) player.heatlh += 5 * .025
+                if (this.player.health < 100) this.player.heatlh += 5 * .025
             }
 
             // Go back to wandering
