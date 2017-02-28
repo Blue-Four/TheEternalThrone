@@ -275,6 +275,7 @@ BasicSprite.prototype.update = function () {
 			handleMovement(this);
 		}
 	}
+	
 }
 
 
