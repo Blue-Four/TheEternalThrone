@@ -164,10 +164,10 @@ Zombie.prototype.update = function () {
             if(isAggro && !this.player.is_dead) {
                 //disable AI wander so they don't change their mind
                 disable_AI_Wander(this);
-                this.desired_x = this.player.x;
-                this.desired_y = this.player.y;
-                this.is_moving = true;
-                //this.path_start = true;
+                // this.desired_x = this.player.x;
+                // this.desired_y = this.player.y;
+                this.path_start = true;
+                getAggroPath(this, this.player);
                 
                 // Attack Player
                 if (checkAttack(this.player, this)) {
