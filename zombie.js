@@ -111,7 +111,7 @@ function Zombie(game, spritesheet, x, y) {
     this.frameSize = 128;
 
     //Combat
-    this.damage_range = 10;
+    this.damage_range = 20;
     this.type = "ENEMY";
     this.attack_power = 5;
     this.health = 100;
@@ -168,7 +168,7 @@ Zombie.prototype.update = function () {
                     //var attackAnim = 'attack' + this.desired_movement_arc;
                     //this.animation = this.animations[attackAnim];
                 }
-                if (checkDistance(this.player, this) < this.damage_range) {
+                if (checkDistance(this.player, this) < this.damage_range  && !this.player.is_moving) {
                     this.is_moving = false;
                     if (this.player.health > 0) {
                         this.player.health -= this.attack_power * 0.05;
@@ -186,16 +186,18 @@ Zombie.prototype.update = function () {
                     }
 
                     // Attack Enemy
-                    if (this.player.game.mouse_down) {
-                        this.health -= this.player.attack_power * 0.05;
-                        //console.log(this.health);
-                        if (this.health <= 0) {
-                            this.health = 0;
-                            killZombie(this);
-                            this.playZombieDeath();
-                            this.player.inventory.setGold(this.gold);
-                            this.player.inventory.playCoin();
-                            this.player.experience += this.expGain;
+                    if (this.player.game.hold_left) {
+                        if (checkFacing(this.player, this)) {
+                            this.health -= this.player.attack_power * 0.05;
+                            //this.bounceBack();
+                            if (this.health <= 0) {
+                                this.health = 0;
+                                killZombie(this);
+                                this.playZombieDeath();
+                                this.player.inventory.setGold(this.gold);
+                                this.player.inventory.playCoin();
+                                this.player.experience += this.expGain;
+                            }
                         }
                     }           
                 }

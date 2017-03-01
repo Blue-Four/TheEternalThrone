@@ -127,7 +127,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_dead = false;
 
 	//Combat
-	this.damage_range = 15;
+	this.damage_range = 20;
 
 	// Flags
 	this.is_aggro = false;
@@ -182,7 +182,7 @@ BasicSprite.prototype.update = function () {
 				if (checkAttack(this.player, this)) {
 					this.is_attack = true;
 				}
-				if (checkDistance(this.player, this) < this.damage_range) {
+				if (checkDistance(this.player, this) < this.damage_range && !this.player.is_moving) {
 					this.is_moving = false;
 					if (this.player.health > 0) {
 						this.player.health -= this.attack_power * 0.05;
@@ -206,27 +206,28 @@ BasicSprite.prototype.update = function () {
 
 					// Player Attack
 					if (this.player.game.hold_left) {
-						this.health -= this.player.attack_power * 0.05;
-						//this.bounceBack();
-						//console.log(this.health);
-						if (this.health <= 0) {
-							this.health = 0;
-							killCharacter(this);
-							this.player.inventory.setGold(this.gold);
-							this.player.inventory.health_potion += this.health_potion;
-							this.player.inventory.playCoin();
-							this.player.experience += this.expGain;
+						if (checkFacing(this.player, this)) {
+							this.health -= this.player.attack_power * 0.05;
 							//this.bounceBack();
-							if (this instanceof Enemy_Skeleton_Melee) {
-								this.playSkeletonDeath();
+							if (this.health <= 0) {
+								this.health = 0;
+								killCharacter(this);
+								this.player.inventory.setGold(this.gold);
+								this.player.inventory.health_potion += this.health_potion;
+								this.player.inventory.playCoin();
+								this.player.experience += this.expGain;
+								//this.bounceBack();
+								if (this instanceof Enemy_Skeleton_Melee) {
+									this.playSkeletonDeath();
+								}
+								if (this instanceof GORGANTHOR) {
+									this.player.inventory.setKey(this.key);
+									this.player.inventory.playPickup();
+									this.playGiantDeath();
+								}
 							}
-							if (this instanceof GORGANTHOR) {
-								this.player.inventory.setKey(this.key);
-								this.player.inventory.playPickup();
-								this.playGiantDeath();
-							}
-						}
-					}			
+						}			
+					}
 				}
 				this.was_aggro = true;
 			}
@@ -244,33 +245,6 @@ BasicSprite.prototype.update = function () {
 
 		}
 
-		// Player attack
-		if (this.type === "PLAYER" && !(this.game.gameVictory)) {
-			if (this.game.hold_left) {
-				if ((this.count += 1) % 41 === 0) {
-					this.playSwing();
-				}
-				this.is_attack = true;
-				/*this.desired_x = this.game.leftclick.x;
-				this.desired_y = this.game.leftclick.y;*/
-				this.is_moving = false
-			}
-			else {
-				this.is_attack = false;
-				this.is_moving = true;
-			}	
-			if (this.game.Digit1) {
-				if (this.health < 100 && this.inventory.health_potion > 0) {
-					this.health += 25;
-					if (this.health > 50 && this.help_played) this.help_played = false;
-					if (this.health > 100) this.health = 100;
-					this.inventory.health_potion -= 1;
-					this.game.Digit1 = false;
-					this.inventory.playPotion();
-				}
-				this.game.Digit1 = false;
-			}
-		}
 
 		// Death animation
 		if(this.game.Digit2) {
@@ -280,7 +254,7 @@ BasicSprite.prototype.update = function () {
 			this.is_moving = false;
 		} 
 		else {
-			if(this instanceof CharacterPC) getPath(this);
+			//if(this instanceof CharacterPC) getPath(this);
 			handleMovement(this);
 		}
 	}
@@ -302,38 +276,76 @@ function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
 	this.helpSound = document.getElementById("help");
 	this.pcDeathSound = document.getElementById("pc_death");
 	this.help_played = false;
+	this.my_x = SCREEN_WIDTH / 2;
+	this.my_y = SCREEN_HEIGHT / 2;
 }
 
 CharacterPC.prototype = Object.create(BasicSprite.prototype);
 CharacterPC.prototype.constructor = BasicSprite;
 
 CharacterPC.prototype.update = function () {
-	if	(!(this.is_dying || this.is_dead || this.game.gameVictory) && this.game.mouse_clicked_right) {
-		this.end_x = this.game.rightclick.x;
-		this.end_y = this.game.rightclick.y;
-		this.path_start = true;
-		this.game.mouse_clicked_right = false;	
-	}
-	if(this.experience >= this.levels[this.currentLevel]) {
-		this.leveledUp = true;
-		this.currentLevel++;
-		this.experience = 0;
-		this.attack_power += Math.floor(this.attack_power * .1);
-	}
-	
-	getPath(this);
-	//check if PC is dead in update
-	BasicSprite.prototype.update.call(this);
-	
+
 	// If the player finds the exit door, complete the associated objective.
 	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
 		this.game.objectives.complete(objective_findexit);
 		this.game.gameVictory = true;
+		this.is_moving = false;
+		this.animation.state = 0;
 	}
-	
+
+	if (!(this.is_dead || this.game.gameVictory)) {
+		if	(this.game.mouse_clicked_right) {
+			this.end_x = this.game.rightclick.x;
+			this.end_y = this.game.rightclick.y;
+			this.path_start = true;
+			this.game.mouse_clicked_right = false;	
+		}
+
+		// Player attack
+		if (this.type === "PLAYER") {
+			if (this.game.hold_left) {
+				if ((this.count += 1) % 41 === 0) {
+					this.playSwing();
+				}
+				this.is_attack = true;
+
+				// Change the facing of character
+				this.animation.facing = calculateMovementArc(this.my_x, this.my_y, this.game.mouse_anchor.x, 
+					this.game.mouse_anchor.y);
+
+				this.is_moving = false
+			}
+			else {
+				this.is_attack = false;
+				this.is_moving = true;
+			}	
+			if (this.game.Digit1) {
+				if (this.health < 100 && this.inventory.health_potion > 0) {
+					this.health += 25;
+					if (this.health > 50 && this.help_played) this.help_played = false;
+					if (this.health > 100) this.health = 100;
+					this.inventory.health_potion -= 1;
+					this.game.Digit1 = false;
+					this.inventory.playPotion();
+				}
+				this.game.Digit1 = false;
+			}
+		}
+		if(this.experience >= this.levels[this.currentLevel]) {
+			this.leveledUp = true;
+			this.currentLevel++;
+			this.experience = 0;
+			this.attack_power += Math.floor(this.attack_power * .1);
+		}
+		
+		getPath(this);
+		handleMovement(this);
+
+	}
+			
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
-	
+		
 }
 
 CharacterPC.prototype.playSwing = function() {
@@ -364,6 +376,7 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 5;
+	this.damage_range = 20;
 	this.gold = Math.floor((Math.random() * 25) + 10);
 	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 25;
@@ -410,7 +423,7 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 10;
-	this.damage_range = 20;
+	this.damage_range = 25;
 	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.health_potion = 1;
 	this.key = 1;
@@ -516,15 +529,6 @@ function handleMovement(character) {
 	// Attack animation
 	if (!(character.is_dying || character.is_dead) && character.is_attack === true){
 		character.animation.state = 2;
-		/*var desired_movement_arc = calculateMovementArc(character.x, character.y,
-														character.desired_x, character.desired_y);
-		if	(desired_movement_arc !== character.animation.facing) {
-			character.animation.state_switched = true;
-			character.animation.facing = desired_movement_arc;
-			
-		}*/
-		/*var direction = Math.atan2(character.desired_y - (character.y),
-									character.desired_x - (character.x));*/
 		character.is_attack = false;
 	}
 	
@@ -624,3 +628,52 @@ function killCharacter(character) {
 	character.animation.state = 3;
 	character.is_dead = true;	
 } 
+
+function checkFacing(character, entity) {
+	/*
+	    4
+	  3   5
+	2       6
+	  1   7
+	    0
+	*/
+	facing = false;
+	switch(character.animation.facing) {
+		case 0:
+			if (entity.animation.facing === 3 || entity.animation.facing === 4 || 
+				entity.animation.facing === 5 || entity.animation.facing === 2) facing = true;
+			break;
+		case 1:
+			if (entity.animation.facing === 4 || entity.animation.facing === 5 || 
+				entity.animation.facing === 6) facing = true;
+			break;
+		case 2:
+			if (entity.animation.facing === 5 || entity.animation.facing === 6 || 
+				entity.animation.facing === 7) facing = true;
+			break;
+		case 3:
+			if (entity.animation.facing === 0 || entity.animation.facing === 7 ||
+				entity.animation.facing === 6) facing = true;
+			break;
+		case 4:
+			if (entity.animation.facing === 0 || entity.animation.facing === 1 || 
+				entity.animation.facing === 7) facing = true;
+			break;
+		case 5:
+			if (entity.animation.facing === 0 || entity.animation.facing === 1 || 
+				entity.animation.facing === 2 || entity.animation.facing === 3) facing = true;
+			break;
+		case 6:
+			if (entity.animation.facing === 1 || entity.animation.facing === 2 || 
+				entity.animation.facing === 3) facing = true;
+			break;
+		case 7:
+			if (entity.animation.facing === 2 || entity.animation.facing === 3 || 
+				entity.animation.facing === 4) facing = true;
+			break;
+		default:
+			facing = false;
+	}
+
+	return facing;
+}
