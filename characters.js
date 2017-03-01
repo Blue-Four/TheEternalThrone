@@ -190,10 +190,11 @@ BasicSprite.prototype.update = function () {
 			if(isAggro && !this.player.is_dead) {
 				//disable AI wander so they don't change their mind
 				disable_AI_Wander(this);
-				this.desired_x = this.player.x;
-				this.desired_y = this.player.y;			
-				this.is_moving = true;
-				//this.path_start = true;
+				//this.end_x = this.player.x;
+				//this.end_y = this.player.y;			
+				//this.is_moving = true;
+				this.path_start = true;
+				getAggroPath(this, this.player);
 				
 				// Enemy Attack
 				if (checkAttack(this.player, this)) {
@@ -563,7 +564,7 @@ function getPath(character) {
 		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
 		//console.log(character.moveNodes.toString());
 		
-		if	(end.isWalkable === true) {
+		if	(isWalkable(end)) {
 			var node = character.moveNodes.shift();
 			if(typeof node == 'undefined') {
 				return;
@@ -582,10 +583,60 @@ function getPath(character) {
 	} else if (character.moveNodes.length > 0 && distanceFromNode(character) < 10) {
 		var node = character.moveNodes.shift();
 		//console.log(node);
-		var coords = character.game.level.getPointFromTile(node.x, node.y);
-		character.desired_x = coords[0];
-		character.desired_y = coords[1];
-		character.is_moving = true;
+		if(!isWalkable(character.game.level.array[node.y][node.x])) {
+			character.moveNodes = [];
+			character.is_moving = false;
+			character.path_start = false;
+		} else {
+			var coords = character.game.level.getPointFromTile(node.x, node.y);
+			character.desired_x = coords[0];
+			character.desired_y = coords[1];
+			character.is_moving = true;
+		}
+		
+	}
+	
+}
+
+function getAggroPath(enemy, player) {
+	if	(enemy.path_start === true) {
+		var start = enemy.game.level.getTileFromPoint(enemy.x, enemy.y);
+		var end = enemy.game.level.getTileFromPoint(player.x, player.y);
+		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
+			return;
+		}
+		enemy.moveNodes = enemy.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
+		//console.log(character.moveNodes.toString());
+		
+		if	(isWalkable(end)) {
+			var node = enemy.moveNodes.shift();
+			if(typeof node == 'undefined') {
+				return;
+			}
+			//console.log(node);
+			var coords = enemy.game.level.getPointFromTile(node.x, node.y);
+			//console.log(coords);
+			enemy.desired_x = coords[0];
+			enemy.desired_y = coords[1];
+			enemy.is_moving = true;
+			
+		}
+		
+		enemy.path_start = false;
+		
+	} else if (enemy.moveNodes.length > 0 && distanceFromNode(enemy) < 10) {
+		var node = enemy.moveNodes.shift();
+		//console.log(node);
+		if(!isWalkable(enemy.game.level.array[node.y][node.x])) {
+			enemy.moveNodes = [];
+			enemy.is_moving = false;
+			enemy.path_start = false;
+		} else {
+			var coords = enemy.game.level.getPointFromTile(node.x, node.y);
+			enemy.desired_x = coords[0];
+			enemy.desired_y = coords[1];
+			enemy.is_moving = true;
+		}
 		
 	}
 	
