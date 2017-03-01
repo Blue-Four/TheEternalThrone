@@ -9,10 +9,13 @@ Left Mouse Click - Attack or Interact With Items
 
 Right Mouse Click - Move player
 
+
 Keys:
 1 - Consume Health Potion
 
+
 Gameplay tips:
+
 To open doors, click near the base of the sprite.
 
 Hold down left mouse in general direction of enemy for effective combat, and let enemies approach you.
