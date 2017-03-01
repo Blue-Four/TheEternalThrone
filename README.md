@@ -14,5 +14,7 @@ Keys:
 
 Gameplay tips:
 To open doors, click near the base of the sprite.
-Hold down left mouse for effective combat and let enemies approach you.
+
+Hold down left mouse in general direction of enemy for effective combat, and let enemies approach you.
+
 Left-click potions to pick them up.
