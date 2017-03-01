@@ -196,7 +196,6 @@ Zombie.prototype.update = function () {
                     if (this.player.game.hold_left) {
                         if (checkFacing(this.player, this)) {
                             this.health -= this.player.attack_power * 0.75;
-                            console.log(this.health);
                             this.bounceBack();
                             if (this.health <= 0) {
                                 this.health = 0;
@@ -221,21 +220,8 @@ Zombie.prototype.update = function () {
                 enable_AI_Wander(this);
                 this.was_aggro = false;
             }
-
-
         }
-
-        // Death animation
-        if(this.game.Digit2) {
-            this.is_dying = true;
-            this.animation = this.animations['death0'];
-            this.is_dead = true;
-            this.is_moving = false;
-        } 
-        else {
-            //if (!isAggro) getPath(this);
-            zombieMovement(this);
-        }
+        zombieMovement(this);
     }
 }
 
@@ -250,10 +236,23 @@ Zombie.prototype.playZombieDeath = function() {
 }
 
 Zombie.prototype.bounceBack = function () {
-    this.x += this.bounce_x;
-    this.y += this.bounce_y;
+    var new_x = this.x + this.bounce_x;
+    var new_y = this.y + this.bounce_y;
+    var tile = this.game.level.getTileFromPoint(new_x, new_y);
+    if (tile.type === "TYPE_WALL") {
+        do {
+            if (this.bounce_x > 0) new_x -= 5;
+            else new_x += 5;
+            if (this.bounce_y > 0) new_y -= 5;
+            else new_y += 5;
+            tile = this.game.level.getTileFromPoint(new_x, new_y);
+        }while (tile.type === "TYPE_WALL");
+    }
+    else {
+        this.x += this.bounce_x;
+        this.y += this.bounce_y;
+    }
     this.bounced = true;
-    console.log("Bounce on");
 }
 
 //handle zombie movement, adapted from handleMovement
