@@ -133,11 +133,15 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_aggro = false;
 	this.was_aggro = false;
 
+	// Movement
 	this.desired_x = x;
 	this.desired_y = y;
 	this.end_x = x;
 	this.end_y = y;
 	this.moveNodes = [];
+	this.bounce_x = 0;
+	this.bounce_y = 0;
+	this.bounced = false;
 
 	this.count = 0;
 }
@@ -155,26 +159,39 @@ BasicSprite.prototype.getHealth = function() {
 }
 
 BasicSprite.prototype.bounceBack = function () {
-	console.log("x: " + this.x + "y: " + this.y);
-	console.log("Facing x: " + this.x + "y: " + this.y);
-	if (this.x < 0) this.x += 30;
-	else this.x -= 30;
-	if (this.y < 0) this.y += 30;
-	else this.y -= 30;
-	console.log("New x: " + this.x + "y: " + this.y);
+	var new_x = this.x + this.bounce_x;
+	var new_y = this.y + this.bounce_y;
+	var tile = this.game.level.getTileFromPoint(new_x, new_y);
+	if (tile.type === "TYPE_WALL") {
+		do {
+			if (this.bounce_x > 0) new_x -= 5;
+			else new_x += 5;
+			if (this.bounce_y > 0) new_y -= 5;
+			else new_y += 5;
+			tile = this.game.level.getTileFromPoint(new_x, new_y);
+		}while (tile.type === "TYPE_WALL");
+	}
+	else {
+		this.x += this.bounce_x;
+		this.y += this.bounce_y;
+	}
+	this.bounced = true;
 }
 
 BasicSprite.prototype.update = function () {
 	if (!this.is_dead) {
+		if (this.bounced && (this.count += 1) % 82 === 0) {
+			this.bounced = false;
+		}
 		
 		// Attack logic
-		if(this.type === "ENEMY") {
+		if(this.type === "ENEMY" && !this.bounced) {
 			var isAggro = checkAggro(this.player, this);
 			if(isAggro && !this.player.is_dead) {
 				//disable AI wander so they don't change their mind
 				disable_AI_Wander(this);
 				this.desired_x = this.player.x;
-				this.desired_y = this.player.y;
+				this.desired_y = this.player.y;			
 				this.is_moving = true;
 				//this.path_start = true;
 				
@@ -185,7 +202,7 @@ BasicSprite.prototype.update = function () {
 				if (checkDistance(this.player, this) < this.damage_range && !this.player.is_moving) {
 					this.is_moving = false;
 					if (this.player.health > 0) {
-						this.player.health -= this.attack_power * 0.05;
+						this.player.health -= this.attack_power * 0.15;
 						if (this instanceof Enemy_Skeleton_Melee) {
 							this.playSkeleton();
 						}
@@ -207,8 +224,8 @@ BasicSprite.prototype.update = function () {
 					// Player Attack
 					if (this.player.game.hold_left) {
 						if (checkFacing(this.player, this)) {
-							this.health -= this.player.attack_power * 0.05;
-							//this.bounceBack();
+							this.health -= this.player.attack_power * 0.75;
+							this.bounceBack();
 							if (this.health <= 0) {
 								this.health = 0;
 								killCharacter(this);
@@ -216,7 +233,6 @@ BasicSprite.prototype.update = function () {
 								this.player.inventory.health_potion += this.health_potion;
 								this.player.inventory.playCoin();
 								this.player.experience += this.expGain;
-								//this.bounceBack();
 								if (this instanceof Enemy_Skeleton_Melee) {
 									this.playSkeletonDeath();
 								}
@@ -241,24 +257,9 @@ BasicSprite.prototype.update = function () {
 				enable_AI_Wander(this);
 				this.was_aggro = false;
 			}
-
-
 		}
-
-
-		// Death animation
-		if(this.game.Digit2) {
-			this.is_dying = true;
-			this.animation.state = 3;
-			this.is_dead = true;
-			this.is_moving = false;
-		} 
-		else {
-			//if(this instanceof CharacterPC) getPath(this);
-			handleMovement(this);
-		}
+		handleMovement(this);
 	}
-	
 }
 
 
@@ -304,6 +305,7 @@ CharacterPC.prototype.update = function () {
 		// Player attack
 		if (this.type === "PLAYER") {
 			if (this.game.hold_left) {
+				this.count = 0;
 				if ((this.count += 1) % 41 === 0) {
 					this.playSwing();
 				}
@@ -642,37 +644,55 @@ function checkFacing(character, entity) {
 		case 0:
 			if (entity.animation.facing === 3 || entity.animation.facing === 4 || 
 				entity.animation.facing === 5 || entity.animation.facing === 2) facing = true;
+			entity.bounce_x = 30;
+			entity.bounce_y = 30;
 			break;
 		case 1:
 			if (entity.animation.facing === 4 || entity.animation.facing === 5 || 
 				entity.animation.facing === 6) facing = true;
+			entity.bounce_x = 10;
+			entity.bounce_y = 30;
 			break;
 		case 2:
 			if (entity.animation.facing === 5 || entity.animation.facing === 6 || 
 				entity.animation.facing === 7) facing = true;
+			entity.bounce_x = -40;
+			entity.bounce_y = 0;
 			break;
 		case 3:
 			if (entity.animation.facing === 0 || entity.animation.facing === 7 ||
 				entity.animation.facing === 6) facing = true;
+			entity.bounce_x = -30;
+			entity.bounce_y = -30;
 			break;
 		case 4:
 			if (entity.animation.facing === 0 || entity.animation.facing === 1 || 
 				entity.animation.facing === 7) facing = true;
+			entity.bounce_x = 0;
+			entity.bounce_y = -30;
 			break;
 		case 5:
 			if (entity.animation.facing === 0 || entity.animation.facing === 1 || 
 				entity.animation.facing === 2 || entity.animation.facing === 3) facing = true;
+			entity.bounce_x = -10;
+			entity.bounce_y = -30;
 			break;
 		case 6:
 			if (entity.animation.facing === 1 || entity.animation.facing === 2 || 
 				entity.animation.facing === 3) facing = true;
+			entity.bounce_x = 40;
+			entity.bounce_y = 0;
 			break;
 		case 7:
 			if (entity.animation.facing === 2 || entity.animation.facing === 3 || 
 				entity.animation.facing === 4) facing = true;
+			entity.bounce_x = 10;
+			entity.bounce_y = 30;
 			break;
 		default:
 			facing = false;
+			entity.bounce_x = 0;
+			entity.bounce_y = 0;
 	}
 
 	return facing;
