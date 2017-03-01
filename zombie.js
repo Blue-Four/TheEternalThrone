@@ -133,6 +133,9 @@ function Zombie(game, spritesheet, x, y) {
     this.end_x = x;
     this.end_y = y;
     this.moveNodes = [];
+    this.bounce_x = 0;
+    this.bounce_y = 0;
+    this.bounced = false;
 
     //Sound
     this.zombieSound = document.getElementById("zombie");
@@ -150,9 +153,13 @@ Zombie.prototype.draw = function () {
 
 Zombie.prototype.update = function () {
     if (!this.is_dead) {
+        if (this.bounced && (this.animation.elapsedTime) % 100 === 0) {
+            this.bounced = false;
+            console.log("Bounce off");
+        }
         
         // Attack logic
-        if(this.type === "ENEMY") {
+        if(this.type === "ENEMY" && !this.bounced) {
             var isAggro = checkAggro(this.player, this);
             if(isAggro && !this.player.is_dead) {
                 //disable AI wander so they don't change their mind
@@ -171,7 +178,7 @@ Zombie.prototype.update = function () {
                 if (checkDistance(this.player, this) < this.damage_range  && !this.player.is_moving) {
                     this.is_moving = false;
                     if (this.player.health > 0) {
-                        this.player.health -= this.attack_power * 0.05;
+                        this.player.health -= this.attack_power * 0.15;
                         this.playZombie();
                         if (this.player.health < 50 && !this.player.help_played) {
                             this.player.playHelp();
@@ -188,8 +195,9 @@ Zombie.prototype.update = function () {
                     // Attack Enemy
                     if (this.player.game.hold_left) {
                         if (checkFacing(this.player, this)) {
-                            this.health -= this.player.attack_power * 0.05;
-                            //this.bounceBack();
+                            this.health -= this.player.attack_power * 0.75;
+                            console.log(this.health);
+                            this.bounceBack();
                             if (this.health <= 0) {
                                 this.health = 0;
                                 killZombie(this);
@@ -239,6 +247,13 @@ Zombie.prototype.playZombie = function() {
 Zombie.prototype.playZombieDeath = function() {
     this.zombieDeathSound.loop = false;
     this.zombieDeathSound.play();
+}
+
+Zombie.prototype.bounceBack = function () {
+    this.x += this.bounce_x;
+    this.y += this.bounce_y;
+    this.bounced = true;
+    console.log("Bounce on");
 }
 
 //handle zombie movement, adapted from handleMovement
