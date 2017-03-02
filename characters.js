@@ -118,6 +118,7 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
     this.ctx = game.ctx;
 	this.collision_radius = 24;
 	this.health = 100;
+	this.player = game.player;
 	
 	// Movement
 	this.is_moving = false;
@@ -126,17 +127,21 @@ function BasicSprite(game, spritesheet, x, y, speed, scale) {
 	this.is_dead = false;
 
 	//Combat
-	this.damage_range = 15;
+	this.damage_range = 20;
 
 	// Flags
 	this.is_aggro = false;
 	this.was_aggro = false;
 
+	// Movement
 	this.desired_x = x;
 	this.desired_y = y;
 	this.end_x = x;
 	this.end_y = y;
 	this.moveNodes = [];
+	this.bounce_x = 0;
+	this.bounce_y = 0;
+	this.bounced = false;
 
 	this.count = 0;
 }
@@ -153,79 +158,99 @@ BasicSprite.prototype.getHealth = function() {
 	return this.health;
 }
 
+BasicSprite.prototype.bounceBack = function () {
+	var new_x = this.x + this.bounce_x;
+	var new_y = this.y + this.bounce_y;
+	var tile = this.game.level.getTileFromPoint(new_x, new_y);
+	if (tile.type === "TYPE_WALL") {
+		do {
+			if (this.bounce_x > 0) new_x -= 5;
+			else new_x += 5;
+			if (this.bounce_y > 0) new_y -= 5;
+			else new_y += 5;
+			tile = this.game.level.getTileFromPoint(new_x, new_y);
+		}while (tile.type === "TYPE_WALL");
+	}
+	else {
+		this.x += this.bounce_x;
+		this.y += this.bounce_y;
+	}
+	this.bounced = true;
+}
+
 BasicSprite.prototype.update = function () {
 	if (!this.is_dead) {
-		// find Player in entities list
-		for (i in this.game.entities) {
-			if (this.game.entities[i] instanceof CharacterPC) {
-				var player = this.game.entities[i];
-				break;
-			}
+		if (this.bounced && (this.count += 1) % 82 === 0) {
+			this.bounced = false;
 		}
 		
 		// Attack logic
-		if(this.type === "ENEMY") {
-			var isAggro = checkAggro(player, this);
-			if(isAggro && !player.is_dead) {
+		if(this.type === "ENEMY" && !this.bounced) {
+			var isAggro = checkAggro(this.player, this);
+			if(isAggro && !this.player.is_dead) {
 				//disable AI wander so they don't change their mind
 				disable_AI_Wander(this);
-				this.desired_x = player.x;
-				this.desired_y = player.y;
-				this.is_moving = true;
-				//this.path_start = true;
+				//this.end_x = this.player.x;
+				//this.end_y = this.player.y;			
+				//this.is_moving = true;
+				this.path_start = true;
+				getAggroPath(this, this.player);
 				
 				// Enemy Attack
-				if (checkAttack(player, this)) {
+				if (checkAttack(this.player, this)) {
 					this.is_attack = true;
 				}
-				if (checkDistance(player, this) < this.damage_range) {
+				if (checkDistance(this.player, this) < this.damage_range && !this.player.is_moving) {
 					this.is_moving = false;
-					if (player.health > 0) {
-						player.health -= this.attack_power * 0.05;
+					if (this.player.health > 0) {
+						this.player.health -= this.attack_power * 0.15;
 						if (this instanceof Enemy_Skeleton_Melee) {
 							this.playSkeleton();
 						}
 						if (this instanceof GORGANTHOR) {
 							this.playGiant();
 						}
-						if (player.health < 50 && !player.help_played) {
-							player.playHelp();
-							player.help_played = true;
+						if (this.player.health < 50 && !this.player.help_played) {
+							this.player.playHelp();
+							this.player.help_played = true;
 						}
-						if (player.health <= 0) {
-							player.health = 0;
+						if (this.player.health <= 0) {
+							this.player.health = 0;
 							this.is_attack = false;
-							killCharacter(player);
-							player.playPCDeath();
+							killCharacter(this.player);
+							this.player.playPCDeath();
 						}
 					}
 
 					// Player Attack
-					if (player.game.hold_left) {
-						this.health -= player.attack_power * 0.05;
-						if (this.health <= 0) {
-							this.health = 0;
-							killCharacter(this);
-							player.inventory.setGold(this.gold);
-							player.inventory.health_potion += this.health_potion;
-							player.inventory.playCoin();
-							player.experience += this.expGain;
-							if (this instanceof Enemy_Skeleton_Melee) {
-								this.playSkeletonDeath();
+					if (this.player.game.hold_left) {
+						if (checkFacing(this.player, this)) {
+							this.health -= this.player.attack_power * 0.75;
+							this.bounceBack();
+							if (this.health <= 0) {
+								this.health = 0;
+								killCharacter(this);
+								this.player.inventory.setGold(this.gold);
+								this.player.inventory.health_potion += this.health_potion;
+								this.player.inventory.playCoin();
+								this.player.experience += this.expGain;
+								if (this instanceof Enemy_Skeleton_Melee) {
+									this.playSkeletonDeath();
+								}
+								if (this instanceof GORGANTHOR) {
+									this.player.inventory.setKey(this.key);
+									this.player.inventory.playPickup();
+									this.playGiantDeath();
+								}
 							}
-							if (this instanceof GORGANTHOR) {
-								player.inventory.setKey(this.key);
-								player.inventory.playPickup();
-								this.playGiantDeath();
-							}
-						}
-					}			
+						}			
+					}
 				}
 				this.was_aggro = true;
 			}
 			else {
 				this.is_moving = true;
-				if (player.health < 100) player.heatlh += 5 * .025;
+				if (this.player.health < 100) this.player.heatlh += 5 * .025;
 			}
 
 			// Go back to wandering
@@ -233,17 +258,64 @@ BasicSprite.prototype.update = function () {
 				enable_AI_Wander(this);
 				this.was_aggro = false;
 			}
+		}
+		handleMovement(this);
+	}
+}
 
 
+// PC
+function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+	this.type = "PLAYER";
+	this.attack_power = 25;
+	this.inventory = new Inventory();
+	this.experience = 0;
+	//xp needed to level
+	this.levels = [0, 100, 200, 300, 500];
+	this.currentLevel = 1;
+	this.swingSound = document.getElementById("attack");
+	this.helpSound = document.getElementById("help");
+	this.pcDeathSound = document.getElementById("pc_death");
+	this.help_played = false;
+	this.my_x = SCREEN_WIDTH / 2;
+	this.my_y = SCREEN_HEIGHT / 2;
+}
+
+CharacterPC.prototype = Object.create(BasicSprite.prototype);
+CharacterPC.prototype.constructor = BasicSprite;
+
+CharacterPC.prototype.update = function () {
+
+	// If the player finds the exit door, complete the associated objective.
+	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
+		this.game.objectives.complete(objective_findexit);
+		this.game.gameVictory = true;
+		this.is_moving = false;
+		this.animation.state = 0;
+	}
+
+	if (!(this.is_dead || this.game.gameVictory)) {
+		if	(this.game.mouse_clicked_right) {
+			this.end_x = this.game.rightclick.x;
+			this.end_y = this.game.rightclick.y;
+			this.path_start = true;
+			this.game.mouse_clicked_right = false;	
 		}
 
 		// Player attack
-		if (this.type === "PLAYER" && !(this.game.gameVictory)) {
+		if (this.type === "PLAYER") {
 			if (this.game.hold_left) {
+				this.count = 0;
 				if ((this.count += 1) % 41 === 0) {
 					this.playSwing();
 				}
 				this.is_attack = true;
+
+				// Change the facing of character
+				this.animation.facing = calculateMovementArc(this.my_x, this.my_y, this.game.mouse_anchor.x, 
+					this.game.mouse_anchor.y);
+
 				this.is_moving = false
 			}
 			else {
@@ -262,69 +334,21 @@ BasicSprite.prototype.update = function () {
 				this.game.Digit1 = false;
 			}
 		}
-
-		// Death animation
-		if(this.game.Digit2) {
-			this.is_dying = true;
-			this.animation.state = 3;
-			this.is_dead = true;
-			this.is_moving = false;
-		} 
-		else {
-			if(this instanceof CharacterPC) getPath(this);
-			handleMovement(this);
+		if(this.experience >= this.levels[this.currentLevel]) {
+			this.leveledUp = true;
+			this.currentLevel++;
+			this.experience = 0;
+			this.attack_power += Math.floor(this.attack_power * .1);
 		}
-	}
-	
-}
+		
+		getPath(this);
+		handleMovement(this);
 
-
-// PC
-function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
-	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
-	this.type = "PLAYER";
-	this.attack_power = 25;
-	this.inventory = new Inventory();
-	this.experience = 0;
-	//xp needed to level
-	this.levels = [0, 100, 200, 300, 500];
-	this.currentLevel = 1;
-	this.swingSound = document.getElementById("attack");
-	this.helpSound = document.getElementById("help");
-	this.pcDeathSound = document.getElementById("pc_death");
-	this.help_played = false;
-}
-
-CharacterPC.prototype = Object.create(BasicSprite.prototype);
-CharacterPC.prototype.constructor = BasicSprite;
-
-CharacterPC.prototype.update = function () {
-	if	(!(this.is_dying || this.is_dead || this.game.gameVictory) && this.game.mouse_clicked_right) {
-		this.end_x = this.game.rightclick.x;
-		this.end_y = this.game.rightclick.y;
-		this.path_start = true;
-		this.game.mouse_clicked_right = false;	
 	}
-	if(this.experience >= this.levels[this.currentLevel]) {
-		this.leveledUp = true;
-		this.currentLevel++;
-		this.experience = 0;
-		this.attack_power += Math.floor(this.attack_power * .1);
-	}
-	
-	getPath(this);
-	//check if PC is dead in update
-	BasicSprite.prototype.update.call(this);
-	
-	// If the player finds the exit door, complete the associated objective.
-	if	(this.game.level.getTileFromPoint(this.x, this.y).type === "TYPE_EXIT_OPEN") {
-		this.game.objectives.complete(objective_findexit);
-		this.game.gameVictory = true;
-	}
-	
+			
 	this.game.x = SCREEN_WIDTH / 2 - this.x;
 	this.game.y = SCREEN_HEIGHT / 2 - this.y;
-	
+		
 }
 
 CharacterPC.prototype.playSwing = function() {
@@ -355,6 +379,7 @@ function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 5;
+	this.damage_range = 20;
 	this.gold = Math.floor((Math.random() * 25) + 10);
 	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 25;
@@ -401,7 +426,7 @@ function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
 	this.animation.frames_state[3] = 10;
 	this.type = "ENEMY";
 	this.attack_power = 10;
-	this.damage_range = 20;
+	this.damage_range = 25;
 	this.gold = Math.floor((Math.random() * 100) + 200);
 	this.health_potion = 1;
 	this.key = 1;
@@ -497,7 +522,7 @@ function handleMovement(character) {
 			
 			var direction = Math.atan2(character.desired_y - (character.y),
 										character.desired_x - (character.x));
-			
+
 			character.x += character.game.clockTick * character.speed * Math.cos(direction);
 			character.y += character.game.clockTick * character.speed * Math.sin(direction) / 2;
 			
@@ -539,7 +564,7 @@ function getPath(character) {
 		character.moveNodes = character.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
 		//console.log(character.moveNodes.toString());
 		
-		if	(end.isWalkable === true) {
+		if	(isWalkable(end)) {
 			var node = character.moveNodes.shift();
 			if(typeof node == 'undefined') {
 				return;
@@ -558,10 +583,60 @@ function getPath(character) {
 	} else if (character.moveNodes.length > 0 && distanceFromNode(character) < 10) {
 		var node = character.moveNodes.shift();
 		//console.log(node);
-		var coords = character.game.level.getPointFromTile(node.x, node.y);
-		character.desired_x = coords[0];
-		character.desired_y = coords[1];
-		character.is_moving = true;
+		if(!isWalkable(character.game.level.array[node.y][node.x])) {
+			character.moveNodes = [];
+			character.is_moving = false;
+			character.path_start = false;
+		} else {
+			var coords = character.game.level.getPointFromTile(node.x, node.y);
+			character.desired_x = coords[0];
+			character.desired_y = coords[1];
+			character.is_moving = true;
+		}
+		
+	}
+	
+}
+
+function getAggroPath(enemy, player) {
+	if	(enemy.path_start === true) {
+		var start = enemy.game.level.getTileFromPoint(enemy.x, enemy.y);
+		var end = enemy.game.level.getTileFromPoint(player.x, player.y);
+		if(isNaN(end.xIndex) || isNaN(end.yIndex)) {
+			return;
+		}
+		enemy.moveNodes = enemy.game.level.findPath(start.xIndex, start.yIndex, end.xIndex, end.yIndex);
+		//console.log(character.moveNodes.toString());
+		
+		if	(isWalkable(end)) {
+			var node = enemy.moveNodes.shift();
+			if(typeof node == 'undefined') {
+				return;
+			}
+			//console.log(node);
+			var coords = enemy.game.level.getPointFromTile(node.x, node.y);
+			//console.log(coords);
+			enemy.desired_x = coords[0];
+			enemy.desired_y = coords[1];
+			enemy.is_moving = true;
+			
+		}
+		
+		enemy.path_start = false;
+		
+	} else if (enemy.moveNodes.length > 0 && distanceFromNode(enemy) < 10) {
+		var node = enemy.moveNodes.shift();
+		//console.log(node);
+		if(!isWalkable(enemy.game.level.array[node.y][node.x])) {
+			enemy.moveNodes = [];
+			enemy.is_moving = false;
+			enemy.path_start = false;
+		} else {
+			var coords = enemy.game.level.getPointFromTile(node.x, node.y);
+			enemy.desired_x = coords[0];
+			enemy.desired_y = coords[1];
+			enemy.is_moving = true;
+		}
 		
 	}
 	
@@ -606,3 +681,70 @@ function killCharacter(character) {
 	character.animation.state = 3;
 	character.is_dead = true;	
 } 
+
+function checkFacing(character, entity) {
+	/*
+	    4
+	  3   5
+	2       6
+	  1   7
+	    0
+	*/
+	facing = false;
+	switch(character.animation.facing) {
+		case 0:
+			if (entity.animation.facing === 3 || entity.animation.facing === 4 || 
+				entity.animation.facing === 5 || entity.animation.facing === 2) facing = true;
+			entity.bounce_x = 30;
+			entity.bounce_y = 30;
+			break;
+		case 1:
+			if (entity.animation.facing === 4 || entity.animation.facing === 5 || 
+				entity.animation.facing === 6) facing = true;
+			entity.bounce_x = 10;
+			entity.bounce_y = 30;
+			break;
+		case 2:
+			if (entity.animation.facing === 5 || entity.animation.facing === 6 || 
+				entity.animation.facing === 7) facing = true;
+			entity.bounce_x = -40;
+			entity.bounce_y = 0;
+			break;
+		case 3:
+			if (entity.animation.facing === 0 || entity.animation.facing === 7 ||
+				entity.animation.facing === 6) facing = true;
+			entity.bounce_x = -30;
+			entity.bounce_y = -30;
+			break;
+		case 4:
+			if (entity.animation.facing === 0 || entity.animation.facing === 1 || 
+				entity.animation.facing === 7) facing = true;
+			entity.bounce_x = 0;
+			entity.bounce_y = -30;
+			break;
+		case 5:
+			if (entity.animation.facing === 0 || entity.animation.facing === 1 || 
+				entity.animation.facing === 2 || entity.animation.facing === 3) facing = true;
+			entity.bounce_x = -10;
+			entity.bounce_y = -30;
+			break;
+		case 6:
+			if (entity.animation.facing === 1 || entity.animation.facing === 2 || 
+				entity.animation.facing === 3) facing = true;
+			entity.bounce_x = 40;
+			entity.bounce_y = 0;
+			break;
+		case 7:
+			if (entity.animation.facing === 2 || entity.animation.facing === 3 || 
+				entity.animation.facing === 4) facing = true;
+			entity.bounce_x = 10;
+			entity.bounce_y = 30;
+			break;
+		default:
+			facing = false;
+			entity.bounce_x = 0;
+			entity.bounce_y = 0;
+	}
+
+	return facing;
+}
