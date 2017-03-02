@@ -30,12 +30,36 @@ AM.downloadAll(function () {
 	
     gameEngine.start();
 
+    var sheetWidth = 120 * 15 * 5;
+    var sheetHeight = 120 * 5;
+
+    //Draw and add Barbarian
+  	var barbarian_spritesheet = AM.getAsset("./img/barbarian_spritesheet.png");
+  	var barbarian_canvas = document.createElement('canvas');
+    barbarian_canvas.width = sheetWidth;
+    barbarian_canvas.height = sheetHeight;
+    var barbarian_ctx = barbarian_canvas.getContext('2d');
+    barbarian_ctx.save();
+	barbarian_ctx.scale(-1, 1);
+    barbarian_ctx.drawImage(barbarian_spritesheet, 0 - sheetWidth, 0);
+    barbarian_ctx.restore();
     var randomCoords = level.getRandomLocation();
-	var barbarianPC = new CharacterPC(gameEngine, AM.getAsset("./img/barbarian_spritesheet.png"), randomCoords.x, randomCoords.y, 175, 1);
+	var barbarianPC = new CharacterPC(gameEngine, barbarian_spritesheet, barbarian_canvas, randomCoords.x, randomCoords.y, 175, 1);
     gameEngine.addEntity(barbarianPC);
 
+
+    //Draw and add Gorganthor
+  	var gorganthor_spritesheet = AM.getAsset("./img/skeleton_gorganthor_spritesheet.png");
+  	var gorganthor_canvas = document.createElement('canvas');
+    gorganthor_canvas.width = sheetWidth;
+    gorganthor_canvas.height = sheetHeight;
+    var gorganthor_ctx = gorganthor_canvas.getContext('2d');
+    gorganthor_ctx.save();
+	gorganthor_ctx.scale(-1, 1);
+    gorganthor_ctx.drawImage(gorganthor_spritesheet, 0 - sheetWidth, 0);
+    gorganthor_ctx.restore();
 	randomCoords = level.getRandomLocation();
-	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, AM.getAsset("./img/skeleton_gorganthor_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 2);
+	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, gorganthor_spritesheet, gorganthor_canvas, randomCoords.x, randomCoords.y, 110, 2);
 	gameEngine.addEntity(gorganthorTheDefiler);	
 	//apply_AI_Wander(gorganthorTheDefiler);
 
@@ -45,6 +69,7 @@ AM.downloadAll(function () {
     // gameEngine.addEntity(missDemeanor);
 	// apply_AI_Wander(missDemeanor);
 	
+
 	for(var i = 0; i < 15; i++) {	
 		randomCoords = level.getRandomLocation();
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
@@ -52,9 +77,19 @@ AM.downloadAll(function () {
 		//apply_AI_Wander(zombie);
 	}
   
+  	//Draw and add Skeleton
+  	var skeleton_spritesheet = AM.getAsset("./img/skeleton_spritesheet.png");
+  	var skeleton_canvas = document.createElement('canvas');
+    skeleton_canvas.width = sheetWidth;
+    skeleton_canvas.height = sheetHeight;
+    var skeleton_ctx = skeleton_canvas.getContext('2d');
+    skeleton_ctx.save();
+	skeleton_ctx.scale(-1, 1);
+    skeleton_ctx.drawImage(skeleton_spritesheet, 0 - sheetWidth, 0);
+    skeleton_ctx.restore();
 	for(var i = 0; i < 15; i++) {
 		randomCoords = level.getRandomLocation();
-		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, AM.getAsset("./img/skeleton_spritesheet.png"), randomCoords.x, randomCoords.y, 110, 1);
+		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, skeleton_spritesheet, skeleton_canvas, randomCoords.x, randomCoords.y, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
 
 		//apply_AI_Wander(swordyMcSwordface);
