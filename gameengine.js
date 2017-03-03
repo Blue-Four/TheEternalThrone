@@ -9,7 +9,7 @@ window.requestAnimFrame = (function () {
             };
 })();
 
-function GameEngine() {
+function GameEngine(objective_sprite_sheet, overlay_sprite) {
     this.entities = [];
     this.ctx = null;
     this.surfaceWidth = null;
@@ -17,6 +17,10 @@ function GameEngine() {
 	this.level = null;
 	this.x = 0;
 	this.y = 0;
+	this.objectives = new Objectives(this, objective_sprite_sheet);
+    this.door = false;
+	this.overlay_sprite = overlay_sprite;
+    this.player = null;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -24,6 +28,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
+    this.gameVictory = false;
     this.startInput();
     console.log('game initialized');
 }
@@ -53,18 +58,46 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("click", function (e) {
         that.leftclick = getXandY(e);
-		that.mouse_clicked_left = true;
 		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
-		console.log("Tile Type = " + tile.type);
+		// Checks to see if the mouse click was within 64 pixels of the PC.
+		// If so, and the clicked tile happens to be a door, interact with it.
+		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.leftclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.leftclick.y, 2))) < 64) {
+			if (tile.type === "TYPE_DOOR_OPEN") {
+				tile.type = "TYPE_DOOR_CLOSED";
+				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 0;
+                playDoorClose();
+			} else if (tile.type === "TYPE_DOOR_CLOSED") {
+				tile.type = "TYPE_DOOR_OPEN";
+				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+                playDoorOpen();
+			} else if (tile.type === "TYPE_EXIT_CLOSED") {
+				if	(that.playerKeys > 0) {
+				tile.type = "TYPE_EXIT_OPEN";
+				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 1;
+                playDoorOpen();
+                playVictory();
+				}
+                else playLocked();
+			}
+			
+		}
     }, false);
 	
 	this.ctx.canvas.addEventListener("mousedown", function (e) {
 		that.mouse_down = true;
+        if(e.which == 1) {
+            that.hold_left = true;
+        }
 		that.mouse_anchor = getXandY(e);
+        //console.log("Click at " + e.x + " " + e.y);
     }, false);
 	
 	this.ctx.canvas.addEventListener("mouseup", function (e) {
 		that.mouse_down = false;
+        if(e.which == 1) {
+            that.hold_left = false;
+        }
+
     }, false);
 
     this.ctx.canvas.addEventListener("contextmenu", function (e) {
@@ -78,33 +111,29 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("mousewheel", function (e) {
-        console.log(e);
+        //console.log(e);
         that.wheel = e;
-        console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
+        //console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
     }, false);
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
-        if (e.code === "Digit1") that.Digit1 = true;
-        if (e.code === "Digit2") that.Digit2 = true;
+        //if (e.code === "Digit1") that.Digit1 = true;
+        //if (e.code === "Digit2") that.Digit2 = true;
         //console.log(e);
         //console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
-        //if (e.code === "Digit1") that.Digit1 = true;
+        if (e.code === "Digit1") that.Digit1 = true;
         //if (e.code === "Digit2") that.Digit2 = true;
 		// var scrollSpeed = 5;
-        // if (e.code === "KeyW") that.y += scrollSpeed;
-		// if (e.code === "KeyA") that.x += scrollSpeed;
-		// if (e.code === "KeyS") that.y -= scrollSpeed;
-		// if (e.code === "KeyD") that.x -= scrollSpeed;
         //console.log(e);
         //console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
     }, false);
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
         if (e.code === "Digit1") that.Digit1 = false;
-        if (e.code === "Digit2") that.Digit2 = false;
+        //if (e.code === "Digit2") that.Digit2 = false;
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
@@ -115,6 +144,8 @@ GameEngine.prototype.startInput = function () {
 GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
     this.entities.push(entity);
+
+    if (entity instanceof CharacterPC) this.player = entity;
 }
 
 GameEngine.prototype.setLevel = function (level) {
@@ -136,11 +167,7 @@ GameEngine.prototype.draw = function () {
 		
 		if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
 			&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
-				this.ctx.drawImage(this.level.spritesheet,
-					120 * tile.sprite_index, 0,
-					120, 120,
-					tile.x + this.x - 60, tile.y + this.y - 90,
-					120, 120);
+				tile.draw();
 					
 		}
 		
@@ -157,11 +184,7 @@ GameEngine.prototype.draw = function () {
 				// If this tile is within the bounds of the screen...
 				if	(tile.x + this.x > -120 && tile.x + this.x < SCREEN_WIDTH + 120 
 						&& tile.y + this.y > -120 && tile.y + this.y < SCREEN_HEIGHT + 120) {
-					this.ctx.drawImage(this.level.spritesheet,
-								120 * tile.sprite_index, 0,
-								120, 120,
-								tile.x + this.x - 60, tile.y + this.y - 90,
-								120, 120);
+					tile.draw();
 								
 				}
 							
@@ -181,11 +204,8 @@ GameEngine.prototype.draw = function () {
 		} else if (iWallCount < this.level.walls.length && iEntityCount >= this.entities.length) {
 			var tile = this.level.walls[iWallCount];
 			
-			this.ctx.drawImage(this.level.spritesheet,
-								120 * tile.sprite_index, 0,
-								120, 120,
-								tile.x + this.x - 60, tile.y + this.y - 90,
-								120, 120);
+			tile.draw();
+								
 			iWallCount++;	
 			
 		} else if (iWallCount >= this.level.walls.length && iEntityCount < this.entities.length) {
@@ -200,12 +220,47 @@ GameEngine.prototype.draw = function () {
 		}
 		
 	}
+	
+	this.ctx.drawImage(this.overlay_sprite, -1, -1,
+						SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2);
 
-    this.ctx.font = "bold 16px Arial";
+	this.ctx.save();
+    this.ctx.font = "bold 18px Times New Roman";
+    this.ctx.fillStyle = "#FF2d2d";    
+    this.ctx.fillText("L-Click: Attack/Interact", SCREEN_WIDTH - 240, 40);
+    this.ctx.fillText("R-Click: Move Player", SCREEN_WIDTH - 240, 60);
+    this.ctx.fillText("1-Key: Use Potion", SCREEN_WIDTH - 240, 80);
+    this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
+    this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
+    this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
+    this.ctx.strokeStyle="#FFFFFF";
+    this.ctx.rect(20,20,200,20);
+    this.ctx.stroke();
+    this.ctx.fillStyle = "red";
+    this.ctx.fillRect(20, 20, this.playerHealth * 2, 20);
+    this.ctx.stroke();
+    this.ctx.fillStyle = "blue";
+    this.ctx.strokestyle ="#0000FF";
+    this.ctx.rect(20, 50, 200, 20);
+    this.ctx.fillRect(20, 50, this.playerExperience * 200, 20);
+    this.ctx.stroke();
     this.ctx.fillStyle = "white";
-    this.ctx.fillText("Press Down 1 Key: PC Attack Animation", 600, 20);
-    this.ctx.fillText("R-Click: Move Player", 600, 36);
+    this.ctx.fillText("Level " + this.playerLevel, 25, 65);
+    //this.ctx.filRect(20, 100, this.)
     this.ctx.restore();
+    if(this.playerHealth <= 0) {
+        this.ctx.fillStyle = "red";
+        this.ctx.font = "bold 96px Arial";
+        this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
+    }
+    if(this.gameVictory) {
+        this.ctx.fillStyle = "#DDDD55";
+        this.ctx.font = "bold 96px Arial";
+        this.ctx.fillText("VICTORY!", this.surfaceWidth/3, this.surfaceHeight/2);
+    }
+	
+	this.objectives.draw();
+	
 }
 
 GameEngine.prototype.update = function () {
@@ -213,8 +268,34 @@ GameEngine.prototype.update = function () {
 
     for (var i = 0; i < entitiesCount; i++) {
         var entity = this.entities[i];
+        if (entity instanceof CharacterPC) {
+                this.playerHealth = entity.health;
+                this.playerGold = entity.inventory.gold;
+                this.playerGold = entity.inventory.gold;
+                this.playerLevel = entity.currentLevel;
+                this.playerExperience = (entity.experience / entity.levels[this.playerLevel]);
+                this.levelUp = entity.leveledUp;
+                this.playerPotions = entity.inventory.health_potion;
+                this.playerKeys = entity.inventory.key;
+        }
 
         entity.update();
+		
+		if (entity.is_dead) {
+			if	(!entity.deathflag) {
+				entity.dateofdeath = new Date();
+				entity.deathflag = true;
+			}
+			
+			if	(new Date() - entity.dateofdeath > 5000) {
+				console.log("testificate");
+				this.entities.splice(i, 1);
+				entitiesCount--;
+
+			}
+			
+        }
+		
     }
 		
 }
@@ -277,3 +358,34 @@ Entity.prototype.rotateAndCache = function (image, angle) {
     //offscreenCtx.strokeRect(0,0,size,size);
     return offscreenCanvas;
 }
+
+function playDoorOpen() {
+    var doorOpen = document.getElementById("door_open");
+    doorOpen.loop = false;
+    doorOpen.play();
+}
+
+function playDoorClose() {
+    var doorClose = document.getElementById("door_close");
+    doorClose.loop = false;
+    doorClose.play();
+}
+
+function playPickup() {
+    var pickupFX = document.getElementById("pickup");
+    pickupFX.loop = false;
+    pickupFX.play();
+}
+
+function playLocked() {
+    var locked = document.getElementById("door_locked");
+    locked.loop = false;
+    locked.play();
+}
+
+function playVictory() {
+    victorySound = document.getElementById("victory");
+    victorySound.loop = false;
+    victorySound.play();
+}
+

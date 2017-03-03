@@ -38,12 +38,12 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y) {
 };
 
 Animation.prototype.currentFrame = function () {
-	if	(this.state_switched === true) {
-		this.state_switched = false;
-		return 0;
-	} else {
-		return Math.floor(this.elapsedTime / this.frameDuration);	
-	}	
+    if  (this.state_switched === true) {
+        this.state_switched = false;
+        return 0;
+    } else {
+        return Math.floor(this.elapsedTime / this.frameDuration);   
+    }   
 }
 
 Animation.prototype.isDone = function () {
@@ -52,13 +52,13 @@ Animation.prototype.isDone = function () {
 
 
 function Zombie(game, spritesheet, x, y) {
-	/*
-	    4
-	  3   5
-	2       6
-	  1   7
-	    0
-	*/
+    /*
+        4
+      3   5
+    2       6
+      1   7
+        0
+    */
     this.animations = [];
     //walking animations
     this.animations['dir4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, true, 0.9, 76);
@@ -80,70 +80,223 @@ function Zombie(game, spritesheet, x, y) {
     this.animations['idle6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 144);
     this.animations['idle7'] = new Animation(spritesheet, 128, 128, 36, 0.15, 4, true, 0.9, 180);
 
-/*    //death animations
-    this.animations['death4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 99);
-    this.animations['death0'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 243);
-    this.animations['death2'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 27);
-    this.animations['death6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 8, false, 1, 171);*/
+    //death animations
+    this.animations['death4'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 107);
+    this.animations['death0'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 251);
+    this.animations['death2'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 35);
+    this.animations['death6'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 179);
+    this.animations['death3'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 71);
+    this.animations['death5'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 143);
+    this.animations['death7'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 215);
+    this.animations['death1'] = new Animation(spritesheet, 128, 128, 36, 5, 1, true, 0.9, 251);
 
+    //attack animations
+    // this.animations['attack4'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 84);
+    // this.animations['attack0'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 228);
+    // this.animations['attack2'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 12);
+    // this.animations['attack6'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 156);
+    // this.animations['attack3'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 48);
+    // this.animations['attack5'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 120);
+    // this.animations['attack7'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 192);
+    // this.animations['attack1'] = new Animation(spritesheet, 128, 128, 36, 0.15, 10, true, 0.9, 264);
+
+    //animation
     this.x = x;
     this.y = y;
     this.animation = this.animations['idle0'];
+    this.collision_radius = 24;
     this.speed = 110;
     this.game = game;
     this.ctx = game.ctx;
-	
-	// Movement
-	this.is_moving = false;
-	this.desired_x = x + 64;
-	this.desired_y = y + 64;
-	
+    this.frameSize = 128;
+
+    //Combat
+    this.damage_range = 20;
+    this.type = "ENEMY";
+    this.attack_power = 5;
+    this.health = 100;
+    this.gold = 10;
+    this.expGain = 25;
+    this.gold = Math.floor((Math.random() * 25) + 10);
+
+    // Flags
+    this.is_aggro = false;
+    this.was_aggro = false;
+    
+    // Movement
+    this.is_moving = false;
+    this.is_attack = false;
+    this.is_dying = false;
+    this.is_dead = false;
+    this.desired_x = x;
+    this.desired_y = y;
+    this.end_x = x;
+    this.end_y = y;
+    this.moveNodes = [];
+    this.bounce_x = 0;
+    this.bounce_y = 0;
+    this.bounced = false;
+
+    //Sound
+    this.zombieSound = document.getElementById("zombie");
+    this.zombieDeathSound = document.getElementById("zombie_death");
+
+    //Set Player
+    this.player = game.player;
+    
 }
 
 Zombie.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x + this.game.x, this.y + this.game.y);
+    this.animation.drawFrame(this.game.clockTick, 
+            this.ctx, this.x + this.game.x - this.frameSize/2, this.y + this.game.y - this.frameSize/2 - 15);
 }
 
 Zombie.prototype.update = function () {
-	zombieMovement(this);
-	
+    if (!this.is_dead) {
+        if (this.bounced && (this.animation.elapsedTime) % 100 === 0) {
+            this.bounced = false;
+            console.log("Bounce off");
+        }
+        
+        // Attack logic
+        if(this.type === "ENEMY" && !this.bounced) {
+            var isAggro = checkAggro(this.player, this);
+            if(isAggro && !this.player.is_dead) {
+                //disable AI wander so they don't change their mind
+                disable_AI_Wander(this);
+                // this.desired_x = this.player.x;
+                // this.desired_y = this.player.y;
+                this.path_start = true;
+                getAggroPath(this, this.player);
+                
+                // Attack Player
+                if (checkAttack(this.player, this)) {
+                    this.is_attack = true;
+                    //var attackAnim = 'attack' + this.desired_movement_arc;
+                    //this.animation = this.animations[attackAnim];
+                }
+                if (checkDistance(this.player, this) < this.damage_range  && !this.player.is_moving) {
+                    this.is_moving = false;
+                    if (this.player.health > 0) {
+                        this.player.health -= this.attack_power * 0.15;
+                        this.playZombie();
+                        if (this.player.health < 50 && !this.player.help_played) {
+                            this.player.playHelp();
+                            this.player.help_played = true;
+                        }
+                        if (this.player.health <= 0) {
+                            this.player.health = 0;
+                            this.is_attack = false;
+                            killCharacter(this.player);
+                            this.player.playPCDeath();
+                        }
+                    }
+
+                    // Attack Enemy
+                    if (this.player.game.hold_left) {
+                        if (checkFacing(this.player, this)) {
+                            this.health -= this.player.attack_power * 0.75;
+                            this.bounceBack();
+                            if (this.health <= 0) {
+                                this.health = 0;
+                                killZombie(this);
+                                this.playZombieDeath();
+                                this.player.inventory.setGold(this.gold);
+                                this.player.inventory.playCoin();
+                                this.player.experience += this.expGain;
+                            }
+                        }
+                    }           
+                }
+                this.was_aggro = true;
+            }
+            else {
+                this.is_moving = true;
+                if (this.player.health < 100) this.player.heatlh += 5 * .025
+            }
+
+            // Go back to wandering
+            if (this.was_aggro) {
+                enable_AI_Wander(this);
+                this.was_aggro = false;
+            }
+        }
+        zombieMovement(this);
+    }
 }
 
+Zombie.prototype.playZombie = function() {
+    this.zombieSound.loop = false;
+    this.zombieSound.play();
+}
+
+Zombie.prototype.playZombieDeath = function() {
+    this.zombieDeathSound.loop = false;
+    this.zombieDeathSound.play();
+}
+
+Zombie.prototype.bounceBack = function () {
+    var new_x = this.x + this.bounce_x;
+    var new_y = this.y + this.bounce_y;
+    var tile = this.game.level.getTileFromPoint(new_x, new_y);
+    if (tile.type === "TYPE_WALL") {
+        do {
+            if (this.bounce_x > 0) new_x -= 5;
+            else new_x += 5;
+            if (this.bounce_y > 0) new_y -= 5;
+            else new_y += 5;
+            tile = this.game.level.getTileFromPoint(new_x, new_y);
+        }while (tile.type === "TYPE_WALL");
+    }
+    else {
+        this.x += this.bounce_x;
+        this.y += this.bounce_y;
+    }
+    this.bounced = true;
+}
 
 //handle zombie movement, adapted from handleMovement
 function zombieMovement(character) {
-	if	(character.is_moving === true) {
-		var frameHalfSize = (character.animation.frameWidth / 2);
-		var desired_movement_arc = calculateMovementArc(character.x + frameHalfSize, character.y + frameHalfSize,
-											character.desired_x, character.desired_y);
-		if	(Math.abs(character.x + frameHalfSize - character.desired_x) < 1 &&
-			 Math.abs(character.y + frameHalfSize - character.desired_y) < 1) {
-			character.x = character.desired_x - frameHalfSize;
-			character.y = character.desired_y - frameHalfSize;
-			var idle = "idle" + desired_movement_arc;
-			character.animation = character.animations[idle];
-			character.is_moving = false;
-			character.animation.state_switched = true;
-			
-		} else {
-			character.animation.state = 1;
-		
-			if	(desired_movement_arc !== character.animation.facing) {
-				character.animation.state_switched = true;
-				var dir = "dir" + desired_movement_arc;
-				character.animation = character.animations[dir];
-				character.animation.facing = desired_movement_arc;
-				
-			}
-			
-			var direction = Math.atan2(character.desired_y - (character.y + frameHalfSize),
-										character.desired_x - (character.x + frameHalfSize));
-			
-			character.x += character.game.clockTick * character.speed * Math.cos(direction);
-			character.y += character.game.clockTick * character.speed * Math.sin(direction) / 2;
-			
-		}
-	
-	}
-	
+    if  (character.is_moving === true) {
+        //var frameHalfSize = (character.animation.frameWidth / 2);
+        this.desired_movement_arc = calculateMovementArc(character.x, character.y,
+                                            character.desired_x, character.desired_y);
+        if  (Math.abs(character.x - character.desired_x) < 1 &&
+             Math.abs(character.y - character.desired_y) < 1) {
+            character.x = character.desired_x;
+            character.y = character.desired_y;
+            var idle = "idle" + desired_movement_arc;
+            character.animation = character.animations[idle];
+            character.is_moving = false;
+            character.animation.state_switched = true;
+            
+        } else {
+            character.animation.state = 1;
+        
+            if  (desired_movement_arc !== character.animation.facing) {
+                character.animation.state_switched = true;
+                var dir = "dir" + desired_movement_arc;
+                character.animation = character.animations[dir];
+                character.animation.facing = desired_movement_arc;
+                
+            }
+            
+            var direction = Math.atan2(character.desired_y - (character.y),
+                                        character.desired_x - (character.x));
+            
+            character.x += character.game.clockTick * character.speed * Math.cos(direction);
+            character.y += character.game.clockTick * character.speed * Math.sin(direction) / 2;
+            
+        }
+    
+    }
+    
 }
+
+function killZombie(character) { 
+    character.is_moving = false;
+    character.is_dying = true;
+    var deathAnim = "death" + this.desired_movement_arc;
+    character.animation = character.animations[deathAnim];
+    character.is_dead = true;   
+} 
