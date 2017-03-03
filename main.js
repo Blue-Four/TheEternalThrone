@@ -17,16 +17,11 @@ AM.queueDownload("./img/gui/overlay.png");
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
-
-    var musicDungeon = document.getElementById("dungeon_music");
-	musicDungeon.loop = true;
-    musicDungeon.play();
-
     var gameEngine = new GameEngine(AM.getAsset("./img/gui/objective.png"), AM.getAsset("./img/gui/overlay.png"));
-    gameEngine.init(ctx);	
-	var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_dungeon1, tile_logic_dungeon1);
-	//var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_test0, tile_logic_dungeon1);
+	//var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_dungeon1, tile_logic_dungeon1, document.getElementById("dungeon_music"));
+	var level = new Level(gameEngine, AM.getAsset("./img/tiles/dungeon1.png"), level_test0, tile_logic_dungeon1, document.getElementById("dungeon_music"));
     gameEngine.setLevel(level);
+    gameEngine.init(ctx);
 	
     gameEngine.start();
 
@@ -60,7 +55,7 @@ AM.downloadAll(function () {
     gorganthor_ctx.restore();
 	randomCoords = level.getRandomLocation();
 	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, gorganthor_spritesheet, gorganthor_canvas, randomCoords.x, randomCoords.y, 110, 2);
-	gameEngine.addEntity(gorganthorTheDefiler);	
+	//gameEngine.addEntity(gorganthorTheDefiler);	
 	//apply_AI_Wander(gorganthorTheDefiler);
 
 	
@@ -73,7 +68,7 @@ AM.downloadAll(function () {
 	for(var i = 0; i < 15; i++) {	
 		randomCoords = level.getRandomLocation();
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
-		gameEngine.addEntity(zombie);
+		//gameEngine.addEntity(zombie);
 		//apply_AI_Wander(zombie);
 	}
   
@@ -90,7 +85,7 @@ AM.downloadAll(function () {
 	for(var i = 0; i < 15; i++) {
 		randomCoords = level.getRandomLocation();
 		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, skeleton_spritesheet, skeleton_canvas, randomCoords.x, randomCoords.y, 110, 1);
-	    gameEngine.addEntity(swordyMcSwordface);
+	    //gameEngine.addEntity(swordyMcSwordface);
 
 		//apply_AI_Wander(swordyMcSwordface);
 
@@ -99,7 +94,7 @@ AM.downloadAll(function () {
 	for(var i = 0; i < 30; i++) {
 		randomCoords = level.getRandomLocation();
 		var healthPot = new HealthPotion(gameEngine, AM.getAsset("./img/healthpot.png"), randomCoords.x, randomCoords.y, barbarianPC);
-	    gameEngine.addEntity(healthPot);
+	    //gameEngine.addEntity(healthPot);
 
 	}
 

@@ -28,8 +28,10 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
-    this.gameVictory = false;
+    this.gameVictory = false;	
     this.startInput();
+	this.level.music.play();
+	this.music_playing = true;
     console.log('game initialized');
 }
 
@@ -129,6 +131,18 @@ GameEngine.prototype.startInput = function () {
 		// var scrollSpeed = 5;
         //console.log(e);
         //console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
+		
+		if	(e.code === "KeyM") {
+			if	(that.music_playing === true) {
+				that.level.music.pause();
+				that.music_playing = false;
+			} else {
+				that.level.music.play();
+				that.music_playing = true;
+			}
+			
+		}
+		
     }, false);
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
@@ -230,6 +244,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.fillText("L-Click: Attack/Interact", SCREEN_WIDTH - 240, 40);
     this.ctx.fillText("R-Click: Move Player", SCREEN_WIDTH - 240, 60);
     this.ctx.fillText("1-Key: Use Potion", SCREEN_WIDTH - 240, 80);
+    this.ctx.fillText("M Key: Mute Music", SCREEN_WIDTH - 240, 100);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
     this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
