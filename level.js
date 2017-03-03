@@ -40,7 +40,7 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 		
 	//graph used for pathfinding
 	var collMap = genCollMap(this.array);
- 	this.graph = new Graph(collMap, { diagonal: false });
+ 	this.graph = new Graph(collMap, { diagonal: true });
 		
 	}
 	
@@ -81,7 +81,7 @@ Level.prototype.getPointFromTile = function(xIndex, yIndex) {
 Level.prototype.findPath = function(xStart, yStart, xEnd, yEnd) {
 	var startIndex = this.graph.grid[parseInt(xStart)][parseInt(yStart)];
 	var endIndex = this.graph.grid[parseInt(xEnd)][parseInt(yEnd)];
-	var result = astar.search(this.graph, startIndex, endIndex);
+	var result = astar.search(this.graph, startIndex, endIndex, { heuristic: astar.heuristics.diagonal });
 	return result;
 }
 

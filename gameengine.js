@@ -20,6 +20,7 @@ function GameEngine(objective_sprite_sheet, overlay_sprite) {
 	this.objectives = new Objectives(this, objective_sprite_sheet);
     this.door = false;
 	this.overlay_sprite = overlay_sprite;
+    this.player = null;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -27,6 +28,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
+    this.gameVictory = false;
     this.startInput();
     console.log('game initialized');
 }
@@ -57,7 +59,6 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("click", function (e) {
         that.leftclick = getXandY(e);
 		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
-		
 		// Checks to see if the mouse click was within 64 pixels of the PC.
 		// If so, and the clicked tile happens to be a door, interact with it.
 		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.leftclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.leftclick.y, 2))) < 64) {
@@ -132,7 +133,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
         if (e.code === "Digit1") that.Digit1 = false;
-        if (e.code === "Digit2") that.Digit2 = false;
+        //if (e.code === "Digit2") that.Digit2 = false;
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
@@ -143,6 +144,8 @@ GameEngine.prototype.startInput = function () {
 GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
     this.entities.push(entity);
+
+    if (entity instanceof CharacterPC) this.player = entity;
 }
 
 GameEngine.prototype.setLevel = function (level) {
@@ -250,6 +253,11 @@ GameEngine.prototype.draw = function () {
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("YOU DIED", this.surfaceWidth/3, this.surfaceHeight/2);
     }
+    if(this.gameVictory) {
+        this.ctx.fillStyle = "#DDDD55";
+        this.ctx.font = "bold 96px Arial";
+        this.ctx.fillText("VICTORY!", this.surfaceWidth/3, this.surfaceHeight/2);
+    }
 	
 	this.objectives.draw();
 	
@@ -272,6 +280,22 @@ GameEngine.prototype.update = function () {
         }
 
         entity.update();
+		
+		if (entity.is_dead) {
+			if	(!entity.deathflag) {
+				entity.dateofdeath = new Date();
+				entity.deathflag = true;
+			}
+			
+			if	(new Date() - entity.dateofdeath > 5000) {
+				console.log("testificate");
+				this.entities.splice(i, 1);
+				entitiesCount--;
+
+			}
+			
+        }
+		
     }
 		
 }
