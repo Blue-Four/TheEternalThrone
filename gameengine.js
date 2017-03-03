@@ -56,12 +56,14 @@ GameEngine.prototype.startInput = function () {
 
     // event listeners are added here
 
-    this.ctx.canvas.addEventListener("click", function (e) {
-        that.leftclick = getXandY(e);
-		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
+    this.ctx.canvas.addEventListener("contextmenu", function (e) {
+        that.rightclick = getXandY(e);
+		that.mouse_clicked_right = true;
+        e.preventDefault();
+		var tile = that.level.getTileFromPoint(that.rightclick.x - that.x, that.rightclick.y - that.y);
 		// Checks to see if the mouse click was within 64 pixels of the PC.
 		// If so, and the clicked tile happens to be a door, interact with it.
-		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.leftclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.leftclick.y, 2))) < 64) {
+		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.rightclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.rightclick.y, 2))) < 64) {
 			if (tile.type === "TYPE_DOOR_OPEN") {
 				tile.type = "TYPE_DOOR_CLOSED";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 0;
@@ -100,11 +102,11 @@ GameEngine.prototype.startInput = function () {
 
     }, false);
 
-    this.ctx.canvas.addEventListener("contextmenu", function (e) {
-        that.rightclick = getXandY(e);
-		that.mouse_clicked_right = true;
-        e.preventDefault();
-    }, false);
+    // this.ctx.canvas.addEventListener("contextmenu", function (e) {
+        // that.rightclick = getXandY(e);
+		// that.mouse_clicked_right = true;
+        // e.preventDefault();
+    // }, false);
 
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         that.mouse = getXandY(e);		
@@ -124,7 +126,7 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (e.code === "Digit1") that.Digit1 = true;
+        if (e.keyCode == "104") that.heal = true;
         //if (e.code === "Digit2") that.Digit2 = true;
 		// var scrollSpeed = 5;
         //console.log(e);
@@ -132,7 +134,7 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
-        if (e.code === "Digit1") that.Digit1 = false;
+        if (e.keyCode == "104") that.heal = false;
         //if (e.code === "Digit2") that.Digit2 = false;
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
@@ -227,9 +229,9 @@ GameEngine.prototype.draw = function () {
 	this.ctx.save();
     this.ctx.font = "bold 18px Times New Roman";
     this.ctx.fillStyle = "#FF2d2d";    
-    this.ctx.fillText("L-Click: Attack/Interact", SCREEN_WIDTH - 240, 40);
+    this.ctx.fillText("Hold L-Click: Attack", SCREEN_WIDTH - 240, 40);
     this.ctx.fillText("R-Click: Move Player", SCREEN_WIDTH - 240, 60);
-    this.ctx.fillText("1-Key: Use Potion", SCREEN_WIDTH - 240, 80);
+    this.ctx.fillText("H-Key: Use Potion", SCREEN_WIDTH - 240, 80);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
     this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);

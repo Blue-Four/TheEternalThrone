@@ -322,16 +322,13 @@ CharacterPC.prototype.update = function () {
 				this.is_attack = false;
 				this.is_moving = true;
 			}	
-			if (this.game.Digit1) {
 				if (this.health < 100 && this.inventory.health_potion > 0) {
 					this.health += 25;
 					if (this.health > 50 && this.help_played) this.help_played = false;
 					if (this.health > 100) this.health = 100;
 					this.inventory.health_potion -= 1;
-					this.game.Digit1 = false;
 					this.inventory.playPotion();
 				}
-				this.game.Digit1 = false;
 			}
 		}
 		if(this.experience >= this.levels[this.currentLevel]) {
