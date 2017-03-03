@@ -1,5 +1,5 @@
 // Background
-function Level(game, spritesheet, tile_sprite_array, tile_logic) {
+function Level(game, spritesheet, tile_sprite_array, tile_logic, music) {
     this.game = game;
     this.ctx = game.ctx;
     this.spritesheet = spritesheet;
@@ -41,6 +41,9 @@ function Level(game, spritesheet, tile_sprite_array, tile_logic) {
 	//graph used for pathfinding
 	var collMap = genCollMap(this.array);
  	this.graph = new Graph(collMap, { diagonal: true });
+	
+	this.music = music;
+	this.music.loop = true;
 		
 	}
 	

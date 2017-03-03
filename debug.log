@@ -5,3 +5,7 @@
 [0215/171153.587:WARNING:in_range_cast.h(38)] value 2001584135092 out of range
 [0215/171153.587:WARNING:in_range_cast.h(38)] value 2001584135432 out of range
 [0215/171153.587:WARNING:in_range_cast.h(38)] value 2001584131598 out of range
+[0302/203543.440:ERROR:process_reader_win.cc(142)] SuspendThread: Access is denied. (0x5)
+[0302/203543.440:ERROR:exception_snapshot_win.cc(87)] thread ID 10636 not found in process
+[0302/203543.440:WARNING:crash_report_exception_handler.cc(60)] ProcessSnapshotWin::Initialize failed
+[0302/203543.440:ERROR:scoped_process_suspend.cc(38)] NtResumeProcess: An attempt was made to access an exiting process.  (0xc000010a)
