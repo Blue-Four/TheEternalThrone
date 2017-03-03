@@ -11,6 +11,7 @@ window.requestAnimFrame = (function () {
 
 function GameEngine(objective_sprite_sheet, overlay_sprite) {
     this.entities = [];
+    this.guielements = [];
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
@@ -21,6 +22,12 @@ function GameEngine(objective_sprite_sheet, overlay_sprite) {
     this.door = false;
 	this.overlay_sprite = overlay_sprite;
     this.player = null;
+	
+	// Dialogue Variables
+    this.in_dialogue = false;
+    this.dialogue = null;
+    this.former_x = 0;
+    this.former_y = 0;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -28,8 +35,10 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
-    this.gameVictory = false;
+    this.gameVictory = false;	
     this.startInput();
+	this.level.music.play();
+	this.music_playing = true;
     console.log('game initialized');
 }
 
@@ -53,14 +62,14 @@ GameEngine.prototype.startInput = function () {
     }
 
     var that = this;
+	that.digits = [false, false, false];
 
     // event listeners are added here
 
-    this.ctx.canvas.addEventListener("contextmenu", function (e) {
-        that.rightclick = getXandY(e);
-		that.mouse_clicked_right = true;
-        e.preventDefault();
-		var tile = that.level.getTileFromPoint(that.rightclick.x - that.x, that.rightclick.y - that.y);
+    this.ctx.canvas.addEventListener("click", function (e) {
+        that.leftclick = getXandY(e);
+		that.mouse_clicked_left = true;
+		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
 		// Checks to see if the mouse click was within 64 pixels of the PC.
 		// If so, and the clicked tile happens to be a door, interact with it.
 		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.rightclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.rightclick.y, 2))) < 64) {
@@ -119,23 +128,38 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
-        //if (e.code === "Digit1") that.Digit1 = true;
-        //if (e.code === "Digit2") that.Digit2 = true;
         //console.log(e);
         //console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
 
     this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (e.keyCode == "104") that.heal = true;
+        if (e.code === "KeyH") that.KeyH = true;
+        if (e.code === "Digit1") that.digits[0] = true;
+        if (e.code === "Digit2") that.digits[1] = true;
+        if (e.code === "Digit3") that.digits[2] = true;
         //if (e.code === "Digit2") that.Digit2 = true;
 		// var scrollSpeed = 5;
         //console.log(e);
         //console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
+		
+		if	(e.code === "KeyM") {
+			if	(that.music_playing === true) {
+				that.level.music.pause();
+				that.music_playing = false;
+			} else {
+				that.level.music.play();
+				that.music_playing = true;
+			}
+			
+		}
+		
     }, false);
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
-        if (e.keyCode == "104") that.heal = false;
-        //if (e.code === "Digit2") that.Digit2 = false;
+        if (e.code === "KeyH") that.KeyH = false;
+        if (e.code === "Digit1") that.digits[0] = false;
+        if (e.code === "Digit2") that.digits[1] = false;
+        if (e.code === "Digit3") that.digits[2] = false;
         //console.log(e);
         //console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
     }, false);
@@ -148,6 +172,24 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 
     if (entity instanceof CharacterPC) this.player = entity;
+}
+
+GameEngine.prototype.addGUIElement = function (guielement) {
+    console.log('added gui element');
+    this.guielements.push(guielement);
+}
+
+GameEngine.prototype.startDialogue = function (dialogue) {
+	if	(!this.in_dialogue) {
+		console.log('begin dialogue');
+		this.guielements.push(dialogue);
+		this.in_dialogue = true;
+		
+		this.dialogue = dialogue;
+		this.former_x = this.x;
+		this.former_y = this.y;
+		
+	}
 }
 
 GameEngine.prototype.setLevel = function (level) {
@@ -223,15 +265,22 @@ GameEngine.prototype.draw = function () {
 		
 	}
 	
+	for	(var i = 0; i < this.guielements.length; i++) {
+		this.guielements[i].draw();
+		
+	}
+	
 	this.ctx.drawImage(this.overlay_sprite, -1, -1,
 						SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2);
 
 	this.ctx.save();
+	this.ctx.beginPath();
     this.ctx.font = "bold 18px Times New Roman";
     this.ctx.fillStyle = "#FF2d2d";    
     this.ctx.fillText("Hold L-Click: Attack", SCREEN_WIDTH - 240, 40);
     this.ctx.fillText("R-Click: Move Player", SCREEN_WIDTH - 240, 60);
-    this.ctx.fillText("H-Key: Use Potion", SCREEN_WIDTH - 240, 80);
+    this.ctx.fillText("H Key: Use Potion", SCREEN_WIDTH - 240, 80);
+    this.ctx.fillText("M Key: Mute Music", SCREEN_WIDTH - 240, 100);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
     this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
@@ -249,6 +298,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.fillStyle = "white";
     this.ctx.fillText("Level " + this.playerLevel, 25, 65);
     //this.ctx.filRect(20, 100, this.)
+	this.ctx.closePath();
     this.ctx.restore();
     if(this.playerHealth <= 0) {
         this.ctx.fillStyle = "red";
@@ -279,8 +329,9 @@ GameEngine.prototype.update = function () {
                 this.levelUp = entity.leveledUp;
                 this.playerPotions = entity.inventory.health_potion;
                 this.playerKeys = entity.inventory.key;
-        }
-
+				
+		}
+		
         entity.update();
 		
 		if (entity.is_dead) {
@@ -298,7 +349,27 @@ GameEngine.prototype.update = function () {
 			
         }
 		
-    }
+	}
+		
+	if	(this.in_dialogue && 
+		 Math.sqrt(Math.pow(this.y - this.former_y, 2), Math.pow(this.x - this.former_x)) > 64) {
+		this.dialogue.destroy = true;
+	}
+		
+	var iCount = 0;
+	var elementsLength = this.guielements.length;
+	while	(iCount < elementsLength) {
+		this.guielements[iCount].update();
+		
+		if	(this.guielements[iCount].destroy) {
+			if	(this.guielements[iCount] instanceof Dialogue) { this.in_dialogue = false; }
+			this.guielements.splice(iCount, 1);
+			elementsLength--;
+		}
+		
+		iCount++;
+		
+	}
 		
 }
 

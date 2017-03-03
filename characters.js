@@ -314,16 +314,16 @@ CharacterPC.prototype.update = function () {
 				this.is_attack = false;
 				this.is_moving = true;
 			}	
-			if (this.game.heal) {
+			if (this.game.KeyH) {
 				if (this.health < 100 && this.inventory.health_potion > 0) {
 					this.health += 25;
 					if (this.health > 50 && this.help_played) this.help_played = false;
 					if (this.health > 100) this.health = 100;
 					this.inventory.health_potion -= 1;
-					this.game.heal = false;
+					this.game.KeyH = false;
 					this.inventory.playPotion();
 				}
-				this.game.heal = false;
+				this.game.KeyH = false;
 			}
 		}
 		if(this.experience >= this.levels[this.currentLevel]) {
@@ -481,6 +481,32 @@ function Ally_Villager(game, spritesheet, spriteSheetReversed, x, y, offset, spe
 
 Ally_Villager.prototype = Object.create(BasicSprite.prototype);
 Ally_Villager.prototype.constructor = BasicSprite;
+
+
+// Potion Seller
+function PotionSeller(game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale);
+	this.type = "NEUTRAL";
+}
+
+PotionSeller.prototype = Object.create(BasicSprite.prototype);
+PotionSeller.prototype.constructor = BasicSprite;
+
+PotionSeller.prototype.update = function() {
+	BasicSprite.prototype.update.call(this);
+	
+	// If clicked upon...
+	if	(!this.game.in_dialogue && this.game.mouse_clicked_left && 
+			Math.sqrt(Math.pow(this.x + this.game.x - this.game.leftclick.x, 2) + Math.pow(this.y  + this.game.y - this.game.leftclick.y, 2)) < 24 &&
+			Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - this.x - this.game.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - this.y - this.game.y, 2)) < 64) {
+	
+		var dialogue = dialogue_storefront(this.game);
+		this.game.startDialogue(dialogue);
+		this.game.mouse_clicked_left = false;
+		
+	}
+	
+}
 
 
 // ====================================
