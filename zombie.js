@@ -114,8 +114,8 @@ function Zombie(game, spritesheet, x, y) {
     this.damage_range = 20;
     this.type = "ENEMY";
     this.attack_power = 5;
-    this.health = 100;
-    this.gold = 10;
+    this.health = 40;
+	this.gold = Math.floor((Math.random() * 25) + 10);
     this.expGain = 25;
     this.gold = Math.floor((Math.random() * 25) + 10);
 
