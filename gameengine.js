@@ -111,11 +111,11 @@ GameEngine.prototype.startInput = function () {
 
     }, false);
 
-    // this.ctx.canvas.addEventListener("contextmenu", function (e) {
-        // that.rightclick = getXandY(e);
-		// that.mouse_clicked_right = true;
-        // e.preventDefault();
-    // }, false);
+    this.ctx.canvas.addEventListener("contextmenu", function (e) {
+        that.rightclick = getXandY(e);
+		that.mouse_clicked_right = true;
+        e.preventDefault();
+    }, false);
 
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         that.mouse = getXandY(e);		
