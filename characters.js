@@ -1,4 +1,4 @@
-function AnimationCharacter(spriteSheet, frameSize, frameDuration, frames, loop, scale) {
+function AnimationCharacter(spriteSheet, spriteSheetReversed, frameSize, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
 	
 	this.sheetWidth = frameSize * frames * 5;
@@ -12,15 +12,7 @@ function AnimationCharacter(spriteSheet, frameSize, frameDuration, frames, loop,
 	this.frames_state = [frames, frames, frames, frames, 1];
 	
 	// Caches a reversed version of the sprite-sheet, for animations facing from north-east to south-east.
-    var offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = this.sheetWidth;
-    offscreenCanvas.height = this.sheetHeight;
-    var offscreenCtx = offscreenCanvas.getContext('2d');
-    offscreenCtx.save();
-	offscreenCtx.scale(-1, 1);
-    offscreenCtx.drawImage(spriteSheet, 0 - this.sheetWidth, 0);
-    offscreenCtx.restore();
-    this.spriteSheetReversed = offscreenCanvas;
+    this.spriteSheetReversed = spriteSheetReversed;
 	
 	/*
 	    4
@@ -109,8 +101,8 @@ AnimationCharacter.prototype.isDone = function () {
 
 
 // Basic Sprite
-function BasicSprite(game, spritesheet, x, y, speed, scale) {
-	this.animation = new AnimationCharacter(spritesheet, 120, 0.1, 15, true, scale);
+function BasicSprite(game, spritesheet, spriteSheetReversed, x, y, speed, scale) {
+	this.animation = new AnimationCharacter(spritesheet, spriteSheetReversed, 120, 0.1, 15, true, scale);
     this.x = x;
     this.y = y;
     this.speed = speed;
@@ -265,8 +257,8 @@ BasicSprite.prototype.update = function () {
 
 
 // PC
-function CharacterPC(game, spritesheet, x, y, offset, speed, scale) {
-	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+function CharacterPC(game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale);
 	this.type = "PLAYER";
 	this.attack_power = 25;
 	this.inventory = new Inventory();
@@ -372,8 +364,8 @@ CharacterPC.prototype.playPCDeath = function() {
 // ====================================
 
 // Enemy Melee Skeleton
-function Enemy_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
-	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+function Enemy_Skeleton_Melee(game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale);
 	this.animation.frames_state[0] = 7;
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
@@ -401,8 +393,8 @@ Enemy_Skeleton_Melee.prototype.playSkeletonDeath = function() {
 }
 
 // Enemy Large Melee Skeleton
-function Large_Skeleton_Melee(game, spritesheet, x, y, offset, speed, scale) {
-	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+function Large_Skeleton_Melee(game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale);
 	this.animation.frames_state[0] = 7;
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
@@ -419,8 +411,8 @@ Large_Skeleton_Melee.prototype.constructor = BasicSprite;
 
 
 // GORGANTHOR THE DEFILER
-function GORGANTHOR(game, spritesheet, x, y, offset, speed, scale) {
-	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, 2);
+function GORGANTHOR(game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, spriteSheetReversed, x, y, offset, speed, 2);
 	this.animation.frames_state[0] = 7;
 	this.animation.frames_state[2] = 10;
 	this.animation.frames_state[3] = 10;
@@ -482,8 +474,8 @@ GORGANTHOR.prototype.playGiantDeath = function() {
 
 
 // Basic Villager
-function Ally_Villager(game, spritesheet, x, y, offset, speed, scale) {
-	BasicSprite.call(this, game, spritesheet, x, y, offset, speed, scale);
+function Ally_Villager(game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale) {
+	BasicSprite.call(this, game, spritesheet, spriteSheetReversed, x, y, offset, speed, scale);
 	this.type = "ALLY";
 }
 
