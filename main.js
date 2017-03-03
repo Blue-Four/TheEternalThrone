@@ -65,6 +65,20 @@ AM.downloadAll(function () {
 	// apply_AI_Wander(missDemeanor);
 	
 
+  	var potionseller_spritesheet = AM.getAsset("./img/villager1_spritesheet.png");
+  	var potionseller_canvas = document.createElement('canvas');
+    potionseller_canvas.width = sheetWidth;
+    potionseller_canvas.height = sheetHeight;
+    var gorganthor_ctx = potionseller_canvas.getContext('2d');
+    gorganthor_ctx.save();
+	gorganthor_ctx.scale(-1, 1);
+    gorganthor_ctx.drawImage(potionseller_spritesheet, 0 - sheetWidth, 0);
+    gorganthor_ctx.restore();
+	randomCoords = level.getRandomLocation();
+	var potionSeller = new PotionSeller(gameEngine, potionseller_spritesheet, potionseller_canvas, randomCoords.x, randomCoords.y, 110, 1);
+    gameEngine.addEntity(potionSeller);
+	
+
 	for(var i = 0; i < 15; i++) {	
 		randomCoords = level.getRandomLocation();
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
