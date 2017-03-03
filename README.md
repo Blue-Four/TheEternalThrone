@@ -11,6 +11,7 @@ Right Mouse Click - Move player/Open door
 
 Keys:
 H - Consume Health Potion
+M - Mute Music
 
 
 Gameplay tips:
