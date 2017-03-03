@@ -72,7 +72,7 @@ GameEngine.prototype.startInput = function () {
 		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
 		// Checks to see if the mouse click was within 64 pixels of the PC.
 		// If so, and the clicked tile happens to be a door, interact with it.
-		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.rightclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.rightclick.y, 2))) < 64) {
+		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.leftclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.leftclick.y, 2))) < 64) {
 			if (tile.type === "TYPE_DOOR_OPEN") {
 				tile.type = "TYPE_DOOR_CLOSED";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 0;
