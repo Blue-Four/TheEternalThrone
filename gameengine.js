@@ -72,7 +72,7 @@ GameEngine.prototype.startInput = function () {
 		var tile = that.level.getTileFromPoint(that.leftclick.x - that.x, that.leftclick.y - that.y);
 		// Checks to see if the mouse click was within 64 pixels of the PC.
 		// If so, and the clicked tile happens to be a door, interact with it.
-		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.leftclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.leftclick.y, 2))) < 64) {
+		if	((Math.sqrt(Math.pow((SCREEN_WIDTH / 2) - that.rightclick.x, 2) + Math.pow((SCREEN_HEIGHT / 2) - that.rightclick.y, 2))) < 64) {
 			if (tile.type === "TYPE_DOOR_OPEN") {
 				tile.type = "TYPE_DOOR_CLOSED";
 				that.level.graph.grid[tile.xIndex][tile.yIndex].weight = 0;
@@ -111,11 +111,11 @@ GameEngine.prototype.startInput = function () {
 
     }, false);
 
-    this.ctx.canvas.addEventListener("contextmenu", function (e) {
-        that.rightclick = getXandY(e);
-		that.mouse_clicked_right = true;
-        e.preventDefault();
-    }, false);
+    // this.ctx.canvas.addEventListener("contextmenu", function (e) {
+        // that.rightclick = getXandY(e);
+		// that.mouse_clicked_right = true;
+        // e.preventDefault();
+    // }, false);
 
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         that.mouse = getXandY(e);		
@@ -277,7 +277,7 @@ GameEngine.prototype.draw = function () {
 	this.ctx.beginPath();
     this.ctx.font = "bold 18px Times New Roman";
     this.ctx.fillStyle = "#FF2d2d";    
-    this.ctx.fillText("L-Click: Attack/Interact", SCREEN_WIDTH - 240, 40);
+    this.ctx.fillText("Hold L-Click: Attack", SCREEN_WIDTH - 240, 40);
     this.ctx.fillText("R-Click: Move Player", SCREEN_WIDTH - 240, 60);
     this.ctx.fillText("H Key: Use Potion", SCREEN_WIDTH - 240, 80);
     this.ctx.fillText("M Key: Mute Music", SCREEN_WIDTH - 240, 100);
