@@ -223,7 +223,6 @@ BasicSprite.prototype.update = function () {
 								this.health = 0;
 								killCharacter(this);
 								this.player.inventory.setGold(this.gold);
-								this.player.inventory.health_potion += this.health_potion;
 								this.player.inventory.playCoin();
 								this.player.experience += this.expGain;
 								if (this instanceof Enemy_Skeleton_Melee) {
@@ -372,8 +371,9 @@ function Enemy_Skeleton_Melee(game, spritesheet, spriteSheetReversed, x, y, offs
 	this.type = "ENEMY";
 	this.attack_power = 5;
 	this.damage_range = 20;
+	this.health = 40;
 	this.gold = Math.floor((Math.random() * 25) + 10);
-	this.health_potion = (Math.random() < 0.4 ? 1 : 0);
+	//this.health_potion = (Math.random() < 0.4 ? 1 : 0);
 	this.expGain = 25;
 	this.skeletonSound = document.getElementById("skeleton");
 	this.skeletonDeathSound = document.getElementById("zombie_death");
