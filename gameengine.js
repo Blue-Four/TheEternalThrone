@@ -196,6 +196,25 @@ GameEngine.prototype.startDialogue = function (dialogue) {
 
 GameEngine.prototype.setLevel = function (level) {
     console.log('set level');
+    this.mapCanvas = document.createElement('canvas');
+    this.mapCanvas.width = level.array[0].length * 7;
+    this.mapCanvas.height = level.array.length * 7;
+    this.mapCtx = this.mapCanvas.getContext('2d');
+    this.mapCtx.save();
+    var width = level.array[0].length;
+    var height = level.array.length;
+    for(var x = 0; x < width; x++){
+        for(var y = 0; y < height; y++){
+            if(isWalkable(level.array[y][x])) {
+                this.mapCtx.fillStyle = "rgba(206, 33, 33, 0.3)";
+                this.mapCtx.fillRect((x * 7),(y * 7),7,7);
+            } else {
+                this.mapCtx.fillStyle = "rgba(0, 0, 0, 0.3)";
+                this.mapCtx.fillRect((x * 7),(y * 7),7,7);
+            }
+        }
+    }
+    this.mapCtx.restore();
     this.level = level;
 }
 
@@ -314,24 +333,11 @@ GameEngine.prototype.draw = function () {
         this.ctx.fillText("VICTORY!", this.surfaceWidth/3, this.surfaceHeight/2);
     }
     if(this.keyF) {
-        var startX = 200;
-        var startY = 100;
-        var width = this.level.array[0].length;
-        var height = this.level.array.length;
-        for(var x = 0; x < width; x++){
-            for(var y = 0; y < height; y++){
-                if(x == this.currentPos.xIndex && y == this.currentPos.yIndex) {
-                    this.ctx.fillStyle = "rgba(206, 33, 33, 0.9)";
-                    this.ctx.fillRect(startX + (x * 7), startY + (y * 7),7,7);
-                } else if(isWalkable(this.level.array[y][x])) {
-                    this.ctx.fillStyle = "rgba(206, 33, 33, 0.3)";
-                    this.ctx.fillRect(startX + (x * 7), startY + (y * 7),7,7);
-                } else {
-                    this.ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
-                    this.ctx.fillRect(startX + (x * 7), startY + (y * 7),7,7);
-                }
-            }
-        }
+        var drawX = 200;
+        var drawY = 100;
+        this.ctx.drawImage(this.mapCanvas, drawX, drawY);
+        this.ctx.fillStyle = "rgba(206, 33, 33, 0.9)";
+        this.ctx.fillRect(drawX + (this.currentPos.xIndex * 7), drawY + (this.currentPos.yIndex * 7),7,7);
         this.ctx.restore();
     }
 	
