@@ -205,7 +205,7 @@ GameEngine.prototype.setLevel = function (level) {
     var height = level.array.length;
     for(var x = 0; x < width; x++){
         for(var y = 0; y < height; y++){
-            if(isWalkable(level.array[y][x])) {
+            if(isWalkable(level.array[y][x]) || level.array[y][x].type == "TYPE_DOOR_CLOSED") {
                 this.mapCtx.fillStyle = "rgba(206, 33, 33, 0.3)";
                 this.mapCtx.fillRect((x * 7),(y * 7),7,7);
             } else {
