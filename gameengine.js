@@ -36,6 +36,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
     this.gameVictory = false;	
+    this.keyF = false;
     this.startInput();
 	this.level.music.play();
 	this.music_playing = true;
@@ -137,6 +138,7 @@ GameEngine.prototype.startInput = function () {
         if (e.code === "Digit1") that.digits[0] = true;
         if (e.code === "Digit2") that.digits[1] = true;
         if (e.code === "Digit3") that.digits[2] = true;
+        if (e.code === "KeyF") that.keyF = !that.keyF;
         //if (e.code === "Digit2") that.Digit2 = true;
 		// var scrollSpeed = 5;
         //console.log(e);
@@ -281,6 +283,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.fillText("R-Click: Move Player", SCREEN_WIDTH - 240, 60);
     this.ctx.fillText("H Key: Use Potion", SCREEN_WIDTH - 240, 80);
     this.ctx.fillText("M Key: Mute Music", SCREEN_WIDTH - 240, 100);
+    this.ctx.fillText("F Key: Toggle Map", SCREEN_WIDTH - 240, 120);
     this.ctx.fillText("Gold: " + this.playerGold, 20, 100);
     this.ctx.fillText("Potions: " + this.playerPotions, 20, 120);
     this.ctx.fillText("Keys: " + this.playerKeys, 20, 140);
@@ -310,6 +313,27 @@ GameEngine.prototype.draw = function () {
         this.ctx.font = "bold 96px Arial";
         this.ctx.fillText("VICTORY!", this.surfaceWidth/3, this.surfaceHeight/2);
     }
+    if(this.keyF) {
+        var startX = 200;
+        var startY = 100;
+        var width = this.level.array[0].length;
+        var height = this.level.array.length;
+        for(var x = 0; x < width; x++){
+            for(var y = 0; y < height; y++){
+                if(x == this.currentPos.xIndex && y == this.currentPos.yIndex) {
+                    this.ctx.fillStyle = "rgba(206, 33, 33, 0.9)";
+                    this.ctx.fillRect(startX + (x * 7), startY + (y * 7),7,7);
+                } else if(isWalkable(this.level.array[y][x])) {
+                    this.ctx.fillStyle = "rgba(206, 33, 33, 0.3)";
+                    this.ctx.fillRect(startX + (x * 7), startY + (y * 7),7,7);
+                } else {
+                    this.ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+                    this.ctx.fillRect(startX + (x * 7), startY + (y * 7),7,7);
+                }
+            }
+        }
+        this.ctx.restore();
+    }
 	
 	this.objectives.draw();
 	
@@ -322,6 +346,7 @@ GameEngine.prototype.update = function () {
         var entity = this.entities[i];
         if (entity instanceof CharacterPC) {
                 this.playerHealth = entity.health;
+                this.currentPos = entity.game.level.getTileFromPoint(entity.x, entity.y);
                 this.playerGold = entity.inventory.gold;
                 this.playerGold = entity.inventory.gold;
                 this.playerLevel = entity.currentLevel;
