@@ -149,7 +149,22 @@ function Zombie(game, spritesheet, x, y) {
 Zombie.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, 
             this.ctx, this.x + this.game.x - this.frameSize/2, this.y + this.game.y - this.frameSize/2 - 15);
+    
+    if  ((!(this.is_dead || this.is_dying)) && this.health < 40) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.strokeStyle="red";
+        this.ctx.rect(this.x + this.game.x - 16, this.y + this.game.y - 50, 35, 3);
+        this.ctx.stroke();
+        this.ctx.fillStyle = "red";
+        this.ctx.fillRect(this.x + this.game.x - 16, this.y + this.game.y - 50, this.health/40 * 35, 3);
+        this.ctx.closePath();
+        this.ctx.stroke();
+        
+    }
+    
 }
+
 
 Zombie.prototype.update = function () {
     if (!this.is_dead) {

@@ -382,6 +382,25 @@ function Enemy_Skeleton_Melee(game, spritesheet, spriteSheetReversed, x, y, offs
 Enemy_Skeleton_Melee.prototype = Object.create(BasicSprite.prototype);
 Enemy_Skeleton_Melee.prototype.constructor = BasicSprite;
 
+Enemy_Skeleton_Melee.prototype.draw = function() {
+	BasicSprite.prototype.draw.call(this);
+	
+	if	((!(this.is_dead || this.is_dying)) && this.health < 40) {
+		this.ctx.save();
+		this.ctx.beginPath();
+		this.ctx.strokeStyle="red";
+	    this.ctx.rect(this.x + this.game.x - 16, this.y + this.game.y - 30, 35, 3);
+	    this.ctx.stroke();
+	    this.ctx.fillStyle = "red";
+	    this.ctx.fillRect(this.x + this.game.x - 16, this.y + this.game.y - 30, this.health/40 * 35, 3);
+	    this.ctx.closePath();
+	    this.ctx.stroke();
+		
+	}
+	
+}
+
+
 Enemy_Skeleton_Melee.prototype.playSkeleton = function() {
 	this.skeletonDeathSound.loop = false;
     this.skeletonDeathSound.play();
@@ -438,8 +457,17 @@ GORGANTHOR.prototype.draw = function() {
 		this.ctx.font = "italic bold 10px Times New Roman";
 		this.ctx.fillStyle = "#FF0000";
 		this.ctx.fillText("GORGANTHOR THE DEFILER",
-					this.x + this.game.x - 65, this.y + this.game.y - 65);		
-		this.ctx.restore();
+					this.x + this.game.x - 65, this.y + this.game.y - 65);
+		if(this.health < 100) {
+			this.ctx.beginPath();
+			this.ctx.strokeStyle="red";
+		    this.ctx.rect(this.x + this.game.x - 45, this.y + this.game.y - 85, 100, 5);
+		    this.ctx.stroke();
+		    this.ctx.fillStyle = "red";
+		    this.ctx.fillRect(this.x + this.game.x - 45, this.y + this.game.y - 85, this.health, 5);
+		    this.ctx.closePath();	
+			this.ctx.restore();
+		}	
 		
 	}
 	
