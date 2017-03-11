@@ -114,10 +114,10 @@ AM.downloadAll(function () {
 
 	}
 	
-	for(var i = 0; i < 20; i++) {
+	for(var i = 0; i < 10; i++) {
 		randomCoords = level.getRandomLocation();
 		var healthPot = new HealthPotion(gameEngine, AM.getAsset("./img/healthpot.png"), randomCoords.x, randomCoords.y, barbarianPC);
-	    //gameEngine.addEntity(healthPot);
+	    gameEngine.addEntity(healthPot);
 
 	}
 

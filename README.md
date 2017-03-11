@@ -11,11 +11,16 @@ Right Mouse Click - Move player/Open door
 
 Keys:
 H - Consume Health Potion
+M - Mute Music
 
 
 Gameplay tips:
 
 To open doors, right click near the base of the sprite.
 
-Hold down left mouse in general direction of enemy for effective combat, and let enemies approach you.
+Use hit and run tactics in combat. Coming in at enemies from multiple angle and retreating is more effective than just wading in.
+
+Enemies can be knocked back when struck, preventing them from hurting you. A good barbarian can slay many foes this way.
+
+Legend has it that a potion seller may be found within the depths of this dungeon. Find her, talk to her, and she may prove to be of help in your quest.
 
