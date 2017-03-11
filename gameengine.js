@@ -28,6 +28,9 @@ function GameEngine(objective_sprite_sheet, overlay_sprite) {
     this.dialogue = null;
     this.former_x = 0;
     this.former_y = 0;
+
+    // Audio
+    this.mutedAudio = false;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -143,14 +146,8 @@ GameEngine.prototype.startInput = function () {
         //console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
 		
 		if	(e.code === "KeyM") {
-			if	(that.music_playing === true) {
-				that.level.music.pause();
-				that.music_playing = false;
-			} else {
-				that.level.music.play();
-				that.music_playing = true;
-			}
-			
+            if (that.mutedAudio) that.mutedAudio = unMuteAudio();
+			else that.mutedAudio = muteAudio();
 		}
 		
     }, false);
@@ -296,7 +293,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.fillRect(20, 50, this.playerExperience * 200, 20);
     this.ctx.stroke();
     this.ctx.fillStyle = "white";
-    this.ctx.fillText("Level " + this.playerLevel, 25, 65);
+    this.ctx.fillText("Exp Level " + this.playerLevel, 25, 65);
     //this.ctx.filRect(20, 100, this.)
 	this.ctx.closePath();
     this.ctx.restore();
@@ -341,7 +338,6 @@ GameEngine.prototype.update = function () {
 			}
 			
 			if	(new Date() - entity.dateofdeath > 5000) {
-				console.log("testificate");
 				this.entities.splice(i, 1);
 				entitiesCount--;
 
@@ -461,4 +457,24 @@ function playVictory() {
     victorySound.loop = false;
     victorySound.play();
 }
+
+function muteAudio() {
+     var audios = document.getElementsByTagName('audio'),
+       i, len = audios.length;
+     for (i = 0; i < len; i++) {
+       audios[i].muted = true;
+     }
+     this.mutedAudio = true;
+     return this.mutedAudio;
+ }
+
+ function unMuteAudio() {
+     var audios = document.getElementsByTagName('audio'),
+       i, len = audios.length;
+     for (i = 0; i < len; i++) {
+       audios[i].muted = false;
+     }
+     this.mutedAudio = false;
+     return this.mutedAudio;
+ }
 

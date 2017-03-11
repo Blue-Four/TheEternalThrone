@@ -54,6 +54,9 @@ AM.downloadAll(function () {
     gorganthor_ctx.drawImage(gorganthor_spritesheet, 0 - sheetWidth, 0);
     gorganthor_ctx.restore();
 	randomCoords = level.getRandomLocation();
+	while (checkSpawnDistance(gameEngine.player, randomCoords) <= 90) {
+        randomCoords = level.getRandomLocation();
+	}
 	var gorganthorTheDefiler = new GORGANTHOR(gameEngine, gorganthor_spritesheet, gorganthor_canvas, randomCoords.x, randomCoords.y, 110, 2);
 	gameEngine.addEntity(gorganthorTheDefiler);	
 	//apply_AI_Wander(gorganthorTheDefiler);
@@ -69,11 +72,11 @@ AM.downloadAll(function () {
   	var potionseller_canvas = document.createElement('canvas');
     potionseller_canvas.width = sheetWidth;
     potionseller_canvas.height = sheetHeight;
-    var gorganthor_ctx = potionseller_canvas.getContext('2d');
-    gorganthor_ctx.save();
-	gorganthor_ctx.scale(-1, 1);
-    gorganthor_ctx.drawImage(potionseller_spritesheet, 0 - sheetWidth, 0);
-    gorganthor_ctx.restore();
+    var potionseller_ctx = potionseller_canvas.getContext('2d');
+    potionseller_ctx.save();
+	potionseller_ctx.scale(-1, 1);
+    potionseller_ctx.drawImage(potionseller_spritesheet, 0 - sheetWidth, 0);
+    potionseller_ctx.restore();
 	randomCoords = level.getRandomLocation();
 	var potionSeller = new PotionSeller(gameEngine, potionseller_spritesheet, potionseller_canvas, randomCoords.x, randomCoords.y, 110, 1);
     gameEngine.addEntity(potionSeller);
@@ -81,6 +84,9 @@ AM.downloadAll(function () {
 
 	for(var i = 0; i < 15; i++) {	
 		randomCoords = level.getRandomLocation();
+		while (checkSpawnDistance(gameEngine.player, randomCoords) <= 90) {
+	        randomCoords = level.getRandomLocation();
+		}
 		var zombie = new Zombie(gameEngine, AM.getAsset("./img/zombie.png"), randomCoords.x, randomCoords.y);
 		gameEngine.addEntity(zombie);
 		//apply_AI_Wander(zombie);
@@ -98,6 +104,9 @@ AM.downloadAll(function () {
     skeleton_ctx.restore();
 	for(var i = 0; i < 15; i++) {
 		randomCoords = level.getRandomLocation();
+		while (checkSpawnDistance(gameEngine.player, randomCoords) <= 90) {
+	        randomCoords = level.getRandomLocation();
+		}
 		var swordyMcSwordface = new Enemy_Skeleton_Melee(gameEngine, skeleton_spritesheet, skeleton_canvas, randomCoords.x, randomCoords.y, 110, 1);
 	    gameEngine.addEntity(swordyMcSwordface);
 
@@ -123,6 +132,13 @@ AM.downloadAll(function () {
 	// Add objectives
 	gameEngine.objectives.add(objective_killgorganthor);
 	gameEngine.objectives.add(objective_findexit);
-	
+
     console.log("All Done!");	
 });
+
+function checkSpawnDistance(character, randomCoords) {
+	var x = Math.abs(character.x - randomCoords.x);
+	var y = Math.abs(character.y - randomCoords.y);
+	var distance = Math.sqrt(x*x + y*y);
+	return distance;
+}
