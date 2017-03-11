@@ -170,7 +170,6 @@ Zombie.prototype.update = function () {
     if (!this.is_dead) {
         if (this.bounced && (this.animation.elapsedTime) % 100 === 0) {
             this.bounced = false;
-            console.log("Bounce off");
         }
         
         // Attack logic
